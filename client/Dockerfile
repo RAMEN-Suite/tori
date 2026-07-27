@@ -82,21 +82,21 @@ RUN cat > /etc/caddy/Caddyfile <<'EOF'
 }
 EOF
 
-RUN cat > /usr/local/bin/awen-entrypoint <<'EOF' \
-  && chmod +x /usr/local/bin/awen-entrypoint
+RUN cat > /usr/local/bin/tori-entrypoint <<'EOF' \
+  && chmod +x /usr/local/bin/tori-entrypoint
 #!/bin/sh
 set -eu
 
-: "${AWEN_APP_NAME:=AWEN - Graph Based Entity Management}"
-: "${AWEN_APP_PREFIX:=/}"
-: "${AWEN_APP_DESCRIPTION:=Entity Management for Graph Applications using the RAMEN-Framework}"
-: "${AWEN_APP_FAVICON:=./favicon-default.jpg}"
+: "${TORI_APP_NAME:=Tori - Graph Based Entity Management}"
+: "${TORI_APP_PREFIX:=/}"
+: "${TORI_APP_DESCRIPTION:=Entity Management for Graph Applications using the RAMEN-Framework}"
+: "${TORI_APP_FAVICON:=./favicon-default.jpg}"
 
 rm -rf /tmp/www
 mkdir -p /tmp/www
 cp -R /usr/share/caddy/. /tmp/www/
 
-envsubst '${AWEN_APP_HOST} ${AWEN_APP_NAME} ${AWEN_APP_PREFIX} ${AWEN_APP_DESCRIPTION} ${AWEN_APP_FAVICON}' \
+envsubst '${TORI_APP_HOST} ${TORI_APP_NAME} ${TORI_APP_PREFIX} ${TORI_APP_DESCRIPTION} ${TORI_APP_FAVICON}' \
   < /usr/share/caddy/index.html \
   > /tmp/www/index.html
 
@@ -109,5 +109,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -q -O /dev/null http://127.0.0.1:8080 || exit 1
 
-CMD ["awen-entrypoint"]
+CMD ["tori-entrypoint"]
 
