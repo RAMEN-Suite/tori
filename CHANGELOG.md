@@ -2,6 +2,29 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.13](https://github.com/RAMEN-Suite/tori/compare/v0.0.12...v0.0.13) (2026-07-27)
+
+
+### Bug Fixes
+
+* **client:** add accessibility modifiers ([e84d3eb](https://github.com/RAMEN-Suite/tori/commit/e84d3eb16d0a768d4d606276584955d58d4e3fd9))
+* **client:** add missing accessibility modifiers ([6caf1f6](https://github.com/RAMEN-Suite/tori/commit/6caf1f692c962d9a24d859ba99100d39b51b4449))
+* **client:** add nodeId default empty string ([dc00628](https://github.com/RAMEN-Suite/tori/commit/dc00628febadc84dba888639e45eebae64915962))
+* **client:** better navigation error handling ([90744f8](https://github.com/RAMEN-Suite/tori/commit/90744f8d9328b38f2548e71ff734c7b642fd1475))
+* **client:** Missing accessibility modifier to back btn component ([a9d4e2f](https://github.com/RAMEN-Suite/tori/commit/a9d4e2f5424b557ea3f4dc1d340be4c03b9f3f4e))
+* **client:** rename AWEN to TORI in UI ([c2c93ef](https://github.com/RAMEN-Suite/tori/commit/c2c93ef0a210da1a9a06608c59161946d19a34fe))
+* **client:** rm non-null assertion ([e8047a2](https://github.com/RAMEN-Suite/tori/commit/e8047a24f7f965214fccc2b811d5600a607c80ba))
+* **client:** type safety of filter-pane.ts ([b287039](https://github.com/RAMEN-Suite/tori/commit/b287039df80e625f20db52aeb785ec3b84423ffb))
+
+
+### Refactoring
+
+* change search fulltext index name ([188b56e](https://github.com/RAMEN-Suite/tori/commit/188b56e2b902b2608f45e8b6e83de7d45b89eefa))
+* **client:** fix linting problems in query-params.service.ts ([bf14d3e](https://github.com/RAMEN-Suite/tori/commit/bf14d3ee20dba9c7335448f858d3e9e3948cb69a))
+* **client:** make storage service type safe ([428e25a](https://github.com/RAMEN-Suite/tori/commit/428e25a3f4769257791130a698939bc92f83a9f6))
+* **client:** move effect from constructor ([367c35b](https://github.com/RAMEN-Suite/tori/commit/367c35b4b43dea9819f5826646f79ad5fc6d319f))
+* **client:** rm entity-id-resolver.ts ([926c739](https://github.com/RAMEN-Suite/tori/commit/926c73996db453fbd64dc764cdd4e80dcd4252f2))
+
 ## [0.0.12](https://github.com/RAMEN-Suite/AWEN/compare/v0.0.11...v0.0.12) (2026-07-14)
 
 
