@@ -91,9 +91,11 @@ export const appConfig: ApplicationConfig = {
 async function initApplication(): Promise<void> {
   const configService: ConfigService = inject(ConfigService);
   const languageService: LanguageService = inject(LanguageService);
+  const healthService: HealthService = inject(HealthService);
 
   await configService.init();
 
   if (!configService.getLoaded()()) return;
   languageService.init();
+  await healthService.init();
 }

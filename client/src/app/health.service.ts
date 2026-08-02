@@ -16,8 +16,8 @@ export class HealthService {
   private readonly _ramenVersion = signal<string>('0.0.0');
   private readonly _healthy = signal<boolean>(true);
 
-  public constructor() {
-    void this.loadStatus().finally(() => this._statusLoaded.set(true));
+  public async init() {
+    await this.loadStatus().finally(() => this._statusLoaded.set(true));
   }
 
   private async loadStatus() {

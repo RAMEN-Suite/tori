@@ -36,7 +36,7 @@ const environmentSchema = z.object({
   TORI_DB_SCHEME: z.enum(['neo4j', 'neo4j+s', 'bolt', 'bolt+s']),
   TORI_DB_NAME: z.string().trim().min(1).default('neo4j'),
 
-  TORI_CAMI_HOST: optionalString.pipe(z.url().optional()),
+  TORI_CAMI_HOST: optionalString.pipe(z.httpUrl().optional()),
 });
 
 export function configuration(): EnvironmentConfig {

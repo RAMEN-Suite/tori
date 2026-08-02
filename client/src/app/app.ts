@@ -71,6 +71,6 @@ export class App {
     return loaded() && healthy() && healthStatusLoaded;
   });
 
-  protected version = this.status.getServerVersion();
+  protected appVersion = this.status.getServerVersion();
   protected ramenVersion = this.status.getRamenVersion();
 }

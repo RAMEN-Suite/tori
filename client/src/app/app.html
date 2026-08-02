@@ -47,7 +47,7 @@
       <div pButtonLabel class="flex flex-column justify-content-center text-center gap-1">
         <span>TORI</span>
         @if (healthStatusLoaded()) {
-          <small>v{{ version() }}</small>
+          <small>v{{ appVersion() }}</small>
         } @else {
           <p-skeleton />
         }
