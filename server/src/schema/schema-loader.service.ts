@@ -4,8 +4,9 @@ import * as fs from 'node:fs';
 import { ModelRegistry } from './model.registry';
 import { compileSchema, JsonSchema, SchemaNode } from 'json-schema-library';
 import { ConfigService } from '@nestjs/config';
+import { EnvironmentConfig } from '../config/config.types';
 
-type SchemaSourceName = 'AWEN_GCORE' | 'AWEN_GCORE_RAMEN' | 'AWEN_GCORE_PROJECT';
+type SchemaSourceName = 'default' | 'ramen' | 'project';
 
 @Injectable()
 export class SchemaLoaderService {
@@ -15,21 +16,17 @@ export class SchemaLoaderService {
   private profileModel!: GModel;
   private registry!: ModelRegistry;
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(private readonly configService: ConfigService<EnvironmentConfig, true>) {}
 
   async loadSchemas() {
-    const gCoreSchemaJSON: JsonSchema = await this.loadJsonFromSource<JsonSchema>('AWEN_GCORE');
+    const gCoreSchemaJSON: JsonSchema = await this.loadJsonFromSource<JsonSchema>('default');
     const gCoreSchema: SchemaNode = compileSchema(gCoreSchemaJSON);
     this.logger.log('Loading schemas...');
 
-    // const ramen: GModel = await this.loadJsonFromSource('AWEN_GCORE_RAMEN');
-
-    const ramen: GModel = this.validateJSON(await this.loadJsonFromSource('AWEN_GCORE_RAMEN'), gCoreSchema);
+    const ramen: GModel = this.validateJSON(await this.loadJsonFromSource('ramen'), gCoreSchema);
     this.logger.log(`Loaded ramen schema "${ramen.version}" successfully`);
 
-    // const profile: GModel = await this.loadJsonFromSource('AWEN_GCORE_PROJECT');
-
-    const profile: GModel = this.validateJSON(await this.loadJsonFromSource('AWEN_GCORE_PROJECT'), gCoreSchema);
+    const profile: GModel = this.validateJSON(await this.loadJsonFromSource('project'), gCoreSchema);
     this.logger.log(`Loaded project schema "${profile.name} ${profile.version}" successfully`);
 
     this.ramenModel = ramen;
@@ -56,7 +53,7 @@ export class SchemaLoaderService {
   }
 
   private async loadJsonFromSource<T>(envName: SchemaSourceName): Promise<T> {
-    const source = this.configService.getOrThrow<string>(envName);
+    const source = this.configService.getOrThrow(`gcore.${envName}`, { infer: true });
 
     if (this.isHttpUrl(source)) {
       const response = await fetch(source);

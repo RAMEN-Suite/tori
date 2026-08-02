@@ -31,7 +31,8 @@
     "neo4j-driver": "^6.1.0",
     "neo4j-driver-core": "^6.1.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
