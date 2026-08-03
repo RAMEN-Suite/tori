@@ -15,8 +15,8 @@
     @if (loaded()) {
       <router-outlet />
     } @else {
-      <div class="loading-wrapper">
-        <p-progress-spinner ariaLabel="loading" />
+      <div class="loading-wrapper" *transloco="let t">
+        <p-progress-spinner [ariaLabel]="t('app.shared.common.loading')" />
       </div>
     }
   </div>
@@ -47,7 +47,7 @@
       <div pButtonLabel class="flex flex-column justify-content-center text-center gap-1">
         <span>TORI</span>
         @if (healthStatusLoaded()) {
-          <small>v{{ version() }}</small>
+          <small>v{{ appVersion() }}</small>
         } @else {
           <p-skeleton />
         }
