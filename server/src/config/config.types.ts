@@ -7,6 +7,7 @@ export interface GcoreConfig {
 }
 
 export interface ServerConfig {
+  name: string;
   port: number;
   version: string;
 }

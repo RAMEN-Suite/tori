@@ -23,6 +23,7 @@ const environmentSchema = z.object({
     .regex(/^\d+\.\d+\.\d+$/, { error: 'APP_VERSION must be in the format major.minor.patch (e.g. 1.0.0)' })
     .default('0.0.0'),
 
+  TORI_APP_NAME: z.string().optional().default('TORI'),
   TORI_GCORE: z.string().trim().min(1),
   TORI_GCORE_RAMEN: z.string().trim().min(1),
   TORI_GCORE_PROJECT: z.string().trim().min(1),
@@ -58,6 +59,7 @@ export function configuration(): EnvironmentConfig {
     },
 
     server: {
+      name: env.TORI_APP_NAME,
       port: env.TORI_SERVER_PORT,
       version: env.APP_VERSION,
     },
