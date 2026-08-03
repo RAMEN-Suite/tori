@@ -3,6 +3,8 @@ import {
   inject,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
+  isDevMode,
+  provideAppInitializer,
 } from '@angular/core';
 import {
   provideRouter,
@@ -20,6 +22,9 @@ import { LocalStoreService } from './utils/local-store.service';
 import { ConfigService } from './config-module/config.service';
 import { HealthService } from './health.service';
 import { definePreset } from '@primeuix/themes';
+import { TranslocoHttpLoader } from './transloco-loader';
+import { provideTransloco } from '@jsverse/transloco';
+import { LanguageService } from './language.service';
 
 const awenTheme = definePreset(Aura, {
   semantic: {
@@ -41,10 +46,10 @@ const awenTheme = definePreset(Aura, {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAppInitializer(initApplication),
     EntityService,
     ConfirmationService,
     MessageService,
-    ConfigService,
     HealthService,
     LocalStoreService,
     provideBrowserGlobalErrorListeners(),
@@ -76,5 +81,21 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     provideHttpClient(),
+    provideTransloco({
+      config: { reRenderOnLangChange: true, prodMode: !isDevMode() },
+      loader: TranslocoHttpLoader,
+    }),
   ],
 };
+
+async function initApplication(): Promise<void> {
+  const configService: ConfigService = inject(ConfigService);
+  const languageService: LanguageService = inject(LanguageService);
+  const healthService: HealthService = inject(HealthService);
+
+  await configService.init();
+
+  if (!configService.getLoaded()()) return;
+  languageService.init();
+  await healthService.init();
+}

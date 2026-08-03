@@ -1,11 +1,12 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EnvironmentConfig } from '../config/config.types';
 
 @Injectable()
 export class CamiService {
   private readonly logger = new Logger(CamiService.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService<EnvironmentConfig, true>) {}
 
   public getCollectionUrl(collectionId: string) {
     return this.getCamiHost() + 'collections/' + collectionId;
@@ -24,7 +25,7 @@ export class CamiService {
   }
 
   private getCamiHost(): string {
-    const camiHost = this.config.get<string>('AWEN_CAMI_HOST');
+    const camiHost = this.config.get('cami.host', { infer: true });
     if (!camiHost) {
       throw new InternalServerErrorException('There is no host for the cami application configured. Contact your administrator.');
     }
