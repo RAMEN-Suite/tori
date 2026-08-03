@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.14](https://github.com/RAMEN-Suite/tori/compare/v0.0.13...v0.0.14) (2026-08-03)
+
+
+### Features
+
+* **cient:** add client translation ([44d928a](https://github.com/RAMEN-Suite/tori/commit/44d928aaea6b3d917c6b05d4b6a735d22776fa73))
+* **cient:** change language on runtime ([072b16c](https://github.com/RAMEN-Suite/tori/commit/072b16ce5000121995ed45ba212fd617d1e3bc08))
+* **cient:** init transloco and language service ([5c41e93](https://github.com/RAMEN-Suite/tori/commit/5c41e93b00a9d7f1ebe661c79efe0e5362451fda))
+* **cient:** translate filter pane ([8b2583b](https://github.com/RAMEN-Suite/tori/commit/8b2583b1765caeea6c8adaf5813440dc40660149))
+* **client:** init health service on startup ([7a0d600](https://github.com/RAMEN-Suite/tori/commit/7a0d60067ae7e08c906411601b12617fc7ee8fe7))
+* **server:** add env var validation and better configuration access ([07b31af](https://github.com/RAMEN-Suite/tori/commit/07b31af219f69adcedb02e63ea4ad81a22509b3b))
+
+
+### Refactoring
+
+* rename env var names to match new application name ([65747c6](https://github.com/RAMEN-Suite/tori/commit/65747c6c29272f43ef229a75fd13a7ce0161e52a))
+
 ## [0.0.13](https://github.com/RAMEN-Suite/tori/compare/v0.0.12...v0.0.13) (2026-07-27)
 
 
