@@ -1,35 +1,50 @@
-import { effect, Injectable, signal, WritableSignal } from '@angular/core';
+import {
+  DestroyRef,
+  effect,
+  Injectable,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { ActionShortcut, RegisteredShortcut } from './shortcut.types';
 import { Action } from './action.class';
 import { tinykeys } from 'tinykeys';
+
+interface ResolvedShortcutBinding {
+  binding: RegisteredShortcut;
+  shortcut: ActionShortcut;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class ShortcutService {
-  private actionBindings: WritableSignal<RegisteredShortcut[]> = signal([
-    this.registerShortcut(),
-  ]);
+  private actionBindings: WritableSignal<RegisteredShortcut[]> = signal([]);
   private runningActions: WritableSignal<Set<string>> = signal(
     new Set<string>(),
   );
+  private nextBindingId = 0;
 
-  private shortCutBindingEffect = effect(() => {
+  private shortCutBindingEffect = effect((onCleanup) => {
     const actionBindings = this.actionBindings();
 
     const seenSlugs = new Set<string>();
-    const bindingsByKeys = new Map<string, RegisteredShortcut[]>();
+    const bindingsByKeys = new Map<string, ResolvedShortcutBinding[]>();
 
-    for (const binding of actionBindings) {
-      const shortcut = binding.shortcut;
+    for (const binding of [...actionBindings].reverse()) {
+      const shortcut = binding.shortcut();
       if (shortcut == null || seenSlugs.has(binding.slug)) {
         continue;
       }
       seenSlugs.add(binding.slug);
       const registeredBindings = bindingsByKeys.get(shortcut.keys) ?? [];
-      registeredBindings.push(binding);
+      registeredBindings.push({ binding, shortcut });
       bindingsByKeys.set(shortcut.keys, registeredBindings);
     }
+
+    if (bindingsByKeys.size === 0) {
+      return;
+    }
+
     const bindings = Object.fromEntries(
       Array.from(bindingsByKeys.entries()).map(([keys, keyBindings]) => [
         keys,
@@ -37,51 +52,72 @@ export class ShortcutService {
           if (event.repeat || this.isEditableTarget(event.target)) {
             return;
           }
-          const binding = keyBindings.find(
-            (candidate) => !candidate.disabled(),
+          const activeBinding = keyBindings.find(
+            (candidate) => !candidate.binding.disabled(),
           );
-          if (binding == null) {
+          if (activeBinding == null) {
             return;
           }
-          if (binding.shortcut?.preventDefault ?? false) {
+          const binding = activeBinding.binding;
+          if (activeBinding.shortcut.preventDefault ?? false) {
             event.preventDefault();
           }
           if (this.runningActions().has(binding.slug)) {
             return;
           }
           this.runningActions.update((old) => {
-            old.add(binding.slug);
-            return old;
+            const next = new Set(old);
+            next.add(binding.slug);
+            return next;
           });
           void binding.run().finally(() => {
             this.runningActions.update((old) => {
-              old.delete(binding.slug);
-              return old;
+              const next = new Set(old);
+              next.delete(binding.slug);
+              return next;
             });
           });
         },
       ]),
     );
-    tinykeys(window, bindings);
+
+    const unsubscribe = tinykeys(window, bindings);
+    onCleanup(unsubscribe);
   });
 
-  private registerShortcut<T>(
+  public register<T>(
     action: Action<T>,
-    params: T,
-  ): RegisteredShortcut {
-    return {
+    params: () => T,
+    destroyRef?: DestroyRef,
+  ): () => void {
+    const binding: RegisteredShortcut = {
+      id: this.nextBindingId++,
       slug: action.slug(),
-      shortcut: action.shortcut(params),
-      disabled: () => action.disabled(params),
-      run: () => action.run(params),
+      shortcut: () => action.shortcut(params()),
+      disabled: () => action.disabled(params()),
+      run: () => action.run(params()),
     };
+
+    this.actionBindings.update((old) => [...old, binding]);
+
+    let registered = true;
+    const unregister = () => {
+      if (!registered) {
+        return;
+      }
+      registered = false;
+      this.unregisterShortcut(binding.id);
+    };
+
+    destroyRef?.onDestroy(unregister);
+
+    return unregister;
   }
 
-  private createAppShortcut(keys: string): ActionShortcut {
-    return {
-      keys,
-      preventDefault: true,
-    };
+  private unregisterShortcut(id: number): void {
+    this.actionBindings.update((old) =>
+      old.filter((binding) => binding.id !== id),
+    );
   }
 
   private isEditableTarget(target: EventTarget | null): boolean {

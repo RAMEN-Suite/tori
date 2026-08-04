@@ -4,8 +4,9 @@ export interface ActionShortcut {
 }
 
 export interface RegisteredShortcut {
+  id: number;
   slug: string;
-  shortcut: ActionShortcut | null;
+  shortcut: () => ActionShortcut | null;
   disabled: () => boolean;
   run: () => Promise<void>;
 }

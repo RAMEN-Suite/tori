@@ -25,6 +25,8 @@ import { definePreset } from '@primeuix/themes';
 import { TranslocoHttpLoader } from './transloco-loader';
 import { provideTransloco } from '@jsverse/transloco';
 import { LanguageService } from './language.service';
+import { DialogService } from 'primeng/dynamicdialog';
+import { ShortcutService } from './shortcuts/shortcut.service';
 
 const awenTheme = definePreset(Aura, {
   semantic: {
@@ -50,6 +52,8 @@ export const appConfig: ApplicationConfig = {
     EntityService,
     ConfirmationService,
     MessageService,
+    DialogService,
+    ShortcutService,
     HealthService,
     LocalStoreService,
     provideBrowserGlobalErrorListeners(),

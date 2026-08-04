@@ -9,7 +9,7 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-create-entity',
   imports: [SplitButton, TranslocoDirective],
-  providers: [CreateEntityService, DialogService],
+  providers: [CreateEntityService],
   templateUrl: './create-entity.html',
 })
 export class CreateEntity {
