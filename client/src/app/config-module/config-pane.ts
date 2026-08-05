@@ -6,6 +6,7 @@ import { FloatLabel } from 'primeng/floatlabel';
 import { Select } from 'primeng/select';
 import { ENTITY_LABEL_NAME } from '../../constants';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { ShortcutConfig } from './shortcut-config/shortcut-config';
 
 @Component({
   selector: 'app-config-pane',
@@ -15,6 +16,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
     FloatLabel,
     Select,
     TranslocoDirective,
+    ShortcutConfig,
   ],
   templateUrl: './config-pane.html',
 })
