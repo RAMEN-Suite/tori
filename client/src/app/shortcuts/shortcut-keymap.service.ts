@@ -1,11 +1,4 @@
-import {
-  effect,
-  EffectRef,
-  inject,
-  Injectable,
-  OnDestroy,
-  signal,
-} from '@angular/core';
+import { effect, inject, Injectable, signal } from '@angular/core';
 import { LocalStoreService } from '../utils/local-store.service';
 import { ActionShortcut } from './shortcut.types';
 
@@ -26,14 +19,15 @@ export interface ShortcutConflict {
 @Injectable({
   providedIn: 'root',
 })
-export class ShortcutKeymapService implements OnDestroy {
-  public ngOnDestroy(): void {
-    this.storeOverridesEffectRef.destroy();
-  }
+export class ShortcutKeymapService {
   private readonly store = inject(LocalStoreService);
 
   private readonly overrides = signal<ShortcutOverrides>({});
-  private readonly storeOverridesEffectRef: EffectRef;
+
+  private readonly storeOverridesEffectRef = effect(() => {
+    const overrides = this.overrides();
+    this.store.saveData('EM_SHORTCUT_STORE_KEY', overrides);
+  });
 
   public readonly configuredShortcuts = this.overrides.asReadonly();
 
@@ -42,11 +36,6 @@ export class ShortcutKeymapService implements OnDestroy {
     if (storedOverrides) {
       this.overrides.set(storedOverrides);
     }
-
-    this.storeOverridesEffectRef = effect(() => {
-      const overrides = this.overrides();
-      this.store.saveData('EM_SHORTCUT_STORE_KEY', overrides);
-    });
   }
 
   public resolve(
@@ -71,20 +60,17 @@ export class ShortcutKeymapService implements OnDestroy {
   }
 
   public setOverride(slug: string, shortcut: ActionShortcut | null): void {
-    this.overrides.update((old) => {
-      if (shortcut) {
-        old[slug] = shortcut.keys;
-      } else {
-        old[slug] = shortcut;
-      }
-      return old;
-    });
+    this.overrides.update((old) => ({
+      ...old,
+      [slug]: shortcut?.keys ?? null,
+    }));
   }
 
   public reset(slug: string): void {
     this.overrides.update((old) => {
-      old[slug] = undefined;
-      return old;
+      const { [slug]: _removed, ...next } = old;
+      void _removed;
+      return next;
     });
   }
 

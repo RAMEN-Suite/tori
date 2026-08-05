@@ -1,9 +1,7 @@
 export type ShortcutPlatform = 'mac' | 'windows' | 'linux' | 'unknown';
 
 export type ShortcutValidationError =
-  | 'empty'
-  | 'modifier-only'
-  | 'unsupported-key';
+  'empty' | 'modifier-only' | 'unsupported-key';
 
 export interface ShortcutNormalizeOptions {
   useModAlias?: boolean;

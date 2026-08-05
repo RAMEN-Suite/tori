@@ -43,6 +43,11 @@
         "copiedToClipboard": "Copied \"{{ id }}\" to clipboard."
       }
     },
+    "actions": {
+      "createAnnotation": {
+        "title": "open create annotation window"
+      }
+    },
     "screens": {
       "common": {
         "loading": "Loading"
@@ -154,6 +159,17 @@
         "collectionTypes": {
           "label": "Collection Types",
           "help": "Select which collections are filterable."
+        },
+        "shortcutConfig": {
+          "tableHeaders": {
+            "action": "Action",
+            "shortcut": "Shortcut",
+            "reset": "Default"
+          },
+          "resetBtn": {
+            "label": "Reset",
+            "aria": "reset shortcut {{ name }} to default"
+          }
         }
       },
       "connectedNode": {

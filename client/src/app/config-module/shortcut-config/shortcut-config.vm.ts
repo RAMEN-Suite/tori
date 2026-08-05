@@ -2,6 +2,7 @@ import { computed, inject, Injectable, Injector } from '@angular/core';
 import { CONFIGURABLE_SHORTCUT_ACTIONS } from '../../shortcuts/shortcut-registry';
 import { ShortcutKeymapService } from '../../shortcuts/shortcut-keymap.service';
 import { ActionShortcut } from '../../shortcuts/shortcut.types';
+import { createAppShortcut } from '../../shortcuts/createAppShortcut';
 
 @Injectable({
   providedIn: 'root',
@@ -33,8 +34,14 @@ export class ShortcutConfigVm {
     }));
   });
 
-  // setShortcut(slug, keys);
-  // resetShortcut(slug);
+  public setShortcut(slug: string, keys: string | null) {
+    const shortcut = keys ? createAppShortcut(keys) : null;
+    this.keymap.setOverride(slug, shortcut);
+  }
+
+  public resetShortcut(slug: string) {
+    this.keymap.reset(slug);
+  }
   // clearShortcut(slug);
   // conflictFor(slug);
 }

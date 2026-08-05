@@ -19,7 +19,7 @@ export class CreateAnnotationAction extends Action<CreateAnnotationDialog> {
   }
 
   public override title(): string {
-    return 'Create Annotation';
+    return 'app.actions.createAnnotation.title';
   }
 
   public override icon(): string | null {
