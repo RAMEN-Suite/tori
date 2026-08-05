@@ -36,7 +36,7 @@ export class CreateAnnotationAction extends Action<CreateAnnotationDialog> {
     this.dialog.open(input.entityId);
   }
 
-  public override shortcut(): ActionShortcut | null {
+  public override configurableShortcut(): ActionShortcut | null {
     return createAppShortcut('$mod+Alt+KeyA');
   }
 }

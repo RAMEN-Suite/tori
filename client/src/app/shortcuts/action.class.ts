@@ -7,9 +7,13 @@ export abstract class Action<I> {
   public abstract disabled(input: I): boolean;
   protected abstract action(input: I): Promise<void> | void;
 
+  public configurableShortcut(): ActionShortcut | null {
+    return null;
+  }
+
   public shortcut(input: I): ActionShortcut | null {
     void input;
-    return null;
+    return this.configurableShortcut();
   }
 
   public runAsync(input: I): void {
