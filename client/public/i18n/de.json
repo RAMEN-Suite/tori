@@ -46,6 +46,9 @@
     "actions": {
       "createAnnotation": {
         "title": "Fenster \"Annotationen erstellen\" öffnen"
+      },
+      "createEntity": {
+        "title": "Fenster \"Entität erstellen\" öffnen"
       }
     },
     "screens": {

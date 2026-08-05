@@ -1,4 +1,4 @@
-import { ActionShortcut } from './shortcut.types';
+import { ActionShortcut } from '../shortcuts/shortcut.types';
 
 export abstract class Action<I> {
   public abstract slug(): string;

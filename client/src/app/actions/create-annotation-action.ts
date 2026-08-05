@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { Action } from '../shortcuts/action.class';
+import { Action } from './action.class';
 import { ActionShortcut } from '../shortcuts/shortcut.types';
 import { createAppShortcut } from '../shortcuts/createAppShortcut';
-import { CreateAnnotationDialogService } from './create-annotation-dialog.service';
+import { CreateAnnotationDialogService } from '../create-annotation/create-annotation-dialog.service';
 
 interface CreateAnnotationDialog {
   entityId: string;

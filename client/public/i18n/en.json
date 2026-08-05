@@ -46,6 +46,9 @@
     "actions": {
       "createAnnotation": {
         "title": "open create annotation window"
+      },
+      "createEntity": {
+        "title": "open create entity window"
       }
     },
     "screens": {

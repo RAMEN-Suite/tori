@@ -7,7 +7,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { ActionShortcut, RegisteredShortcut } from './shortcut.types';
-import { Action } from './action.class';
+import { Action } from '../actions/action.class';
 import { tinykeys } from 'tinykeys';
 import { ShortcutKeymapService } from './shortcut-keymap.service';
 

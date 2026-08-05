@@ -19,7 +19,7 @@ import { AnnotationList } from '../../annotations-list/annotation-list';
 import { AttributeList } from '../../annotations-list/attribute-list/attribute-list';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { ShortcutService } from '../../shortcuts/shortcut.service';
-import { CreateAnnotationAction } from '../../create-annotation/create-annotation-action';
+import { CreateAnnotationAction } from '../../actions/create-annotation-action';
 
 @Component({
   selector: 'app-detail-page',
