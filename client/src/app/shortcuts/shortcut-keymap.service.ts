@@ -28,18 +28,16 @@ export interface ShortcutConflict {
 })
 export class ShortcutKeymapService implements OnDestroy {
   public ngOnDestroy(): void {
-    if (this.storeOverridesEffectRef) {
-      this.storeOverridesEffectRef.destroy();
-    }
+    this.storeOverridesEffectRef.destroy();
   }
   private readonly store = inject(LocalStoreService);
 
   private readonly overrides = signal<ShortcutOverrides>({});
-  private storeOverridesEffectRef: EffectRef | undefined;
+  private readonly storeOverridesEffectRef: EffectRef;
 
   public readonly configuredShortcuts = this.overrides.asReadonly();
 
-  public init(): void {
+  public constructor() {
     const storedOverrides = this.store.getData('EM_SHORTCUT_STORE_KEY');
     if (storedOverrides) {
       this.overrides.set(storedOverrides);

@@ -1,6 +1,7 @@
 import {
   DestroyRef,
   effect,
+  inject,
   Injectable,
   signal,
   WritableSignal,
@@ -8,6 +9,7 @@ import {
 import { ActionShortcut, RegisteredShortcut } from './shortcut.types';
 import { Action } from './action.class';
 import { tinykeys } from 'tinykeys';
+import { ShortcutKeymapService } from './shortcut-keymap.service';
 
 interface ResolvedShortcutBinding {
   binding: RegisteredShortcut;
@@ -18,6 +20,8 @@ interface ResolvedShortcutBinding {
   providedIn: 'root',
 })
 export class ShortcutService {
+  private readonly keymap = inject(ShortcutKeymapService);
+
   private actionBindings: WritableSignal<RegisteredShortcut[]> = signal([]);
   private runningActions: WritableSignal<Set<string>> = signal(
     new Set<string>(),
@@ -31,7 +35,9 @@ export class ShortcutService {
     const bindingsByKeys = new Map<string, ResolvedShortcutBinding[]>();
 
     for (const binding of [...actionBindings].reverse()) {
-      const shortcut = binding.shortcut();
+      const defaultShortcut = binding.shortcut();
+      const shortcut = this.keymap.resolve(binding.slug, defaultShortcut);
+
       if (shortcut == null || seenSlugs.has(binding.slug)) {
         continue;
       }

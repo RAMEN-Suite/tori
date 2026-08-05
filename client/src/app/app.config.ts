@@ -27,6 +27,7 @@ import { provideTransloco } from '@jsverse/transloco';
 import { LanguageService } from './language.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ShortcutService } from './shortcuts/shortcut.service';
+import { ShortcutKeymapService } from './shortcuts/shortcut-keymap.service';
 
 const awenTheme = definePreset(Aura, {
   semantic: {
@@ -53,6 +54,7 @@ export const appConfig: ApplicationConfig = {
     ConfirmationService,
     MessageService,
     DialogService,
+    ShortcutKeymapService,
     ShortcutService,
     HealthService,
     LocalStoreService,
