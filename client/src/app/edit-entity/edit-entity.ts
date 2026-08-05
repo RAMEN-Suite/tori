@@ -9,7 +9,7 @@ import { TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-edit-entity',
   imports: [Button],
-  providers: [DialogService, EditEntityService],
+  providers: [EditEntityService],
   templateUrl: './edit-entity.html',
 })
 export class EditEntity {

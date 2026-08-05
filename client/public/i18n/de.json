@@ -43,6 +43,14 @@
         "copiedToClipboard": "\"{{ id }}\" wurde in die Zwischenablage kopiert."
       }
     },
+    "actions": {
+      "createAnnotation": {
+        "title": "Fenster \"Annotationen erstellen\" öffnen"
+      },
+      "createEntity": {
+        "title": "Fenster \"Entität erstellen\" öffnen"
+      }
+    },
     "screens": {
       "common": {
         "loading": "Wird geladen"
@@ -69,8 +77,8 @@
       },
       "collections": {
         "available": "Insgesamt {{ count }} Einträge verfügbar",
-        "select": "Sammlung auswählen:",
-        "search": "Sammlung durchsuchen:",
+        "select": "Collection auswählen:",
+        "search": "Collection durchsuchen:",
         "sort": "Sortieren nach:",
         "tooltips": {
           "reset": "Zurücksetzen",
@@ -148,12 +156,23 @@
           "help": "Wähle aus, welche Entitätstypen über diese Anwendung verfügbar sein sollen."
         },
         "collectionChain": {
-          "label": "Sammlungskette",
-          "help": "Wähle aus, welche Sammlungskette für den Filter verwendet werden soll."
+          "label": "Collection Kette",
+          "help": "Wähle aus, welche Collection kette für den Filter verwendet werden soll."
         },
         "collectionTypes": {
-          "label": "Sammlungstypen",
-          "help": "Wähle aus, welche Sammlungen filterbar sind."
+          "label": "Collection-Typen",
+          "help": "Wähle aus, welche Collections filterbar sind."
+        },
+        "shortcutConfig": {
+          "tableHeaders": {
+            "action": "Aktion",
+            "shortcut": "Tastaturkürzel",
+            "reset": "Standard"
+          },
+          "resetBtn": {
+            "label": "Zurücksetzen",
+            "aria": "Tastaturkürzel {{ name }} auf standard zurücksetzen"
+          }
         }
       },
       "connectedNode": {

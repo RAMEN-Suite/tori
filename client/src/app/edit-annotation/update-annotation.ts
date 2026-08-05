@@ -8,7 +8,7 @@ import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-update-annotation',
-  providers: [DialogService, UpdateAnnotationService],
+  providers: [UpdateAnnotationService],
   imports: [Button],
   templateUrl: './update-annotation.html',
 })

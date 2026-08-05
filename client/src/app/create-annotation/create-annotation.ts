@@ -1,45 +1,31 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { Button } from 'primeng/button';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { CreateAnnotationForm } from './create-annotation-form/create-annotation-form';
-import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
+import { TranslocoDirective } from '@jsverse/transloco';
+import { CreateAnnotationAction } from '../actions/create-annotation-action';
 
 @Component({
   selector: 'app-create-annotation',
-  providers: [DialogService],
   imports: [Button, TranslocoDirective],
   templateUrl: './create-annotation.html',
 })
 export class CreateAnnotation {
-  private readonly dialogService = inject(DialogService);
-  private readonly transloco = inject(TranslocoService);
+  private readonly action = inject(CreateAnnotationAction);
 
   public entityId = input.required<string>();
   public label = input<string | undefined>();
-  public icon = input<string>();
+  public icon = input<string | undefined>();
 
-  private createAnnotationDialogRef: DynamicDialogRef<CreateAnnotationForm> | null =
-    null;
+  protected params = computed(() => ({
+    entityId: this.entityId(),
+  }));
+
+  protected title = computed(() => this.label() ?? this.action.title());
+
+  protected buttonIcon = computed(() => this.icon() ?? this.action.icon());
+
+  protected disabled = computed(() => this.action.disabled(this.params()));
 
   protected clickCreate() {
-    this.createAnnotationDialogRef = this.dialogService.open(
-      CreateAnnotationForm,
-      {
-        inputValues: {
-          entityId: this.entityId(),
-        },
-        header: this.transloco.translate(
-          'app.shared.createAnnotation.dialog.header',
-        ),
-        styleClass: 'w-11 md:w-9 lg:w-8',
-        style: {
-          'min-height': '20vh',
-        },
-        contentStyle: {
-          'padding-top': '0.5rem',
-        },
-        closable: true,
-      },
-    );
+    void this.action.run(this.params());
   }
 }

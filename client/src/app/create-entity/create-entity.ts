@@ -1,24 +1,19 @@
 import { Component, computed, inject } from '@angular/core';
 import { CreateEntityService } from './create-entity.service';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { CreateEntityForm } from './create-entity-form/create-entity-form';
 import { SplitButton } from 'primeng/splitbutton';
 import { MenuItem } from 'primeng/api';
-import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
+import { TranslocoDirective } from '@jsverse/transloco';
+import { CreateEntityDialogService } from './create-entity-dialog.service';
 
 @Component({
   selector: 'app-create-entity',
   imports: [SplitButton, TranslocoDirective],
-  providers: [CreateEntityService, DialogService],
+  providers: [CreateEntityService],
   templateUrl: './create-entity.html',
 })
 export class CreateEntity {
   private readonly createEntityService = inject(CreateEntityService);
-  private readonly dialogService = inject(DialogService);
-  private readonly transloco = inject(TranslocoService);
-
-  private createEntityDialogRef: DynamicDialogRef<CreateEntityForm> | null =
-    null;
+  private readonly createEntityDialog = inject(CreateEntityDialogService);
 
   private entityTypes = this.createEntityService.getEntityTypes();
 
@@ -32,17 +27,7 @@ export class CreateEntity {
   });
 
   private show(preselectedType?: string) {
-    this.createEntityDialogRef = this.dialogService.open(CreateEntityForm, {
-      inputValues: {
-        preselectedType: preselectedType,
-      },
-      header: this.transloco.translate('app.shared.createEntity.dialog.header'),
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '20vh',
-      },
-      closable: true,
-    });
+    this.createEntityDialog.open(preselectedType);
   }
 
   protected clickCreateEntityBtn() {

@@ -1,9 +1,9 @@
 <p-button
   *transloco="let t"
-  [label]="label() ?? t('app.shared.createAnnotation.label')"
-  [icon]="icon()"
+  [label]="title() ?? t('app.shared.createAnnotation.label')"
+  [icon]="buttonIcon() ?? undefined"
   (onClick)="clickCreate()"
-  [disabled]="!entityId()"
+  [disabled]="disabled()"
   severity="primary"
   [outlined]="true"
 />

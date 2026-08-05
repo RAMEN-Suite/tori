@@ -1,0 +1,31 @@
+<p-button-group class="flex align-items-center gap-2">
+  <button
+    pButton
+    type="button"
+    class="justify-content-start"
+    outlined
+    [class.p-button-warning]="validationError() !== null"
+    [disabled]="disabled()"
+    [attr.aria-label]="ariaLabel()"
+    (click)="startRecording()"
+    (keydown)="handleKeydown($event)"
+  >
+    @if (displayValue()) {
+      <span>{{ displayValue() }}</span>
+    } @else {
+      <span class="text-color-secondary">{{ placeholder() }}</span>
+    }
+  </button>
+
+  @if (keys() !== null) {
+    <button
+      pButton
+      type="button"
+      icon="pi pi-times"
+      outlined
+      [disabled]="disabled()"
+      aria-label="Clear shortcut"
+      (click)="clear($event)"
+    ></button>
+  }
+</p-button-group>

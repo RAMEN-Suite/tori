@@ -1,0 +1,30 @@
+<table *transloco="let t" class="w-12">
+  <thead>
+    <tr>
+      <td>{{ t("app.shared.configPane.shortcutConfig.tableHeaders.action") }}</td>
+      <td>{{ t("app.shared.configPane.shortcutConfig.tableHeaders.shortcut") }}</td>
+      <td>{{ t("app.shared.configPane.shortcutConfig.tableHeaders.reset") }}</td>
+    </tr>
+  </thead>
+  <tbody>
+    @for (row of rows(); track row.slug) {
+      <tr>
+        <td>{{ t(row.title) }}</td>
+        <td>
+          <app-shortcut-input [keys]="row.effectiveShortcut?.keys ?? null" (keysChange)="setShortcut(row.slug, $event)" />
+        </td>
+        <td>
+          <button
+            pButton
+            severity="secondary"
+            (click)="resetShortcut(row.slug)"
+            [disabled]="row.effectiveShortcut?.keys === row.defaultShortcut?.keys"
+            [attr.aria-label]="t('app.shared.configPane.shortcutConfig.resetBtn.label', { name: row.title })"
+          >
+            {{ t("app.shared.configPane.shortcutConfig.resetBtn.label") }}
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

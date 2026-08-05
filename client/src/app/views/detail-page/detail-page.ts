@@ -1,20 +1,28 @@
-import { Component, effect, inject, input, OnDestroy } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  effect,
+  inject,
+  input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { DeleteEntity } from '../../delete-entity/delete-entity';
 import { EditEntity } from '../../edit-entity/edit-entity';
 import { EntityService } from '../../entity.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { CreateAnnotation } from '../../create-annotation/create-annotation';
-import { DialogService } from 'primeng/dynamicdialog';
 import { visibleProperties } from '../../utils/utils';
 import { NodeTypes } from '../../annotations-list/node-types/node-types';
 import { AnnotationList } from '../../annotations-list/annotation-list';
 import { AttributeList } from '../../annotations-list/attribute-list/attribute-list';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { ShortcutService } from '../../shortcuts/shortcut.service';
+import { CreateAnnotationAction } from '../../actions/create-annotation-action';
 
 @Component({
   selector: 'app-detail-page',
-  providers: [DialogService],
   imports: [
     TableModule,
     DeleteEntity,
@@ -29,10 +37,23 @@ import { TranslocoDirective } from '@jsverse/transloco';
   styleUrl: './detail-page.scss',
   templateUrl: './detail-page.html',
 })
-export class DetailPage implements OnDestroy {
+export class DetailPage implements OnDestroy, OnInit {
   private readonly entityService = inject(EntityService);
+  private readonly shortcuts = inject(ShortcutService);
+  private readonly createAnnotationAction = inject(CreateAnnotationAction);
+  private readonly destroyRef = inject(DestroyRef);
 
   public entityId = input.required<string>();
+
+  public ngOnInit() {
+    this.shortcuts.register(
+      this.createAnnotationAction,
+      () => ({
+        entityId: this.entityId(),
+      }),
+      this.destroyRef,
+    );
+  }
 
   protected annotations = this.entityService.annotations;
   protected entity = this.entityService.entity;

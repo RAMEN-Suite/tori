@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { EmConfig } from '../../interfaces';
 import { LanguageKey } from '../models/config/LanguageOptions';
+import { ShortcutOverrides } from '../shortcuts/shortcut-keymap.service';
 
 interface StorageMap {
   EM_CONFIG_STORE_KEY: EmConfig;
   EM_LANGUAGE_STORE_KEY: LanguageKey;
+  EM_SHORTCUT_STORE_KEY: ShortcutOverrides;
 }
 
 @Injectable({
