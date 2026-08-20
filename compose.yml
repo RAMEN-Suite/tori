@@ -79,10 +79,10 @@ services:
       - "7474:7474"
       - "7687:7687"
     volumes:
-      - ./neo4j/import:/var/lib/neo4j/import
-      - ./neo4j/plugins:/var/lib/neo4j/plugins
-      - ./neo4j/backups:/var/lib/neo4j/backups
-      - ./neo4j/data:/data
+      - ./neo4j/import:/import
+      - ./neo4j/backups:/backups
+      - neo4j_plugins:/plugins
+      - neo4j_data:/data
     environment:
       NEO4J_AUTH: neo4j/neo4jadmin
       NEO4J_PLUGINS: '["apoc", "apoc-extended"]'
@@ -94,8 +94,10 @@ services:
       apoc.initializer.neo4j.2: CREATE CONSTRAINT character_uuid IF NOT EXISTS FOR (ch:Character) REQUIRE ch.uuid IS UNIQUE
       apoc.initializer.neo4j.3: CREATE CONSTRAINT annotation_uuid IF NOT EXISTS FOR (a:Annotation) REQUIRE a.uuid IS UNIQUE
       apoc.initializer.neo4j.4: CREATE CONSTRAINT entity_uuid IF NOT EXISTS FOR (e:Entity) REQUIRE e.uuid IS UNIQUE
-      apoc.initializer.neo4j.5: CREATE FULLTEXT INDEX search IF NOT EXISTS FOR (n:Entity) ON EACH [n.label]
     healthcheck:
       test: /var/lib/neo4j/bin/cypher-shell -u "neo4j" -p "neo4jadmin" "show databases;"
       start_period: 20s
 
+volumes:
+  neo4j_plugins:
+  neo4j_data:
