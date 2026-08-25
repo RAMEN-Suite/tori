@@ -7,3 +7,8 @@ export const CONTENT_LABEL_NAME = 'Content';
 export const BASE_DATA_TYPES = ['String', 'Boolean', 'Integer', 'Float'];
 export const TO_ANNOTATION_REL_TYPE = 'HAS_ANNOTATION';
 export const FROM_ANNOTATION_REL_TYPE = 'REFERS_TO';
+
+export enum Order {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
