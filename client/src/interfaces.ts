@@ -1,4 +1,5 @@
 import { LanguageOptions } from './app/models/config/LanguageOptions';
+import { PageOptions } from './app/models/dtos/page-options.dto';
 
 export interface Entity {
   label: string;
@@ -87,7 +88,7 @@ export interface EntityNames {
   id: string;
 }
 
-export interface EntitySearchQuery {
+export interface EntitySearchQuery extends PageOptions {
   label: string;
   collectionFilter?: Record<string, string[]>;
   types?: string[];

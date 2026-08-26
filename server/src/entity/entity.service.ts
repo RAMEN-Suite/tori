@@ -25,6 +25,7 @@ import { RAMENError } from '../schema/RAMENError';
 import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
 import { PageOptionsDto } from '../dto/page-options.dto';
 import { PageDto } from '../dto/page.dto';
+import { PageMetaDto } from '../dto/page-meta.dto';
 
 @Injectable()
 export class EntityService implements OnApplicationBootstrap {
@@ -210,7 +211,8 @@ export class EntityService implements OnApplicationBootstrap {
       return record.get('entity');
     });
 
-    return new PageDto(entities, { itemCount, pageOptionsDto: pageOptionsDto });
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
   }
 
   private addFilterByCollection(eNode: Cypher.Node, collectionFilters: Record<string, string[]>) {
