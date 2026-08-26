@@ -94,7 +94,6 @@ export class EntityService implements OnApplicationBootstrap {
       query = query.with(eNode, score).match(typePatten).with(eNode, score).distinct();
     }
 
-    // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
     if (collPattern) {
       query = query.with(eNode, score).match(collPattern).with(eNode, score).distinct();
     }
