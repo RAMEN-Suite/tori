@@ -15,7 +15,6 @@ import {
 import { EntityService } from './entity.service';
 import { IdDto } from '../dto/id.dto';
 import { LabelDto } from './dto/label.dto';
-import { OldEntityDto } from './dto/old-entity.dto';
 import { EntityNamesDto } from './dto/entity-names.dto';
 import { parseStringToSearchQueryString } from '../utils/utils';
 import { EntitySearchDto } from './dto/entity-search.dto';
@@ -29,6 +28,8 @@ import { RAMENError } from '../schema/RAMENError';
 import { UpdateEntityDto } from './dto/update-entity.dto';
 import { AnnotationsOfEntityDto } from '../annotation/dto/annotations_of_entity.dto';
 import { AnnotationsOfEntityWithContentDto } from '../annotation/dto/annotations_of_entity_with_content.dto';
+import { PageOptionsDto } from '../dto/page-options.dto';
+import { PageDto } from '../dto/page.dto';
 
 @Controller('entity')
 export class EntityController {
@@ -39,13 +40,16 @@ export class EntityController {
     private readonly annotationService: AnnotationService,
   ) {}
 
-  @ApiResponse({ type: [OldEntityDto] })
+  @ApiResponse({ type: PageDto })
   @Get('')
-  async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
+  async getAutoCompleteF(
+    @Query() params: EntitySearchDto,
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<EntityCollectionNameDto>> {
     const { label } = params;
 
     const searchQuery = parseStringToSearchQueryString(label);
-    const entities = await this.entityService.find({
+    const entities = await this.entityService.find(pageOptionsDto, {
       collectionFilter: params.collectionFilter,
       types: params.types,
       label: searchQuery,
