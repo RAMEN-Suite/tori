@@ -1,10 +1,12 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, Signal } from '@angular/core';
 import { EntityApiService } from './api/entity-api.service';
 import {
   OldEntity,
   EntityAutocompleteQuery,
   EntitySearchQuery,
 } from '../interfaces';
+import { PaginationStore } from './utils/pagination.store';
+import { PageMetaDto } from './models/dtos/page-meta.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -12,34 +14,34 @@ import {
 export class SearchEntityService {
   private readonly entityApi = inject(EntityApiService);
 
-  private entities = signal<OldEntity[]>([]);
-  private entitiesLoading = signal<boolean>(false);
+  private readonly pagination = new PaginationStore<
+    OldEntity,
+    EntitySearchQuery
+  >((query) => this.entityApi.searchEntities(query));
 
   public async getSuggestions(search: string, query: EntityAutocompleteQuery) {
     return await this.entityApi.getAutocomplete(search, query);
   }
 
-  public getEntitiesLoading() {
-    return this.entitiesLoading.asReadonly();
+  public getPageMeta(): Signal<PageMetaDto> {
+    return this.pagination.meta.asReadonly();
   }
 
-  public getEntities() {
-    return this.entities.asReadonly();
+  public getEntitiesLoading(): Signal<boolean> {
+    return this.pagination.loading.asReadonly();
+  }
+
+  public getEntities(): Signal<OldEntity[]> {
+    return this.pagination.data.asReadonly();
   }
 
   public resetEntityList() {
-    this.entities.set(new Array<OldEntity>());
+    this.pagination.reset();
+    return this;
   }
 
   public async searchEntities(query: EntitySearchQuery) {
-    this.entitiesLoading.set(true);
-    const entities = await this.entityApi.searchEntities(query);
-    if (Array.isArray(entities)) {
-      this.entities.set(entities);
-    } else {
-      this.entities.set(new Array<OldEntity>());
-    }
-    this.entitiesLoading.set(false);
+    await this.pagination.search(query);
     return this;
   }
 }

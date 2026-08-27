@@ -23,6 +23,9 @@ import {
 import { EntityDto } from './dto/entity.dto';
 import { RAMENError } from '../schema/RAMENError';
 import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
+import { PageOptionsDto } from '../dto/page-options.dto';
+import { PageDto } from '../dto/page.dto';
+import { PageMetaDto } from '../dto/page-meta.dto';
 
 @Injectable()
 export class EntityService implements OnApplicationBootstrap {
@@ -80,7 +83,7 @@ export class EntityService implements OnApplicationBootstrap {
 
     let typePatten: undefined | Pattern = undefined;
 
-    if (queryParams.types) {
+    if (queryParams.types?.length) {
       typePatten = this.addFilterByTypes(eNode, queryParams.types);
     }
 
@@ -92,7 +95,6 @@ export class EntityService implements OnApplicationBootstrap {
       query = query.with(eNode, score).match(typePatten).with(eNode, score).distinct();
     }
 
-    // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
     if (collPattern) {
       query = query.with(eNode, score).match(collPattern).with(eNode, score).distinct();
     }
@@ -122,7 +124,7 @@ export class EntityService implements OnApplicationBootstrap {
       .with(eNode, score);
   }
 
-  private async entityReturnMap(eNode: Cypher.Node, query: Cypher.With) {
+  private entityReturnMap(eNode: Cypher.Node, collections: Cypher.Variable) {
     const l = new Cypher.Variable();
     const typesExpr = new Cypher.ListComprehension(l)
       .in(Cypher.labels(eNode))
@@ -132,9 +134,7 @@ export class EntityService implements OnApplicationBootstrap {
     const keysExpr = new Cypher.List([new Cypher.Literal(this.ENTITY_KEY_PROPERTY), new Cypher.Literal(ENTITY_NAME_PROPERTY)]);
     const cleanedProps = new Cypher.Function('apoc.map.removeKeys', [propsExpr, keysExpr]);
 
-    const [clause, collections] = await this.collectionService.getCollectionsOfEntityNode(eNode, query);
-
-    const returnMap = new Cypher.Map({
+    return new Cypher.Map({
       nodeLabel: new Cypher.Literal(ENTITY_LABEL_NAME),
       types: typesExpr,
       label: eNode.property(ENTITY_NAME_PROPERTY),
@@ -142,11 +142,16 @@ export class EntityService implements OnApplicationBootstrap {
       properties: cleanedProps,
       collections: collections,
     });
+  }
+
+  private async entityReturnClause(eNode: Cypher.Node, query: Cypher.With) {
+    const [clause, collections] = await this.collectionService.getCollectionsOfEntityNode(eNode, query);
+    const returnMap = this.entityReturnMap(eNode, collections);
 
     return clause.return([returnMap, 'entity']);
   }
 
-  async find(queryParams: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
+  private async buildFindQuery(queryParams: EntitySearchDto) {
     const eNode = new Cypher.Node();
     const score = new Cypher.Variable();
 
@@ -171,18 +176,33 @@ export class EntityService implements OnApplicationBootstrap {
       query = query.with(eNode, score).match(typePatten).with(eNode, score).distinct();
     }
 
-    // Wenn ein Collection-Filter existiert, erweitern wir den Query mit MATCH
     if (collPattern) {
       query = query.with(eNode, score).match(collPattern).with(eNode, score).distinct();
     }
 
-    // // Rückgabe als Liste
-    // const collectReturnMap = Cypher.collect(returnMap);
-    // const returnClause = new Cypher.Return([collectReturnMap, "entities"]);
+    query = await this.addOrderByProperty(query, eNode, [[score, 'ASC']]);
 
-    // Finaler Query
-    const clause = await this.entityReturnMap(eNode, query);
+    return { eNode, query };
+  }
 
+  private readNumber(value: Integer | number | undefined): number {
+    if (typeof value === 'number') return value;
+    return value?.toNumber() ?? 0;
+  }
+
+  async find(pageOptionsDto: PageOptionsDto, queryParams: EntitySearchDto): Promise<PageDto<EntityCollectionNameDto>> {
+    const countQuery = await this.buildFindQuery(queryParams);
+    const countClause = countQuery.query.return([Cypher.count(countQuery.eNode), 'itemCount']);
+    const { cypher: countCypher, params: countParams } = countClause.build();
+    const countRes = await this.neo4jService.read<{ itemCount: Integer }>(countCypher, countParams);
+    const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
+
+    const dataQuery = await this.buildFindQuery(queryParams);
+    let paginatedQuery = dataQuery.query.limit(new Cypher.Literal(pageOptionsDto.take));
+    if (pageOptionsDto.skip > 0) {
+      paginatedQuery = paginatedQuery.skip(new Cypher.Literal(pageOptionsDto.skip));
+    }
+    const clause = await this.entityReturnClause(dataQuery.eNode, paginatedQuery);
     const { cypher, params } = clause.build();
     const res = await this.neo4jService.read<{
       entity: EntityCollectionNameDto;
@@ -191,7 +211,8 @@ export class EntityService implements OnApplicationBootstrap {
       return record.get('entity');
     });
 
-    return entities;
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
   }
 
   private addFilterByCollection(eNode: Cypher.Node, collectionFilters: Record<string, string[]>) {
