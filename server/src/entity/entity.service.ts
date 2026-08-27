@@ -440,7 +440,6 @@ export class EntityService implements OnApplicationBootstrap {
     const countPattern = pattern();
     const countClause = countPattern.query.return([Cypher.count(countPattern.eNode), 'itemCount']);
     const { cypher: countCypher, params: countParams } = countClause.build();
-    this.logger.log(countCypher);
     const countRes = await this.neo4jService.read<{ itemCount: Integer }>(countCypher, countParams);
     const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
 
