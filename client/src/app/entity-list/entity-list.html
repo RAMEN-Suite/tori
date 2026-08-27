@@ -1,19 +1,5 @@
 <ng-container *transloco="let t">
-  @if (entitiesLoading()) {
-    <p-virtualscroller
-      [items]="entities()"
-      [itemSize]="50"
-      [scrollHeight]="height()"
-      styleClass="border border-surface"
-      [style]="{ width: width(), height: height() }"
-    >
-      <ng-template pTemplate="content">
-        <div class="flex items-center align-items-center p-2">
-          <p-progress-spinner [ariaLabel]="t('app.shared.common.loading')" />
-        </div>
-      </ng-template>
-    </p-virtualscroller>
-  } @else if (entities().length === 0) {
+  @if (entities().length === 0) {
     <div class="w-full flex justify-content-center">
       <span>{{ t("app.shared.entityList.empty") }}</span>
     </div>

@@ -20,7 +20,7 @@ export class PaginationStore<T, Q extends object> {
     await this.load({
       ...query,
       page: pageOptions.page ?? 1,
-      take: pageOptions.take ?? 10,
+      take: pageOptions.take ?? 50,
     });
   }
 
