@@ -12,3 +12,9 @@ export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+export enum EntityPropertyKeys {
+  CREATED_AT = '_created_at',
+  UPDATED_AT = '_updated_at',
+  VERSION = '_version',
+}
