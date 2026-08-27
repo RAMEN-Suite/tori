@@ -41,4 +41,8 @@ export class SearchPage implements OnInit {
   protected onSearch(): void {
     this.hasSearched.set(true);
   }
+
+  protected async nextPage() {
+    await this.searchService.nextPage('append');
+  }
 }

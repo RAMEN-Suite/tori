@@ -24,15 +24,18 @@ export class PaginationStore<T, Q extends object> {
     });
   }
 
-  public async nextPage() {
+  public async nextPage(mode: 'replace' | 'append' = 'replace') {
     const meta = this.meta();
     if (!this.lastQuery || !meta.hasNextPage) return;
 
-    await this.load({
-      ...this.lastQuery,
-      page: meta.page + 1,
-      take: meta.take,
-    });
+    await this.load(
+      {
+        ...this.lastQuery,
+        page: meta.page + 1,
+        take: meta.take,
+      },
+      mode,
+    );
   }
 
   public reset(): void {
@@ -42,11 +45,16 @@ export class PaginationStore<T, Q extends object> {
     this.loading.set(false);
   }
 
-  private async load(query: Q & PageOptions) {
+  private async load(
+    query: Q & PageOptions,
+    mode: 'replace' | 'append' = 'replace',
+  ) {
     this.loading.set(true);
     try {
       const page = await this.loader(query);
-      this.data.set(page.data);
+      this.data.set(
+        mode === 'append' ? [...this.data(), ...page.data] : page.data,
+      );
       this.meta.set(page.meta);
     } finally {
       this.loading.set(false);
