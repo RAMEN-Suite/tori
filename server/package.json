@@ -26,6 +26,7 @@
     "@nestjs/platform-express": "^11.1.27",
     "@nestjs/serve-static": "^5.0.5",
     "@nestjs/swagger": "^11.4.4",
+    "@nestjs/typeorm": "^11.0.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "json-schema-library": "^11.6.1",
@@ -33,6 +34,8 @@
     "neo4j-driver-core": "^6.1.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sqlite3": "^6.0.1",
+    "typeorm": "^1.1.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
