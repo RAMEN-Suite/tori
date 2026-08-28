@@ -11,7 +11,15 @@
 
     <div class="entity-list w-12" [class.entity-list--visible]="hasSearched()">
       @if (hasSearched()) {
-        <app-entity-list [entities]="entities()" [entitiesLoading]="loading()" [onSelect]="navigateToDetailPage" height="60vh" />
+        <app-entity-list
+          [entities]="entities()"
+          [entitiesLoading]="loading()"
+          [onSelect]="navigateToDetailPage"
+          [loading]="loading()"
+          (atBottom)="nextPage()"
+          height="60vh"
+          enableInfiniteScroll
+        />
       }
     </div>
   </div>

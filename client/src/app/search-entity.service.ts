@@ -44,4 +44,9 @@ export class SearchEntityService {
     await this.pagination.search(query);
     return this;
   }
+
+  public async nextPage(mode: 'replace' | 'append' = 'replace') {
+    await this.pagination.nextPage(mode);
+    return this;
+  }
 }
