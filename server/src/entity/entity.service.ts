@@ -27,6 +27,7 @@ import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
 import { PageOptionsDto } from '../dto/page-options.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageMetaDto } from '../dto/page-meta.dto';
+import { addPaginationSubclause } from '../utils/pagination.utils';
 
 @Injectable()
 export class EntityService implements OnApplicationBootstrap {
@@ -199,10 +200,7 @@ export class EntityService implements OnApplicationBootstrap {
     const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
 
     const dataQuery = await this.buildFindQuery(queryParams);
-    let paginatedQuery = dataQuery.query.limit(new Cypher.Literal(pageOptionsDto.take));
-    if (pageOptionsDto.skip > 0) {
-      paginatedQuery = paginatedQuery.skip(new Cypher.Literal(pageOptionsDto.skip));
-    }
+    const paginatedQuery = addPaginationSubclause(dataQuery.query, pageOptionsDto);
     const clause = await this.entityReturnClause(dataQuery.eNode, paginatedQuery);
     const { cypher, params } = clause.build();
     const res = await this.neo4jService.read<{
@@ -444,10 +442,7 @@ export class EntityService implements OnApplicationBootstrap {
     const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
 
     const paginatedPattern = pattern();
-    let paginatedQuery = paginatedPattern.query.limit(new Cypher.Literal(pageOptionsDto.take));
-    if (pageOptionsDto.skip > 0) {
-      paginatedQuery = paginatedQuery.skip(new Cypher.Literal(pageOptionsDto.skip));
-    }
+    const paginatedQuery = addPaginationSubclause(paginatedPattern.query, pageOptionsDto);
     const clause = (await this.entityReturnClause(paginatedPattern.eNode, paginatedQuery)).orderBy([
       paginatedPattern.eNode.property(EntityPropertyKeys.UPDATED_AT),
       'DESC',
