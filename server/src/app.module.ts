@@ -14,6 +14,8 @@ import { configuration } from './config/configuration';
 import { EnvironmentConfig } from './config/config.types';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EntityViewEntity } from './entity/entity-view.orm-entity';
+import { UserEntity } from './entity/users.orm-entity';
 
 @Module({
   imports: [
@@ -26,7 +28,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       inject: [ConfigService],
       useFactory: async (config: ConfigService<EnvironmentConfig, true>) => ({
         ...(await config.getOrThrow('userDatabase', { infer: true })),
-        entities: [],
+        entities: [EntityViewEntity, UserEntity],
       }),
     }),
     Neo4jModule.forRootAsync({
