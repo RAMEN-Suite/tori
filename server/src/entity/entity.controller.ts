@@ -77,10 +77,16 @@ export class EntityController {
     }
   }
 
-  @ApiResponse({ type: PageDto })
+  @ApiResponse({ type: PageDto<EntityCollectionNameDto> })
   @Get('recently-updated')
   async getRecentlyUpdated(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
     return await this.entityService.recentlyUpdated(pageOptionsDto);
+  }
+
+  @ApiResponse({ type: PageDto })
+  @Get('suggested')
+  async getMostViewed(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
+    return await this.entityService.mostViewed(GUEST_DEFAULT_USER.ID, pageOptionsDto);
   }
 
   @ApiResponse({ type: EntityDto })
