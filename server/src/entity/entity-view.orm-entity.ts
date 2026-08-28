@@ -2,7 +2,7 @@ import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeor
 import { UserEntity } from './users.orm-entity';
 
 @Entity('entity_views')
-@Index(['actorId', 'entityId'], { unique: true })
+@Index(['actor.id', 'entityId'], { unique: true })
 export class EntityViewEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
