@@ -1,5 +1,8 @@
 import z from 'zod';
 import { EnvironmentConfig } from './config.types';
+import type { DatabaseType } from 'typeorm/driver/types/DatabaseType';
+
+const USER_DB_TYPES = ['better-sqlite3'] as const satisfies readonly [DatabaseType, ...DatabaseType[]];
 
 const optionalString = z.preprocess((value) => {
   if (typeof value !== 'string') {
@@ -36,6 +39,14 @@ const environmentSchema = z.object({
   TORI_DB_USER: z.string().trim().min(1),
   TORI_DB_SCHEME: z.enum(['neo4j', 'neo4j+s', 'bolt', 'bolt+s']),
   TORI_DB_NAME: z.string().trim().min(1).default('neo4j'),
+
+  TORI_USER_DB_HOST: z.string().trim().min(1).optional(),
+  TORI_USER_DB_PASSWORD: z.string().min(1).optional(),
+  TORI_USER_DB_PORT: port().optional(),
+  TORI_USER_DB_USER: z.string().trim().min(1).optional(),
+  TORI_USER_DB_TYPE: z.enum(USER_DB_TYPES).default('better-sqlite3'),
+  TORI_USER_DB_NAME: z.string().trim().min(1).default('./data/user.db'),
+  TORI_USER_DB_SYNCHRONIZE: z.boolean().default(false),
 
   TORI_CAMI_HOST: optionalString.pipe(z.httpUrl().optional()),
 });
@@ -75,6 +86,16 @@ export function configuration(): EnvironmentConfig {
 
     cami: {
       host: env.TORI_CAMI_HOST,
+    },
+
+    userDatabase: {
+      type: env.TORI_USER_DB_TYPE,
+      host: env.TORI_USER_DB_HOST,
+      password: env.TORI_USER_DB_PASSWORD,
+      port: env.TORI_USER_DB_PORT,
+      username: env.TORI_USER_DB_USER,
+      database: env.TORI_USER_DB_NAME,
+      synchronize: env.TORI_USER_DB_SYNCHRONIZE,
     },
   };
 }

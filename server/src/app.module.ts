@@ -13,6 +13,7 @@ import { ProjectConfigModule } from './project-config/project-config.module';
 import { configuration } from './config/configuration';
 import { EnvironmentConfig } from './config/config.types';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -21,7 +22,13 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       cache: true,
       load: [configuration],
     }),
-
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService<EnvironmentConfig, true>) => ({
+        ...(await config.getOrThrow('userDatabase', { infer: true })),
+        entities: [],
+      }),
+    }),
     Neo4jModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService<EnvironmentConfig, true>) => {
