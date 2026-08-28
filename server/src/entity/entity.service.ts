@@ -19,7 +19,9 @@ import {
   ENTITY_NAME_PROPERTY,
   EntityPropertyKeys,
   FROM_ANNOTATION_REL_TYPE,
+  GUEST_DEFAULT_USER,
   TO_ANNOTATION_REL_TYPE,
+  USER,
 } from '../constants';
 import { EntityDto } from './dto/entity.dto';
 import { RAMENError } from '../schema/RAMENError';
@@ -47,6 +49,7 @@ export class EntityService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     await this.createSearchFulltextIndex();
+    await this.createGuestDefaultUser();
   }
 
   async getById(id: string): Promise<EntityDto | undefined> {
@@ -419,6 +422,21 @@ export class EntityService implements OnApplicationBootstrap {
     this.logger.log(`Successfully created FULLTEXT INDEX ${searchIndex}`);
   }
 
+  private async createGuestDefaultUser() {
+    const uNode = new Cypher.Node();
+    const query = new Cypher.Merge(
+      new Cypher.Pattern(uNode, {
+        labels: USER.LABEL,
+        properties: {
+          [USER.PROPERTIES.ID]: new Cypher.Param(GUEST_DEFAULT_USER.ID),
+        },
+      }),
+    );
+    const { cypher, params } = query.build();
+    await this.neo4jService.write(cypher, params);
+    this.logger.log(`Successfully created DEFAULT USER ${GUEST_DEFAULT_USER.ID}`);
+  }
+
   async recentlyUpdated(pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
     function pattern() {
       const eNode = new Cypher.Node();
@@ -442,11 +460,9 @@ export class EntityService implements OnApplicationBootstrap {
     const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
 
     const paginatedPattern = pattern();
-    const paginatedQuery = addPaginationSubclause(paginatedPattern.query, pageOptionsDto);
-    const clause = (await this.entityReturnClause(paginatedPattern.eNode, paginatedQuery)).orderBy([
-      paginatedPattern.eNode.property(EntityPropertyKeys.UPDATED_AT),
-      'DESC',
-    ]);
+    const query = paginatedPattern.query.orderBy([paginatedPattern.eNode.property(EntityPropertyKeys.UPDATED_AT), 'DESC']);
+    const paginatedQuery = addPaginationSubclause(query, pageOptionsDto);
+    const clause = await this.entityReturnClause(paginatedPattern.eNode, paginatedQuery);
     const { cypher, params } = clause.build();
     const res = await this.neo4jService.read<{
       entity: EntityCollectionNameDto;
@@ -456,6 +472,66 @@ export class EntityService implements OnApplicationBootstrap {
     });
 
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
+  }
+
+  async mostViewed(actorId: string, pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
+    function pattern() {
+      const uNode = new Cypher.Node();
+      const eNode = new Cypher.Node();
+      const viewedRelation = new Cypher.Relationship();
+
+      const query = new Cypher.Match(
+        new Cypher.Pattern(uNode, {
+          labels: USER.LABEL,
+          properties: {
+            [USER.PROPERTIES.ID]: new Cypher.Param(actorId),
+          },
+        })
+          .related(viewedRelation, {
+            type: 'VIEWED',
+          })
+          .to(eNode, {
+            labels: ENTITY_LABEL_NAME,
+          }),
+      ).with(eNode, viewedRelation);
+
+      return {
+        eNode,
+        viewedRelation,
+        query,
+      };
+    }
+
+    const countPattern = pattern();
+    const countClause = countPattern.query.return([Cypher.count(countPattern.eNode), 'itemCount']);
+
+    const { cypher: countCypher, params: countParams } = countClause.build();
+
+    const countRes = await this.neo4jService.read<{ itemCount: Integer }>(countCypher, countParams);
+
+    const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
+
+    const dataPattern = pattern();
+
+    const query = dataPattern.query.orderBy(
+      [dataPattern.viewedRelation.property('count'), 'DESC'],
+      [dataPattern.viewedRelation.property('lastViewedAt'), 'DESC'],
+    );
+    const paginatedQuery = addPaginationSubclause(query, pageOptionsDto);
+
+    const clause = await this.entityReturnClause(dataPattern.eNode, paginatedQuery);
+
+    const { cypher, params } = clause.build();
+
+    const res = await this.neo4jService.read<{
+      entity: EntityCollectionNameDto;
+    }>(cypher, params);
+
+    const entities = res.records.map((record) => record.get('entity'));
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
     return new PageDto(entities, pageMetaDto);
   }
 }

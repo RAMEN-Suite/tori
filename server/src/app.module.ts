@@ -12,6 +12,7 @@ import { CamiModule } from './cami/cami.module';
 import { ProjectConfigModule } from './project-config/project-config.module';
 import { configuration } from './config/configuration';
 import { EnvironmentConfig } from './config/config.types';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { EnvironmentConfig } from './config/config.types';
         return config.getOrThrow('database', { infer: true });
       },
     }),
+    EventEmitterModule.forRoot(),
     GuidelinesModule,
     EntityModule,
     CollectionModule,

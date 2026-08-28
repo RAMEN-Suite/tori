@@ -30,6 +30,8 @@ import { AnnotationsOfEntityDto } from '../annotation/dto/annotations_of_entity.
 import { AnnotationsOfEntityWithContentDto } from '../annotation/dto/annotations_of_entity_with_content.dto';
 import { PageOptionsDto } from '../dto/page-options.dto';
 import { PageDto } from '../dto/page.dto';
+import { EntityEventsService } from './entity-events.service';
+import { GUEST_DEFAULT_USER } from '../constants';
 
 @Controller('entity')
 export class EntityController {
@@ -38,6 +40,7 @@ export class EntityController {
   constructor(
     private readonly entityService: EntityService,
     private readonly annotationService: AnnotationService,
+    private readonly entityEvents: EntityEventsService,
   ) {}
 
   @ApiResponse({ type: PageDto })
@@ -90,6 +93,8 @@ export class EntityController {
     if (!entity) {
       throw new NotFoundException('Entity was not found!');
     }
+
+    this.entityEvents.entityViewed(id, GUEST_DEFAULT_USER.ID);
 
     return entity;
   }
