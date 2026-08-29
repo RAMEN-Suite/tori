@@ -74,6 +74,12 @@ export class EntityController {
     }
   }
 
+  @ApiResponse({ type: PageDto })
+  @Get('recently-updated')
+  async getRecentlyUpdated(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
+    return await this.entityService.recentlyUpdated(pageOptionsDto);
+  }
+
   @ApiResponse({ type: EntityDto })
   @Get(':id')
   async getById(@Param() params: IdDto): Promise<EntityDto> {

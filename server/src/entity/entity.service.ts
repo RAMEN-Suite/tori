@@ -2,7 +2,7 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { GuidelinesService } from '../guidelines/guidelines.service';
 import { EntityNamesDto } from './dto/entity-names.dto';
-import Cypher, { PartialPattern, Pattern, type SetParam } from '@neo4j/cypher-builder';
+import Cypher, { isNotNull, PartialPattern, Pattern, type SetParam } from '@neo4j/cypher-builder';
 import { EntitySearchDto } from './dto/entity-search.dto';
 import { EntityCollectionNameDto } from './dto/entity-collection-name.dto';
 import { CollectionService } from '../collection/collection.service';
@@ -17,6 +17,7 @@ import {
   COLLECTION_LABEL_NAME,
   ENTITY_LABEL_NAME,
   ENTITY_NAME_PROPERTY,
+  EntityPropertyKeys,
   FROM_ANNOTATION_REL_TYPE,
   TO_ANNOTATION_REL_TYPE,
 } from '../constants';
@@ -418,5 +419,48 @@ export class EntityService implements OnApplicationBootstrap {
       `CREATE FULLTEXT INDEX ${searchIndex} IF NOT EXISTS FOR (n:${ENTITY_LABEL_NAME}) ON EACH [n.${ENTITY_NAME_PROPERTY}]`,
     );
     this.logger.log(`Successfully created FULLTEXT INDEX ${searchIndex}`);
+  }
+
+  async recentlyUpdated(pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
+    function pattern() {
+      const eNode = new Cypher.Node();
+      const query = new Cypher.Match(
+        new Cypher.Pattern(eNode, {
+          labels: ENTITY_LABEL_NAME,
+        }),
+      )
+        .where(isNotNull(eNode.property(EntityPropertyKeys.UPDATED_AT)))
+        .with('*');
+      return {
+        eNode,
+        query,
+      };
+    }
+
+    const countPattern = pattern();
+    const countClause = countPattern.query.return([Cypher.count(countPattern.eNode), 'itemCount']);
+    const { cypher: countCypher, params: countParams } = countClause.build();
+    const countRes = await this.neo4jService.read<{ itemCount: Integer }>(countCypher, countParams);
+    const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
+
+    const paginatedPattern = pattern();
+    let paginatedQuery = paginatedPattern.query.limit(new Cypher.Literal(pageOptionsDto.take));
+    if (pageOptionsDto.skip > 0) {
+      paginatedQuery = paginatedQuery.skip(new Cypher.Literal(pageOptionsDto.skip));
+    }
+    const clause = (await this.entityReturnClause(paginatedPattern.eNode, paginatedQuery)).orderBy([
+      paginatedPattern.eNode.property(EntityPropertyKeys.UPDATED_AT),
+      'DESC',
+    ]);
+    const { cypher, params } = clause.build();
+    const res = await this.neo4jService.read<{
+      entity: EntityCollectionNameDto;
+    }>(cypher, params);
+    const entities: EntityCollectionNameDto[] = res.records.map((record) => {
+      return record.get('entity');
+    });
+
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
   }
 }
