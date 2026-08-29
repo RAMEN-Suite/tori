@@ -1,4 +1,4 @@
-import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UserEntity } from './users.orm-entity';
 
 @Entity('entity_views')
@@ -16,6 +16,6 @@ export class EntityViewEntity {
   @Column({ default: 0 })
   count!: number;
 
-  @Column({ type: 'datetime' })
+  @UpdateDateColumn()
   lastViewedAt!: Date;
 }

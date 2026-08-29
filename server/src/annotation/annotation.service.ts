@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Neo4jService } from '../neo4j/neo4j.service';
-import { GuidelinesService } from '../guidelines/guidelines.service';
-import { CollectionService } from '../collection/collection.service';
 import { RamenModelService } from '../schema/ramen-model.service';
 import { NodeRepository } from '../graph/node-repository.service';
 import {
@@ -35,8 +33,6 @@ export class AnnotationService {
 
   constructor(
     private readonly neo4jService: Neo4jService,
-    private readonly guidelinesService: GuidelinesService,
-    private readonly collectionService: CollectionService,
     private readonly model: RamenModelService,
     private readonly nodes: NodeRepository,
   ) {
@@ -104,7 +100,13 @@ export class AnnotationService {
 
     const { cypher, params } = clause.build();
     const res = await this.neo4jService.write<{ id: string }>(cypher, params);
-    return res.records[0].get('id');
+    const record = res.records[0];
+
+    if (!record) {
+      throw new Error('Entity not found');
+    }
+
+    return record.get('id');
   }
 
   async update(id: string, properties: Record<string, unknown>) {

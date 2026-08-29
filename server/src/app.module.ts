@@ -16,6 +16,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EntityViewEntity } from './entity/entity-view.orm-entity';
 import { UserEntity } from './entity/users.orm-entity';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { UserEntity } from './entity/users.orm-entity';
     AnnotationModule,
     CamiModule,
     ProjectConfigModule,
+    UserModule,
   ],
   controllers: [HealthController],
   providers: [],

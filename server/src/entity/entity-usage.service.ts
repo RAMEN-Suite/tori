@@ -1,60 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { Neo4jService } from '../neo4j/neo4j.service';
-import { RamenModelService } from '../schema/ramen-model.service';
-import Cypher from '@neo4j/cypher-builder';
-import { ENTITY_LABEL_NAME, USER } from '../constants';
+import { Repository } from 'typeorm';
+import { EntityViewEntity } from './entity-view.orm-entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from './users.orm-entity';
+import { PageOptionsDto } from '../dto/page-options.dto';
 
 @Injectable()
 export class EntityUsageService {
-  ENTITY_KEY_PROPERTY!: string;
   constructor(
-    private readonly neo4jService: Neo4jService,
-    private readonly model: RamenModelService,
-  ) {
-    this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
-  }
+    @InjectRepository(EntityViewEntity)
+    private entityViewRepository: Repository<EntityViewEntity>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+  ) {}
 
   public async recordView(actorId: string, entityId: string) {
-    const uNode = new Cypher.Node();
-    const eNode = new Cypher.Node();
-    const viewedRelation = new Cypher.Relationship();
-
-    const entityPattern = new Cypher.Pattern(eNode, {
-      labels: ENTITY_LABEL_NAME,
-      properties: {
-        [this.ENTITY_KEY_PROPERTY]: new Cypher.Param(entityId),
-      },
+    let entityView: EntityViewEntity | null = await this.entityViewRepository.findOneBy({
+      actor: { id: actorId },
+      entityId: entityId,
     });
 
-    const userPattern = new Cypher.Pattern(uNode, {
-      labels: USER.LABEL,
-      properties: {
-        [USER.PROPERTIES.ID]: new Cypher.Param(actorId),
+    const user = await this.userRepository.findOneBy({ id: actorId });
+    if (!user) {
+      throw new Error('User does not exist');
+    }
+    entityView ??= this.entityViewRepository.create({ actor: { id: actorId }, entityId: entityId });
+
+    entityView.count++;
+    await this.entityViewRepository.save(entityView);
+  }
+
+  public async findMostViewedEntityIds(actorId: string, pageOptionsDto: PageOptionsDto) {
+    const [views, itemCount] = await this.entityViewRepository.findAndCount({
+      where: { actor: { id: actorId } },
+      order: {
+        count: 'DESC',
+        lastViewedAt: 'DESC',
       },
+      skip: pageOptionsDto.skip,
+      take: pageOptionsDto.take,
+      select: { entityId: true },
     });
 
-    const relationPattern = new Cypher.Pattern(uNode)
-      .related(viewedRelation, {
-        type: 'VIEWED',
-      })
-      .to(eNode);
-
-    const query = new Cypher.Match(entityPattern)
-      .match(userPattern)
-      .merge(relationPattern)
-      .onCreateSet(
-        [viewedRelation.property('count'), new Cypher.Literal(1)],
-        [viewedRelation.property('lastViewedAt'), Cypher.localdatetime()],
-      )
-      .onMatchSet(
-        [
-          viewedRelation.property('count'),
-          Cypher.plus(Cypher.coalesce(viewedRelation.property('count'), new Cypher.Literal(0)), new Cypher.Literal(1)),
-        ],
-        [viewedRelation.property('lastViewedAt'), Cypher.localdatetime()],
-      );
-
-    const { cypher, params } = query.build();
-    await this.neo4jService.write(cypher, params);
+    return {
+      entityIds: views.map((view) => view.entityId),
+      itemCount,
+    };
   }
 }
