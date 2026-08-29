@@ -24,7 +24,7 @@ export class EntityUsageService {
     if (!user) {
       throw new Error('User does not exist');
     }
-    entityView ??= this.entityViewRepository.create({ actor: { id: actorId }, entityId: entityId });
+    entityView ??= this.entityViewRepository.create({ actor: { id: actorId }, entityId: entityId, count: 0 });
 
     entityView.count++;
     await this.entityViewRepository.save(entityView);
@@ -39,7 +39,6 @@ export class EntityUsageService {
       },
       skip: pageOptionsDto.skip,
       take: pageOptionsDto.take,
-      select: { entityId: true },
     });
 
     return {

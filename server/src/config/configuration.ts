@@ -46,7 +46,7 @@ const environmentSchema = z.object({
   TORI_USER_DB_USER: z.string().trim().min(1).optional(),
   TORI_USER_DB_TYPE: z.enum(USER_DB_TYPES).default('better-sqlite3'),
   TORI_USER_DB_NAME: z.string().trim().min(1).default('./data/user.db'),
-  TORI_USER_DB_SYNCHRONIZE: z.boolean().default(false),
+  TORI_USER_DB_SYNCHRONIZE: z.stringbool().default(false),
 
   TORI_CAMI_HOST: optionalString.pipe(z.httpUrl().optional()),
 });
