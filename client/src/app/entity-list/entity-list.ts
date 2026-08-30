@@ -8,9 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { OldEntity } from '../../interfaces';
-import { Scroller } from 'primeng/scroller';
 import { NgClass } from '@angular/common';
-import { PrimeTemplate } from 'primeng/api';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Chip } from 'primeng/chip';
 import { Button } from 'primeng/button';
@@ -21,9 +19,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
 @Component({
   selector: 'app-entity-list',
   imports: [
-    Scroller,
     NgClass,
-    PrimeTemplate,
     ProgressSpinner,
     Chip,
     Button,

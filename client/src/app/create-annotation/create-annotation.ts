@@ -1,11 +1,10 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { Button } from 'primeng/button';
-import { TranslocoDirective } from '@jsverse/transloco';
 import { CreateAnnotationAction } from '../actions/create-annotation-action';
 
 @Component({
   selector: 'app-create-annotation',
-  imports: [Button, TranslocoDirective],
+  imports: [Button],
   templateUrl: './create-annotation.html',
 })
 export class CreateAnnotation {
