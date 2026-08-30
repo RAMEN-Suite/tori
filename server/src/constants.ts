@@ -8,6 +8,18 @@ export const BASE_DATA_TYPES = ['String', 'Boolean', 'Integer', 'Float'];
 export const TO_ANNOTATION_REL_TYPE = 'HAS_ANNOTATION';
 export const FROM_ANNOTATION_REL_TYPE = 'REFERS_TO';
 
+export const GUEST_DEFAULT_USER = {
+  ID: 'system:guest',
+};
+
+enum USER_PROPERTIES {
+  ID = 'id',
+}
+export const USER = {
+  LABEL: 'UserProfile',
+  PROPERTIES: USER_PROPERTIES,
+};
+
 export enum Order {
   ASC = 'ASC',
   DESC = 'DESC',

@@ -27,6 +27,8 @@ import { metadataForNewNode, metadataForUpdateNode } from '../utils/utils';
 import { PageOptionsDto } from '../dto/page-options.dto';
 import { PageDto } from '../dto/page.dto';
 import { PageMetaDto } from '../dto/page-meta.dto';
+import { addPaginationSubclause } from '../utils/pagination.utils';
+import { EntityUsageService } from './entity-usage.service';
 
 @Injectable()
 export class EntityService implements OnApplicationBootstrap {
@@ -40,6 +42,7 @@ export class EntityService implements OnApplicationBootstrap {
     private readonly collectionService: CollectionService,
     private readonly model: RamenModelService,
     private readonly nodes: NodeRepository,
+    private readonly entityUsageService: EntityUsageService,
   ) {
     this.ENTITY_KEY_PROPERTY = this.model.getNodeKeyField(ENTITY_LABEL_NAME);
   }
@@ -59,6 +62,39 @@ export class EntityService implements OnApplicationBootstrap {
     if (!gNode) return undefined;
 
     return transformNodeToEntityDTO(entityNode, gNode);
+  }
+
+  async findByIdsPreservingOrder(entityIds: string[]): Promise<EntityCollectionNameDto[]> {
+    if (entityIds.length === 0) {
+      return [];
+    }
+
+    const eNode = new Cypher.Node();
+
+    const query = new Cypher.Match(
+      new Cypher.Pattern(eNode, {
+        labels: ENTITY_LABEL_NAME,
+      }).where(Cypher.in(eNode.property(this.ENTITY_KEY_PROPERTY), new Cypher.Param(entityIds))),
+    ).with(eNode);
+
+    const clause = await this.entityReturnClause(eNode, query);
+
+    const { cypher, params } = clause.build();
+
+    const res = await this.neo4jService.read<{
+      entity: EntityCollectionNameDto;
+    }>(cypher, params);
+
+    const entitiesById = new Map<string, EntityCollectionNameDto>();
+
+    for (const record of res.records) {
+      const entity = record.get('entity');
+      entitiesById.set(entity.id, entity);
+    }
+
+    return entityIds
+      .map((id) => entitiesById.get(id))
+      .filter((entity): entity is EntityCollectionNameDto => entity !== undefined);
   }
 
   async getByProperty(key: string, value: string): Promise<EntityNodeDto[]> {
@@ -199,10 +235,7 @@ export class EntityService implements OnApplicationBootstrap {
     const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
 
     const dataQuery = await this.buildFindQuery(queryParams);
-    let paginatedQuery = dataQuery.query.limit(new Cypher.Literal(pageOptionsDto.take));
-    if (pageOptionsDto.skip > 0) {
-      paginatedQuery = paginatedQuery.skip(new Cypher.Literal(pageOptionsDto.skip));
-    }
+    const paginatedQuery = addPaginationSubclause(dataQuery.query, pageOptionsDto);
     const clause = await this.entityReturnClause(dataQuery.eNode, paginatedQuery);
     const { cypher, params } = clause.build();
     const res = await this.neo4jService.read<{
@@ -444,14 +477,9 @@ export class EntityService implements OnApplicationBootstrap {
     const itemCount = this.readNumber(countRes.records[0]?.get('itemCount'));
 
     const paginatedPattern = pattern();
-    let paginatedQuery = paginatedPattern.query.limit(new Cypher.Literal(pageOptionsDto.take));
-    if (pageOptionsDto.skip > 0) {
-      paginatedQuery = paginatedQuery.skip(new Cypher.Literal(pageOptionsDto.skip));
-    }
-    const clause = (await this.entityReturnClause(paginatedPattern.eNode, paginatedQuery)).orderBy([
-      paginatedPattern.eNode.property(EntityPropertyKeys.UPDATED_AT),
-      'DESC',
-    ]);
+    const query = paginatedPattern.query.orderBy([paginatedPattern.eNode.property(EntityPropertyKeys.UPDATED_AT), 'DESC']);
+    const paginatedQuery = addPaginationSubclause(query, pageOptionsDto);
+    const clause = await this.entityReturnClause(paginatedPattern.eNode, paginatedQuery);
     const { cypher, params } = clause.build();
     const res = await this.neo4jService.read<{
       entity: EntityCollectionNameDto;
@@ -462,5 +490,19 @@ export class EntityService implements OnApplicationBootstrap {
 
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto(entities, pageMetaDto);
+  }
+
+  async mostViewed(actorId: string, pageOptionsDto: PageOptionsDto) {
+    const usagePage = await this.entityUsageService.findMostViewedEntityIds(actorId, pageOptionsDto);
+
+    const entities = await this.findByIdsPreservingOrder(usagePage.entityIds);
+
+    return new PageDto(
+      entities,
+      new PageMetaDto({
+        itemCount: usagePage.itemCount,
+        pageOptionsDto,
+      }),
+    );
   }
 }
