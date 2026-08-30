@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { EntityViewEntity } from './entity-view.orm-entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './users.orm-entity';
@@ -7,6 +7,8 @@ import { PageOptionsDto } from '../dto/page-options.dto';
 
 @Injectable()
 export class EntityUsageService {
+  private readonly maxViewsPerActor: number = 150;
+
   constructor(
     @InjectRepository(EntityViewEntity)
     private entityViewRepository: Repository<EntityViewEntity>,
@@ -28,6 +30,8 @@ export class EntityUsageService {
 
     entityView.count++;
     await this.entityViewRepository.save(entityView);
+
+    await this.pruneViews(actorId);
   }
 
   public async findMostViewedEntityIds(actorId: string, pageOptionsDto: PageOptionsDto) {
@@ -45,5 +49,28 @@ export class EntityUsageService {
       entityIds: views.map((view) => view.entityId),
       itemCount,
     };
+  }
+
+  private async pruneViews(actorId: string) {
+    const viewsToKeep = await this.entityViewRepository.find({
+      where: { actor: { id: actorId } },
+      order: {
+        count: 'DESC',
+        lastViewedAt: 'DESC',
+      },
+      take: this.maxViewsPerActor,
+      select: { id: true, count: true, lastViewedAt: true },
+    });
+
+    const keepIds = viewsToKeep.map((view) => view.id);
+
+    if (keepIds.length < this.maxViewsPerActor) {
+      return;
+    }
+
+    await this.entityViewRepository.delete({
+      actor: { id: actorId },
+      id: Not(In(keepIds)),
+    });
   }
 }
