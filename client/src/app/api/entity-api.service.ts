@@ -13,6 +13,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { QueryParamsService } from '../utils/query-params.service';
 import { MessageService } from 'primeng/api';
 import { TranslocoService } from '@jsverse/transloco';
+import { PageDto } from '../models/dtos/page.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -23,22 +24,22 @@ export class EntityApiService {
   private readonly messageService = inject(MessageService);
   private readonly transloco = inject(TranslocoService);
 
-  public searchEntities(query: EntitySearchQuery) {
+  public searchEntities(query: EntitySearchQuery): Promise<PageDto<OldEntity>> {
     const httpParams = this.queryParamService.transformQueryParams(query);
 
     const res = this.http
-      .get<OldEntity[]>('/api/entity/', {
+      .get<PageDto<OldEntity>>('/api/entity/', {
         params: httpParams,
       })
       .pipe(
-        catchError(() => {
+        catchError((err) => {
           this.messageService.add({
             severity: 'error',
             detail: this.transloco.translate(
               'app.services.entityApi.errors.loadingEntities',
             ),
           });
-          return of(new Array<OldEntity>());
+          throw err;
         }),
       );
     return firstValueFrom(res);

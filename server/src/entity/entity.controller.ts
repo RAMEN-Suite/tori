@@ -15,7 +15,6 @@ import {
 import { EntityService } from './entity.service';
 import { IdDto } from '../dto/id.dto';
 import { LabelDto } from './dto/label.dto';
-import { OldEntityDto } from './dto/old-entity.dto';
 import { EntityNamesDto } from './dto/entity-names.dto';
 import { parseStringToSearchQueryString } from '../utils/utils';
 import { EntitySearchDto } from './dto/entity-search.dto';
@@ -29,6 +28,10 @@ import { RAMENError } from '../schema/RAMENError';
 import { UpdateEntityDto } from './dto/update-entity.dto';
 import { AnnotationsOfEntityDto } from '../annotation/dto/annotations_of_entity.dto';
 import { AnnotationsOfEntityWithContentDto } from '../annotation/dto/annotations_of_entity_with_content.dto';
+import { PageOptionsDto } from '../dto/page-options.dto';
+import { PageDto } from '../dto/page.dto';
+import { EntityEventsService } from './entity-events.service';
+import { GUEST_DEFAULT_USER } from '../constants';
 
 @Controller('entity')
 export class EntityController {
@@ -37,15 +40,19 @@ export class EntityController {
   constructor(
     private readonly entityService: EntityService,
     private readonly annotationService: AnnotationService,
+    private readonly entityEvents: EntityEventsService,
   ) {}
 
-  @ApiResponse({ type: [OldEntityDto] })
+  @ApiResponse({ type: PageDto })
   @Get('')
-  async getAutoCompleteF(@Query() params: EntitySearchDto): Promise<EntityCollectionNameDto[]> {
+  async getAutoCompleteF(
+    @Query() params: EntitySearchDto,
+    @Query() pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<EntityCollectionNameDto>> {
     const { label } = params;
 
     const searchQuery = parseStringToSearchQueryString(label);
-    const entities = await this.entityService.find({
+    const entities = await this.entityService.find(pageOptionsDto, {
       collectionFilter: params.collectionFilter,
       types: params.types,
       label: searchQuery,
@@ -70,6 +77,18 @@ export class EntityController {
     }
   }
 
+  @ApiResponse({ type: PageDto<EntityCollectionNameDto> })
+  @Get('recently-updated')
+  async getRecentlyUpdated(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
+    return await this.entityService.recentlyUpdated(pageOptionsDto);
+  }
+
+  @ApiResponse({ type: PageDto })
+  @Get('suggested')
+  async getMostViewed(@Query() pageOptionsDto: PageOptionsDto): Promise<PageDto<EntityCollectionNameDto>> {
+    return await this.entityService.mostViewed(GUEST_DEFAULT_USER.ID, pageOptionsDto);
+  }
+
   @ApiResponse({ type: EntityDto })
   @Get(':id')
   async getById(@Param() params: IdDto): Promise<EntityDto> {
@@ -80,6 +99,8 @@ export class EntityController {
     if (!entity) {
       throw new NotFoundException('Entity was not found!');
     }
+
+    this.entityEvents.entityViewed(id, GUEST_DEFAULT_USER.ID);
 
     return entity;
   }

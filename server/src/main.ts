@@ -4,14 +4,16 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Neo4jExceptionFilter } from './neo4j/neo4j-exception-filter';
 import { RAMENExceptionFilter } from './schema/ramen-exception-filter';
-
-function envOrDefault(name: string, defaultValue: string = ''): string {
-  const value = process.env[name]?.trim() ?? '';
-  return value.length > 0 ? value : defaultValue;
-}
+import { ConfigService } from '@nestjs/config';
+import { EnvironmentConfig } from './config/config.types';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.get<ConfigService<EnvironmentConfig, true>>(ConfigService);
+  const { port, name } = configService.getOrThrow('server', {
+    infer: true,
+  });
 
   app.useGlobalFilters(new Neo4jExceptionFilter(), new RAMENExceptionFilter());
 
@@ -31,11 +33,11 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder().setTitle(envOrDefault('AWEN_APP_NAME', 'AWEN')).build();
+  const config = new DocumentBuilder().setTitle(name).build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, documentFactory);
 
-  await app.listen(envOrDefault('AWEN_SERVER_PORT', '3000'));
+  await app.listen(port);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap().catch(console.error);

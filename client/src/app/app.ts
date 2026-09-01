@@ -1,8 +1,10 @@
 import {
   Component,
   computed,
+  DestroyRef,
   ElementRef,
   inject,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
@@ -17,6 +19,8 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Navbar } from './navbar/navbar';
 import { Skeleton } from 'primeng/skeleton';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { ShortcutService } from './shortcuts/shortcut.service';
+import { CreateEntityAction } from './actions/create-entity-action';
 
 @Component({
   selector: 'app-root',
@@ -36,9 +40,13 @@ import { TranslocoDirective } from '@jsverse/transloco';
   styleUrl: './app.scss',
   templateUrl: './app.html',
 })
-export class App {
+export class App implements OnInit {
   private readonly config = inject(ConfigService);
   private readonly status = inject(HealthService);
+  private readonly shortcuts = inject(ShortcutService);
+  private readonly createEntityAction = inject(CreateEntityAction);
+
+  private readonly destroyRef = inject(DestroyRef);
   private router = inject(Router);
 
   @ViewChild('appContent') private appContent!: ElementRef<HTMLDivElement>;
@@ -51,6 +59,13 @@ export class App {
       .subscribe(() => {
         this.scrollToTop('instant');
       });
+  }
+  public ngOnInit(): void {
+    this.shortcuts.register(
+      this.createEntityAction,
+      () => ({}),
+      this.destroyRef,
+    );
   }
 
   protected onContentScroll(event: Event): void {

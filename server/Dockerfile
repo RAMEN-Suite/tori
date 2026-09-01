@@ -24,6 +24,7 @@ COPY package*.json ./
 COPY .npmrc ./
 # Install the application dependencies
 RUN npm install
+RUN npm rebuild better-sqlite3 --ignore-scripts=false
 # Copy the rest of the application files
 COPY . .
 
@@ -41,6 +42,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY .npmrc ./
 RUN npm ci
+RUN npm rebuild better-sqlite3 --ignore-scripts=false
 COPY . .
 RUN npm run build
 

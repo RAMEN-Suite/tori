@@ -4,11 +4,10 @@ import { SchemaModule } from '../schema/schema.module';
 import { GraphModule } from '../graph/graph.module';
 import { CollectionService } from '../collection/collection.service';
 import { AnnotationController } from './annotation.controller';
-import { EntityService } from '../entity/entity.service';
 
 @Module({
   imports: [SchemaModule, GraphModule],
-  providers: [AnnotationService, CollectionService, EntityService],
+  providers: [AnnotationService, CollectionService],
   exports: [AnnotationService],
   controllers: [AnnotationController],
 })
