@@ -13,6 +13,7 @@ COPY package*.json ./
 COPY .npmrc ./
 # Install the production dependencies, omit the development dependencies
 RUN npm ci --omit=dev
+RUN npm rebuild better-sqlite3 --ignore-scripts=false
 
 # Dev
 FROM base AS dev
