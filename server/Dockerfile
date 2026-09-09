@@ -23,8 +23,7 @@ COPY package*.json ./
 # Copy .npmrc for supplychain security
 COPY .npmrc ./
 # Install the application dependencies
-RUN npm install
-RUN npm rebuild better-sqlite3 --ignore-scripts=false
+RUN npm install && npm rebuild better-sqlite3 --ignore-scripts=false
 # Copy the rest of the application files
 COPY . .
 
@@ -41,8 +40,7 @@ FROM base AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
 COPY .npmrc ./
-RUN npm ci
-RUN npm rebuild better-sqlite3 --ignore-scripts=false
+RUN npm ci && npm rebuild better-sqlite3 --ignore-scripts=false
 COPY . .
 RUN npm run build
 
@@ -62,7 +60,25 @@ COPY --from=builder --chown=nodeapp:nodeapp /usr/src/app/dist ./dist
 COPY --from=deps --chown=nodeapp:nodeapp /app/node_modules ./node_modules
 COPY NOTICES.md .
 
-RUN echo "APP_VERSION=$(npm pkg get version)" >> ./.env
+RUN cat > /usr/local/bin/expand-file-secrets.sh <<'EOF' \
+  && chmod 0555 /usr/local/bin/expand-file-secrets.sh \
+  && echo "APP_VERSION=$(npm pkg get version)" >> ./.env
+#!/bin/sh
+set -eu
+for _name in $(env | sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)_FILE=.*/\1/p'); do
+  eval "_path=\${${_name}_FILE}"
+  _value="$(cat "$_path" 2>/dev/null || true)"
+  if [ -n "$_value" ]; then
+    export "${_name}=${_value}"
+    unset "${_name}_FILE"
+  else
+    echo "expand-file-secrets: ${_name}_FILE=${_path} unreadable or empty, leaving ${_name} alone" >&2
+  fi
+done
+unset _name _path _value
+
+exec "$@"
+EOF
 
 USER nodeapp
 EXPOSE ${PORT}
@@ -70,5 +86,5 @@ EXPOSE ${PORT}
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1
 
-ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/expand-file-secrets.sh"]
 CMD ["node", "dist/src/main"]
