@@ -2,6 +2,46 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.15](https://github.com/RAMEN-Suite/tori/compare/v0.0.14...v0.0.15) (2026-09-01)
+
+
+### Features
+
+* **client:** add create entity shortcut ([728c492](https://github.com/RAMEN-Suite/tori/commit/728c492cf858ec10328d93aae1106629304ab565))
+* **client:** configurable shortcuts implemented ([1f7f5a2](https://github.com/RAMEN-Suite/tori/commit/1f7f5a2d1fdab3220496adb0609d75614313e436))
+* **client:** implement action and shortcut to open the create-annotation modal ([65ce1a4](https://github.com/RAMEN-Suite/tori/commit/65ce1a43bb5317e5c1de96749d102053bd498df6))
+* **client:** implement infinite scroll for search ([b1d7a10](https://github.com/RAMEN-Suite/tori/commit/b1d7a1064e2e0bc335f300f05432db93ce7f4af7))
+* **client:** implement pagination api in frontend. ([4b14cdd](https://github.com/RAMEN-Suite/tori/commit/4b14cddcfb30a413922758f8e35fb99a0039f84e))
+* **client:** implement shortcut keymap service ([56d0e72](https://github.com/RAMEN-Suite/tori/commit/56d0e724b622204c322bea9debb73041d4be3acc))
+* **client:** init shortcut config component ([75e037b](https://github.com/RAMEN-Suite/tori/commit/75e037b395622ce8b28da72caac0c789ea74830f))
+* **client:** init shortcut key normalizer ([162a5da](https://github.com/RAMEN-Suite/tori/commit/162a5da6a513c0c0d433e04104467c3012b34083))
+* **server:** create pageDTO structure ([01b637c](https://github.com/RAMEN-Suite/tori/commit/01b637c2af641c67aca661872d992fa0f965eb3e))
+* **server:** created /entity/suggested route ([7b7204a](https://github.com/RAMEN-Suite/tori/commit/7b7204a39fde87ed357cfa39a2f00eb37e3b0916))
+* **server:** implemented 'recently-updated' route ([4a1c89b](https://github.com/RAMEN-Suite/tori/commit/4a1c89bcc95ff72fbade45849c24ab4a423d1603))
+* **server:** implemented 'recently-updated' route ([dbb7a0a](https://github.com/RAMEN-Suite/tori/commit/dbb7a0a3f947a621b4ba143fb95be9e64626eabf))
+* **server:** init user sqlite db ([c487fdd](https://github.com/RAMEN-Suite/tori/commit/c487fdd706927ec2de39369503976419a9bd9d3c))
+* **server:** init user sqlite db ([d677004](https://github.com/RAMEN-Suite/tori/commit/d67700428ea6b7edebdca7828665ae89b6b205f6))
+* **server:** integrated sqlite userdb for view count ([8e2f365](https://github.com/RAMEN-Suite/tori/commit/8e2f365ea731048f540aa4d8023aa9e752d611b2))
+* **server:** only save 150 entity views per  user ([bee56fc](https://github.com/RAMEN-Suite/tori/commit/bee56fc47437db1ba4fde7eddd6143c0d9f0a473))
+* **server:** refactor find entity method to implement pagination ([4a6cba2](https://github.com/RAMEN-Suite/tori/commit/4a6cba21cd7986b023da4d863e37a22208be1276))
+* **server:** save viewed counter ([5395a80](https://github.com/RAMEN-Suite/tori/commit/5395a80c700e9a8de7e10dd4fcbb76602de020ba))
+
+
+### Bug Fixes
+
+* **client:** add shortcut keymap service constructor ([594acce](https://github.com/RAMEN-Suite/tori/commit/594accedad86796c1f243bf348bb7f3451b7ea5d))
+* **client:** address build warnings ([bbf7860](https://github.com/RAMEN-Suite/tori/commit/bbf786060e2ca6aaad8031ba2569fa118fc36a0a))
+* **client:** ui does not reset on nextPage call ([1886060](https://github.com/RAMEN-Suite/tori/commit/18860600c1d1940cdb74e7d4105d9f04e6764234))
+* move neo4j data to volumes ([167e1f9](https://github.com/RAMEN-Suite/tori/commit/167e1f9af9fd2977043c89975e681cec67ad1730))
+* **server:** add configService to main.ts ([d79d5fe](https://github.com/RAMEN-Suite/tori/commit/d79d5fef1e88f858848e06d0e30ca0da612fc1a1))
+* **server:** rm comment ([88a82b3](https://github.com/RAMEN-Suite/tori/commit/88a82b34df0306ffe0330c233e08a586dacbc813))
+
+
+### Refactoring
+
+* **server:** create pagination function ([c37d512](https://github.com/RAMEN-Suite/tori/commit/c37d5120e414824573d7b818800bc50bbcaf3ba6))
+* **server:** rm entity-service from annotation controller ([1d96566](https://github.com/RAMEN-Suite/tori/commit/1d9656653956e3bf37ab9d384876040261132a99))
+
 ## [0.0.14](https://github.com/RAMEN-Suite/tori/compare/v0.0.13...v0.0.14) (2026-08-03)
 
 
