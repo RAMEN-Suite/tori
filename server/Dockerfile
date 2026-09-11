@@ -52,7 +52,7 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-RUN addgroup -S nodeapp && adduser -S nodeapp -G nodeapp && \
+RUN addgroup -S -g 10001 nodeapp && adduser -S -u 10001 nodeapp -G nodeapp && \
   apk upgrade --no-cache && \
   apk add --no-cache tini=0.19.0-r3
 
