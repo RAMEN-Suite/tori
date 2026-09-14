@@ -33,7 +33,7 @@ export interface UserDatabaseConfig {
   synchronize?: boolean;
 }
 
-export interface CamiConfig {
+export interface MisoConfig {
   host?: string;
 }
 
@@ -41,6 +41,6 @@ export interface EnvironmentConfig {
   gcore: GcoreConfig;
   server: ServerConfig;
   database: DatabaseConfig;
-  cami: CamiConfig;
+  miso: MisoConfig;
   userDatabase: UserDatabaseConfig;
 }
