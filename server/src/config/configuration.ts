@@ -48,7 +48,7 @@ const environmentSchema = z.object({
   TORI_USER_DB_NAME: z.string().trim().min(1).default('/tori-config/user.db'),
   TORI_USER_DB_SYNCHRONIZE: z.stringbool().default(false),
 
-  TORI_CAMI_HOST: optionalString.pipe(z.httpUrl().optional()),
+  TORI_MISO_HOST: optionalString.pipe(z.httpUrl().optional()),
 });
 
 export function configuration(): EnvironmentConfig {
@@ -84,8 +84,8 @@ export function configuration(): EnvironmentConfig {
       database: env.TORI_DB_NAME,
     },
 
-    cami: {
-      host: env.TORI_CAMI_HOST,
+    miso: {
+      host: env.TORI_MISO_HOST,
     },
 
     userDatabase: {
