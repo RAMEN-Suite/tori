@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Button } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { UpdateAnnotationService } from './update-annotation.service';
@@ -10,6 +15,7 @@ import { TranslocoService } from '@jsverse/transloco';
   selector: 'app-update-annotation',
   providers: [UpdateAnnotationService],
   imports: [Button],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './update-annotation.html',
 })
 export class UpdateAnnotation {

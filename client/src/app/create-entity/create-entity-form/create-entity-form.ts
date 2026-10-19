@@ -8,6 +8,7 @@ import {
   Signal,
   viewChild,
   WritableSignal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CreateEntityService } from '../create-entity.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -32,6 +33,7 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
     ButtonDirective,
     TranslocoDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-entity-form.html',
 })
 export class CreateEntityForm {

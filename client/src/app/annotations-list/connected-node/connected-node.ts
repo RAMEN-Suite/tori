@@ -5,6 +5,7 @@ import {
   inject,
   input,
   OnInit,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
@@ -31,6 +32,7 @@ import { TranslocoService } from '@jsverse/transloco';
   selector: 'app-connected-node',
   imports: [NodeTypes, RouterLink, Button, NgTemplateOutlet],
   providers: [MessageService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './connected-node.html',
 })
 export class ConnectedNode implements OnInit {

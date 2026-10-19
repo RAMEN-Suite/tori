@@ -6,6 +6,7 @@ import {
   inject,
   OnInit,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Toast } from 'primeng/toast';
@@ -38,6 +39,7 @@ import { CreateEntityAction } from './actions/create-entity-action';
     TranslocoDirective,
   ],
   styleUrl: './app.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './app.html',
 })
 export class App implements OnInit {

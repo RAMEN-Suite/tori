@@ -1,4 +1,11 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { ButtonDirective } from 'primeng/button';
 import { ShortcutValidationError } from '../../../shortcuts/shortcut-key-normalizer';
 import { ShortcutInputVm } from './shortcut-input.vm';
@@ -8,6 +15,7 @@ import { ButtonGroup } from 'primeng/buttongroup';
   selector: 'app-shortcut-input',
   imports: [ButtonDirective, ButtonGroup],
   providers: [ShortcutInputVm],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './shortcut-input.html',
 })
 export class ShortcutInput {

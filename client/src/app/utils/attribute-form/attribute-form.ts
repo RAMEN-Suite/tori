@@ -1,4 +1,10 @@
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { AutoComplete } from 'primeng/autocomplete';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputNumber } from 'primeng/inputnumber';
@@ -36,6 +42,7 @@ interface AttributeWithOptValue
     KeyFilter,
     TranslocoDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './attribute-form.html',
 })
 export class AttributeForm {

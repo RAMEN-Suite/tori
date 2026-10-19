@@ -6,6 +6,7 @@ import {
   input,
   output,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import {
   FormControl,
@@ -56,6 +57,7 @@ interface CFOption {
     TranslocoDirective,
     Tooltip,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './filter-pane.html',
 })
 export class FilterPane {

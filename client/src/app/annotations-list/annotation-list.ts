@@ -5,6 +5,7 @@ import {
   inject,
   input,
   signal,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { EntityService } from '../entity.service';
 import { AnnotationOfEntityWithContent, Direction } from '../../interfaces';
@@ -46,6 +47,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
     TranslocoDirective,
   ],
   templateUrl: './annotation-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './annotation-list.scss',
 })
 export class AnnotationList {

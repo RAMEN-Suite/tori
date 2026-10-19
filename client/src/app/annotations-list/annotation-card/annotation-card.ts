@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Button } from 'primeng/button';
 import { ConnectedNode } from '../connected-node/connected-node';
 import { NodeTypes } from '../node-types/node-types';
@@ -26,6 +31,7 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
     NgClass,
     TranslocoDirective,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './annotation-card.html',
 })
 export class AnnotationCard {

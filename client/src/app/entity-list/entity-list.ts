@@ -6,6 +6,7 @@ import {
   input,
   output,
   ViewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { OldEntity } from '../../interfaces';
 import { NgClass } from '@angular/common';
@@ -27,6 +28,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
     TranslocoDirective,
   ],
   templateUrl: './entity-list.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     :host {
       display: flex;

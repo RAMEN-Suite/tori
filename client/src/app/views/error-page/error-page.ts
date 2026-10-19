@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { TranslocoDirective } from '@jsverse/transloco';
@@ -7,6 +7,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
   selector: 'app-error-page',
   imports: [Button, RouterLink, TranslocoDirective],
   styleUrl: './error-page.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './error-page.html',
 })
 export class ErrorPage {

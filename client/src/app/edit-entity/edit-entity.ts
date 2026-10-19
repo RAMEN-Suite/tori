@@ -1,4 +1,9 @@
-import { Component, inject, input } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { EditEntityService } from './edit-entity.service';
 import { Button } from 'primeng/button';
@@ -10,6 +15,7 @@ import { TranslocoService } from '@jsverse/transloco';
   selector: 'app-edit-entity',
   imports: [Button],
   providers: [EditEntityService],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './edit-entity.html',
 })
 export class EditEntity {
