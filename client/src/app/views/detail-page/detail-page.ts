@@ -6,7 +6,6 @@ import {
   input,
   OnDestroy,
   OnInit,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { DeleteEntity } from '../../delete-entity/delete-entity';
@@ -36,7 +35,6 @@ import { CreateAnnotationAction } from '../../actions/create-annotation-action';
     TranslocoDirective,
   ],
   styleUrl: './detail-page.scss',
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnDestroy, OnInit {

@@ -1,17 +1,10 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { Button } from 'primeng/button';
 import { CreateAnnotationAction } from '../actions/create-annotation-action';
 
 @Component({
   selector: 'app-create-annotation',
   imports: [Button],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-annotation.html',
 })
 export class CreateAnnotation {

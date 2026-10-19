@@ -6,7 +6,6 @@ import {
   signal,
   Signal,
   viewChild,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Entity, EntityPropertyDto, GAttribute } from '../../../interfaces';
@@ -36,7 +35,6 @@ interface AttributeWithOptValue
     ButtonDirective,
     TranslocoDirective,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './edit-entity-form.html',
 })
 export class EditEntityForm {

@@ -1,9 +1,4 @@
-import {
-  Component,
-  computed,
-  input,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { Chip } from 'primeng/chip';
 import { castUnknownToString, visibleProperties } from '../../utils/utils';
 import { NodePropertyDto } from '../../../interfaces';
@@ -14,7 +9,6 @@ type TextSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 @Component({
   selector: 'app-attribute-list',
   imports: [Chip, TranslocoDirective],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './attribute-list.html',
 })
 export class AttributeList {

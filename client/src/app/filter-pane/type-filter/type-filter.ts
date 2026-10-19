@@ -1,11 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  model,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, effect, inject, model } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TitleCasePipe } from '@angular/common';
 import { Checkbox } from 'primeng/checkbox';
@@ -14,7 +7,6 @@ import { ConfigService } from '../../config-module/config.service';
 @Component({
   selector: 'app-type-filter',
   imports: [Checkbox, ReactiveFormsModule, TitleCasePipe],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './type-filter.html',
 })
 export class TypeFilter {

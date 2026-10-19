@@ -1,10 +1,4 @@
-import {
-  booleanAttribute,
-  Component,
-  computed,
-  input,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { Chip } from 'primeng/chip';
 import {
   ANNOTATION_LABEL_NAME,
@@ -23,7 +17,6 @@ const RAMEN_CORE_TYPES = [
 @Component({
   selector: 'app-node-types',
   imports: [Chip],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './node-types.html',
 })
 export class NodeTypes {

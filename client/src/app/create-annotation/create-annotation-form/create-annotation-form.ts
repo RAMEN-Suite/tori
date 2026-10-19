@@ -8,7 +8,6 @@ import {
   signal,
   viewChild,
   WritableSignal,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CreateAnnotationService } from '../create-annotation.service';
 import { FloatLabel } from 'primeng/floatlabel';
@@ -37,7 +36,6 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
     AttributeForm,
     TranslocoDirective,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './create-annotation-form.html',
 })
 export class CreateAnnotationForm {

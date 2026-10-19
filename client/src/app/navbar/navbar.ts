@@ -1,10 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  Signal,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, inject, Signal } from '@angular/core';
 import { Menubar } from 'primeng/menubar';
 import { MenuItem } from 'primeng/api';
 import { BackButtonComponent } from '../utils/back-button.component';
@@ -33,7 +27,6 @@ import { Nullable } from 'primeng/ts-helpers';
     TranslocoDirective,
     Popover,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './navbar.html',
 })
 export class Navbar {

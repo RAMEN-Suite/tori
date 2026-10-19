@@ -1,10 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { ConfigService } from './config.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MultiSelect } from 'primeng/multiselect';
@@ -24,7 +18,6 @@ import { ShortcutConfig } from './shortcut-config/shortcut-config';
     TranslocoDirective,
     ShortcutConfig,
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './config-pane.html',
 })
 export class ConfigPane {
