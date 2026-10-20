@@ -55,7 +55,8 @@ ENV PORT=3000
 
 RUN addgroup -S nodeapp && adduser -S nodeapp -G nodeapp && \
   apk upgrade --no-cache && \
-  apk add --no-cache tini=0.19.0-r3
+  apk add --no-cache tini=0.19.0-r3 && \
+  mkdir -p /user-db && chown nodeapp:nodeapp /user-db
 
 COPY --chown=nodeapp:nodeapp package.json ./
 COPY --from=builder --chown=nodeapp:nodeapp /usr/src/app/dist ./dist
