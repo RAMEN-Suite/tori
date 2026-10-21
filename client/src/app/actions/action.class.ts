@@ -11,8 +11,7 @@ export abstract class Action<I> {
     return null;
   }
 
-  public shortcut(input: I): ActionShortcut | null {
-    void input;
+  public shortcut(_input: I): ActionShortcut | null {
     return this.configurableShortcut();
   }
 

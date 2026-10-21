@@ -13,7 +13,7 @@ import { ProjectConfigModule } from './project-config/project-config.module';
 import { configuration } from './config/configuration';
 import { EnvironmentConfig } from './config/config.types';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { EntityViewEntity } from './entity/entity-view.orm-entity';
 import { UserEntity } from './entity/users.orm-entity';
 import { UserModule } from './user/user.module';
@@ -27,8 +27,8 @@ import { UserModule } from './user/user.module';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: async (config: ConfigService<EnvironmentConfig, true>) => ({
-        ...(await config.getOrThrow('userDatabase', { infer: true })),
+      useFactory: (config: ConfigService<EnvironmentConfig, true>) => ({
+        ...(config.getOrThrow('userDatabase', { infer: true }) satisfies TypeOrmModuleOptions),
         entities: [EntityViewEntity, UserEntity],
       }),
     }),

@@ -13,7 +13,7 @@ import {
   withNavigationErrorHandler,
 } from '@angular/router';
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -86,7 +86,7 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
-    provideHttpClient(),
+    provideHttpClient(withXhr()),
     provideTransloco({
       config: { reRenderOnLangChange: true, prodMode: !isDevMode() },
       loader: TranslocoHttpLoader,
