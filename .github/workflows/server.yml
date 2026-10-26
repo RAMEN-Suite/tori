@@ -3,15 +3,15 @@ name: Server CI
 on:
   pull_request:
     paths:
-      - "server/**"
-      - "schema/**"
-      - ".github/workflows/server.yml"
+      - 'server/**'
+      - 'schema/**'
+      - '.github/workflows/server.yml'
   push:
     branches: [dev, main]
     paths:
-      - "server/**"
-      - "schema/**"
-      - ".github/workflows/server.yml"
+      - 'server/**'
+      - 'schema/**'
+      - '.github/workflows/server.yml'
   workflow_dispatch:
 
 defaults:
@@ -43,7 +43,7 @@ jobs:
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version-file: .nvmrc
-          cache: "npm"
+          cache: 'npm'
           cache-dependency-path: server/package-lock.json
       - name: Install dependencies
         run: npm ci
@@ -135,8 +135,8 @@ jobs:
           image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
           format: sarif
           output: trivy.sarif
-          severity: "CRITICAL,HIGH"
-          exit-code: "0"
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
           ignore-unfixed: true
       - name: Upload trivy scan results
         if: always() && github.ref == 'refs/heads/dev'
@@ -188,15 +188,15 @@ jobs:
     environment: ${{ matrix.environment }}
     permissions:
       contents: read # required for actions/checkout to fetch repo contents if this repo is private
-      packages: read # required for docker login + docker compose pull to authenticate against and pull from the registry
+      packages: read # the token piped to the gateway logs the host in to the registry for docker compose pull
     strategy:
       fail-fast: false
       matrix:
         include:
           - environment: development
-            script: deploy-tori-server
-          - environment: sbwi
-            script: "deploy ed/tori server"
+            stack: tori/tori
+          - environment: staging
+            stack: dev/tori
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -205,7 +205,7 @@ jobs:
       - name: Install SSH Key
         env:
           KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          PRIVATE_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
           HOST: ${{ secrets.SSH_HOST }}
           USER: ${{ secrets.SSH_USER }}
         run: |
@@ -221,8 +221,8 @@ jobs:
             User $USER
             IdentityFile ~/.ssh/staging.key
           END
-      - name: Start Container
+      - name: Deploy the dev image
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SCRIPT: ${{ matrix.script }}
-        run: printf '%s' "$GH_TOKEN" | ssh staging $SCRIPT
+          STACK: ${{ matrix.stack }}
+        run: printf '%s' "$GH_TOKEN" | ssh staging deploy "$STACK" server dev

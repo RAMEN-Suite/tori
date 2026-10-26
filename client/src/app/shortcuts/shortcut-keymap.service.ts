@@ -69,7 +69,6 @@ export class ShortcutKeymapService {
   public reset(slug: string): void {
     this.overrides.update((old) => {
       const { [slug]: _removed, ...next } = old;
-      void _removed;
       return next;
     });
   }
