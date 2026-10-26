@@ -67,14 +67,19 @@ RUN npm run build
 FROM caddy:${CADDY_VERSION} AS prod
 WORKDIR /app
 
-RUN addgroup -S webuser \
-  && adduser -S webuser -G webuser \
-  && apk add --no-cache gettext-envsubst=0.24.1-r1
+RUN addgroup -S -g 10001 webuser \
+  && adduser -S -u 10001 webuser -G webuser \
+  && apk add --no-cache gettext-envsubst=0.24.1-r1 \
+  && setcap -r /usr/bin/caddy
 
 
 COPY --chown=webuser:webuser --from=builder /app/dist/*/browser /usr/share/caddy
 
 RUN cat > /etc/caddy/Caddyfile <<'EOF'
+{
+    persist_config off
+    admin off
+}
 :8080 {
     root * /tmp/www
     try_files {path} {path}/ /index.html

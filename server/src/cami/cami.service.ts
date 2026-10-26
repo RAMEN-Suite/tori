@@ -25,7 +25,7 @@ export class CamiService {
   }
 
   private getCamiHost(): string {
-    const camiHost = this.config.get('cami.host', { infer: true });
+    const camiHost = this.config.get('miso.host', { infer: true });
     if (!camiHost) {
       throw new InternalServerErrorException('There is no host for the cami application configured. Contact your administrator.');
     }
