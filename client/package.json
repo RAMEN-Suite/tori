@@ -25,6 +25,7 @@
     "@angular/router": "^22.2.3",
     "@jsverse/transloco": "^8.4.0",
     "@primeuix/themes": "^2.0.3",
+    "@sushi-kit/angular": "^0.1.4",
     "ngx-logger": "^5.0.12",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
