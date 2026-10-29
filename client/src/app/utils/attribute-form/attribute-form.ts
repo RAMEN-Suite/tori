@@ -2,7 +2,6 @@ import { Component, computed, inject, input } from '@angular/core';
 import { AutoComplete } from 'primeng/autocomplete';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputNumber } from 'primeng/inputnumber';
-import { InputText } from 'primeng/inputtext';
 import {
   FormControl,
   FormGroup,
@@ -18,6 +17,7 @@ import { MessageService } from 'primeng/api';
 import { KeyFilter } from 'primeng/keyfilter';
 import { castValue, castValues } from '../utils';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
+import { Input, Label } from '@sushi-kit/angular';
 
 interface AttributeWithOptValue
   extends
@@ -30,11 +30,12 @@ interface AttributeWithOptValue
     AutoComplete,
     FloatLabel,
     InputNumber,
-    InputText,
     ReactiveFormsModule,
     ToggleButton,
     KeyFilter,
     TranslocoDirective,
+    Input,
+    Label,
   ],
   templateUrl: './attribute-form.html',
 })

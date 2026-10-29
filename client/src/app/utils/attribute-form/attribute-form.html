@@ -1,7 +1,7 @@
 <ng-container *transloco="let t">
   @for (property of properties(); track property.name) {
     @if (findDataType(property.typeId); as dataType) {
-      <div class="field" [formGroup]="propertiesForm()">
+      <div class="" [formGroup]="propertiesForm()">
         @let isArray = property.bounds.upperBound === -1 || property.bounds.upperBound > 1;
         @let fieldId = "create-entity-form_" + formName + "_" + property.name;
         @if (isArray) {
@@ -34,14 +34,14 @@
             @let isLabel = property.name === ENTITY_NAME_PROPERTY;
             <p-floatlabel variant="on">
               <input
-                pInputText
+                suiInput
                 [formControlName]="property.name"
                 (blur)="isLabel ? onLabelBlur($event) : null"
                 [id]="fieldId"
                 autocomplete="off"
                 fluid
               />
-              <label [for]="fieldId"
+              <label [for]="fieldId" suiLabel
                 >{{ property.name }}
                 @if (property.bounds.lowerBound > 0) {
                   <small class="text-red-400"> *</small>
