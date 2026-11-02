@@ -10,10 +10,17 @@ import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { EntityPropertyDto } from '../../../interfaces';
 import { ConfigService } from '../../config-module/config.service';
 import { EntityApiService } from '../../api/entity-api.service';
-import { MessageService } from 'primeng/api';
 import { castValue, castValues } from '../utils';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
-import { Chip, Input, InputNumber, Label, Toggle } from '@sushi-kit/angular';
+import {
+  Chip,
+  Input,
+  InputNumber,
+  Label,
+  ToastService,
+  Toggle,
+} from '@sushi-kit/angular';
+import { SushiToastTemplates } from '../../models/config/SushiToastTemplates';
 
 interface AttributeWithOptValue
   extends
@@ -38,7 +45,7 @@ interface AttributeWithOptValue
 export class AttributeForm {
   private readonly configService = inject(ConfigService);
   private readonly entityAPI = inject(EntityApiService);
-  private readonly messageService = inject(MessageService);
+  private readonly toastService = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
 
   public properties = input.required<AttributeWithOptValue[]>();
@@ -157,13 +164,14 @@ export class AttributeForm {
       }),
     );
     if (detailMsg.length === 0) return;
-    this.messageService.add({
+    this.toastService.show({
       severity: 'info',
-      summary: this.transloco.translate(
+      title: this.transloco.translate(
         'app.shared.attributeForm.similar.summary',
       ),
-      detail: detailMsg.join('\n'),
-      life: 11000,
+      message: detailMsg.join('\n'),
+      duration: 11000,
+      template: SushiToastTemplates.HTML,
     });
   }
 

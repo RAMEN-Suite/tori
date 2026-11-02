@@ -1,0 +1,6 @@
+<header suiDialogHeader>
+  <h2 id="menu-dialog-title" class="text-lg font-semibold">{{ data.title }}</h2>
+</header>
+<div suiDialogBody>
+  <ng-container *ngComponentOutlet="data.component; inputs: data.inputs" />
+</div>

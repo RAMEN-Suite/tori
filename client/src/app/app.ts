@@ -8,7 +8,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { Toast } from 'primeng/toast';
 import { ConfigService } from './config-module/config.service';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { MenubarModule } from 'primeng/menubar';
@@ -22,11 +21,15 @@ import { TranslocoDirective } from '@jsverse/transloco';
 import { ShortcutService } from './shortcuts/shortcut.service';
 import { CreateEntityAction } from './actions/create-entity-action';
 
+import { Toast as PrimeToast } from 'primeng/toast';
+import { Toast as SushiToast, ToastContentTemplate } from '@sushi-kit/angular';
+import { SushiToastTemplates } from './models/config/SushiToastTemplates';
+
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
-    Toast,
+    PrimeToast,
     ProgressSpinner,
     MenubarModule,
     Button,
@@ -36,6 +39,8 @@ import { CreateEntityAction } from './actions/create-entity-action';
     Navbar,
     Skeleton,
     TranslocoDirective,
+    SushiToast,
+    ToastContentTemplate,
   ],
   styleUrl: './app.scss',
   templateUrl: './app.html',
@@ -88,4 +93,5 @@ export class App implements OnInit {
 
   protected appVersion = this.status.getServerVersion();
   protected ramenVersion = this.status.getRamenVersion();
+  protected readonly SushiToastTemplates = SushiToastTemplates;
 }

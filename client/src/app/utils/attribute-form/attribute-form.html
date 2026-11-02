@@ -1,7 +1,7 @@
 <ng-container *transloco="let t">
   @for (property of properties(); track property.name) {
     @if (findDataType(property.typeId); as dataType) {
-      <div class="grid max-w-md gap-4" [formGroup]="propertiesForm()">
+      <div class="grid gap-5" [formGroup]="propertiesForm()">
         @let isArray = property.bounds.upperBound === -1 || property.bounds.upperBound > 1;
         @let fieldId = "create-entity-form_" + formName + "_" + property.name;
         @if (isArray) {
@@ -70,8 +70,8 @@
               <!--              [id]="fieldId"-->
               <!--            />-->
               <label suiLabel [for]="fieldId" class="flex items-center gap-2">
-                <input suiToggle [id]="fieldId" type="checkbox" size="sm" checked [formControlName]="property.name" />
                 {{ property.name }}
+                <input suiToggle [id]="fieldId" type="checkbox" size="sm" checked [formControlName]="property.name" />
               </label>
             }
             @if (dataType.name.toLowerCase() === "integer") {

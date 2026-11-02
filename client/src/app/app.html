@@ -7,6 +7,14 @@
   </ng-template>
 </p-toast>
 <p-confirm-dialog />
+<sui-toast horizontal="end" vertical="top" motion="fade" dismissLabel="Close notification" style="--sui-toast-offset-block: 5rem">
+  <ng-template [suiToastContent]="SushiToastTemplates.HTML" let-toast>
+    <div class="p-toast-message-text">
+      <span class="p-toast-summary">{{ toast.title }}</span>
+      <div class="p-toast-detail" [innerHTML]="toast.message"></div>
+    </div>
+  </ng-template>
+</sui-toast>
 
 <div class="app-shell">
   <app-navbar class="topbar" />

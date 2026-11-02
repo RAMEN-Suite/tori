@@ -28,6 +28,7 @@ import { LanguageService } from './language.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ShortcutService } from './shortcuts/shortcut.service';
 import { ShortcutKeymapService } from './shortcuts/shortcut-keymap.service';
+import { ToastService } from '@sushi-kit/angular';
 
 const awenTheme = definePreset(Aura, {
   semantic: {
@@ -53,6 +54,7 @@ export const appConfig: ApplicationConfig = {
     EntityService,
     ConfirmationService,
     MessageService,
+    ToastService,
     DialogService,
     ShortcutKeymapService,
     ShortcutService,

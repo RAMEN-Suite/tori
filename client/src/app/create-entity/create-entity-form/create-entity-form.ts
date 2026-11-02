@@ -15,12 +15,12 @@ import { Select } from 'primeng/select';
 import { GAttribute } from '../../../interfaces';
 import { FloatLabel } from 'primeng/floatlabel';
 import { ButtonDirective } from 'primeng/button';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ConfirmationService } from 'primeng/api';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { Router } from '@angular/router';
 import { UtilsService } from '../../utils/utils.service';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
+import { DialogRef } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-create-entity-form',
@@ -38,7 +38,7 @@ export class CreateEntityForm {
   private readonly createEntityService = inject(CreateEntityService);
   private readonly utilService = inject(UtilsService);
   private readonly router = inject(Router);
-  private dialogRef = inject(DynamicDialogRef);
+  private dialogRef = inject(DialogRef);
   private readonly transloco = inject(TranslocoService);
 
   private confirmationService = inject(ConfirmationService);
