@@ -11,10 +11,11 @@ import { FilterPane } from '../filter-pane/filter-pane';
 import { FormsModule } from '@angular/forms';
 import { EntityList } from '../entity-list/entity-list';
 import { Annotation, OldEntity } from '../../interfaces';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmService } from '../utils/confirm.service';
+import { NotificationService } from '../utils/notification.service';
 import { AnnotationApiService } from '../api/annotation-api.service';
 import { getKeyProperty } from '../utils/entity.utils';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DialogRef } from '@angular/cdk/dialog';
 import { EntityService } from '../entity.service';
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -28,11 +29,11 @@ export class CreateAnnotationConnection {
   private readonly entityService = inject(EntityService);
   private readonly annotationApi = inject(AnnotationApiService);
   private readonly searchService = inject(SearchEntityService);
-  private confirmationService = inject(ConfirmationService);
-  private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmService);
+  private messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
 
-  private readonly dialogRef = inject(DynamicDialogRef);
+  private readonly dialogRef = inject(DialogRef);
 
   public annotation = input.required<Annotation>();
 
@@ -70,8 +71,7 @@ export class CreateAnnotationConnection {
       header: this.transloco.translate(
         'app.shared.createAnnotationConnection.header',
       ),
-      icon: 'pi pi-info-circle',
-      rejectLabel: this.transloco.translate('app.shared.actions.cancel'),
+      icon: 'info-circle',
       rejectButtonProps: {
         label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',

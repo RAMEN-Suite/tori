@@ -1,63 +1,62 @@
 <ng-container *transloco="let t">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="formgrid grid">
-    <div class="field col-12">
-      <p-auto-complete
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-wrap">
+    <div class="flex flex-wrap gap-2 w-full">
+      <sui-autocomplete
         formControlName="label"
-        [suggestions]="suggestions()"
+        [options]="suggestionOptions()"
         [invalid]="form.controls.label.invalid && form.controls.label.touched"
-        (completeMethod)="autocompleteChanges($event)"
-        (onSelect)="onItemSelect($event); onSubmit()"
-        (keydown.enter)="onSubmit()"
+        (queryChange)="autocompleteChanges($event)"
+        (valueChange)="onSuggestionValue($event)"
         fluid
-        [showEmptyMessage]="showEmptyMessage()"
-        optionLabel="label"
-        panelStyleClass="w-30rem"
         autofocus
       >
-        <ng-template let-entity #item>
+        <ng-template let-entity suiAutocompleteItem>
           @if (enableLinkToEntity()) {
-            <a [routerLink]="['/', 'entity', entity.id]" [target]="openLinkInNewTab() ? '_blank' : ''" class="flex items-center gap-2">
-              <span class="text-black-alpha-90">{{ entity.label }}</span>
+            <a
+              [routerLink]="['/', 'entity', suggestionId(entity.value)]"
+              [target]="openLinkInNewTab() ? '_blank' : ''"
+              class="flex items-center gap-2"
+            >
+              <span class="text-black/90">{{ entity.label }}</span>
             </a>
           } @else {
             <div class="flex items-center gap-2">
-              <span class="text-black-alpha-90">{{ entity.label }}</span>
+              <span class="text-black/90">{{ entity.label }}</span>
             </div>
           }
         </ng-template>
-      </p-auto-complete>
+      </sui-autocomplete>
       @if (form.controls.label.invalid && form.controls.label.touched) {
-        <p-message severity="error" size="small" variant="simple">{{ t("app.shared.filterPane.label.error") }}</p-message>
+        <div severity="error" size="sm" role="alert" class="text-sm text-red-700">{{ t("app.shared.filterPane.label.error") }}</div>
       }
     </div>
     @for (input of collectionFilterOptions(); track $index) {
-      <form [formGroup]="form.controls.collectionFilter" class="field col-12 md:col">
-        <p-select
-          [options]="input.values"
+      <div [formGroup]="form.controls.collectionFilter" class="flex flex-wrap gap-2 w-full md:flex-1 min-w-0">
+        <sui-select
+          [compareWith]="compareSelectionValues"
+          [options]="input.values | options"
           [formControlName]="input.type"
-          optionLabel="label"
           [placeholder]="t('app.shared.filterPane.collection.placeholder', { collectionType: input.type })"
-          [virtualScroll]="true"
-          [virtualScrollItemSize]="30"
           showClear
           filter
-          filterBy="label"
           class="w-full"
         />
-      </form>
+      </div>
     }
-    <div class="field col-12">
+    <div class="flex flex-wrap gap-2 w-full">
       <app-type-filter [(form)]="form.controls.types" />
     </div>
-    <div class="field col-12 flex justify-content-end gap-2">
-      <p-button
-        text
+    <div class="flex flex-wrap gap-2 w-full flex justify-end gap-2">
+      <button
+        suiButton
+        variant="text"
         type="button"
-        icon="pi pi-undo"
-        [pTooltip]="t('app.shared.filterPane.resetBtn.tooltip')"
-        (onClick)="resetFilterClicked()"
-      />
-      <p-button type="submitt" [label]="t('app.shared.filterPane.submitBtn.label')" />
+        [suiTooltip]="t('app.shared.filterPane.resetBtn.tooltip')"
+        (click)="resetFilterClicked()"
+      >
+        <app-icon name="undo" />
+      </button>
+      <button suiButton type="submit">{{ t("app.shared.filterPane.submitBtn.label") }}</button>
     </div>
   </form>
 </ng-container>

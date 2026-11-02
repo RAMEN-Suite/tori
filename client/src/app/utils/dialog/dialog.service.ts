@@ -1,4 +1,4 @@
-import { inject, Service } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Dialog as CdkDialog } from '@angular/cdk/dialog';
 import { ComponentType } from '@angular/cdk/overlay';
 import { Dialog } from './dialog';
@@ -8,7 +8,7 @@ interface Config<I extends Record<string, unknown>> {
   inputs?: I;
 }
 
-@Service()
+@Injectable({ providedIn: 'root' })
 export class DialogService {
   private readonly dialogService: CdkDialog = inject(CdkDialog);
 
@@ -25,6 +25,8 @@ export class DialogService {
       },
       panelClass: 'sui-dynamic-dialog',
       backdropClass: 'sui-dialog-backdrop',
+      width: 'min(64rem, 94vw)',
+      maxHeight: '90dvh',
     });
   }
 }

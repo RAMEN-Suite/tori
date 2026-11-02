@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { NotificationService } from './utils/notification.service';
 import { HealthApiService, HealthStatus } from './api/health-api.service';
 import { TranslocoService } from '@jsverse/transloco';
 
@@ -8,7 +8,7 @@ import { TranslocoService } from '@jsverse/transloco';
 })
 export class HealthService {
   private readonly healthApi = inject(HealthApiService);
-  private readonly messageService = inject(MessageService);
+  private readonly messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
 
   private readonly _statusLoaded = signal<boolean>(false);

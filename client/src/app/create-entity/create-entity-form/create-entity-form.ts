@@ -1,3 +1,5 @@
+import { OptionsPipe } from '../../utils/options.pipe';
+import { Select, Button } from '@sushi-kit/angular';
 import {
   Component,
   computed,
@@ -11,11 +13,9 @@ import {
 } from '@angular/core';
 import { CreateEntityService } from '../create-entity.service';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Select } from 'primeng/select';
 import { GAttribute } from '../../../interfaces';
-import { FloatLabel } from 'primeng/floatlabel';
-import { ButtonDirective } from 'primeng/button';
-import { ConfirmationService } from 'primeng/api';
+
+import { ConfirmService } from '../../utils/confirm.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { Router } from '@angular/router';
 import { UtilsService } from '../../utils/utils.service';
@@ -25,11 +25,11 @@ import { DialogRef } from '@angular/cdk/dialog';
 @Component({
   selector: 'app-create-entity-form',
   imports: [
+    OptionsPipe,
     Select,
     ReactiveFormsModule,
-    FloatLabel,
     AttributeForm,
-    ButtonDirective,
+    Button,
     TranslocoDirective,
   ],
   templateUrl: './create-entity-form.html',
@@ -41,7 +41,7 @@ export class CreateEntityForm {
   private dialogRef = inject(DialogRef);
   private readonly transloco = inject(TranslocoService);
 
-  private confirmationService = inject(ConfirmationService);
+  private confirmationService = inject(ConfirmService);
 
   public preselectedType = input<string>();
 
@@ -101,7 +101,7 @@ export class CreateEntityForm {
           'app.shared.createEntityForm.success.message',
         ),
         header: this.transloco.translate('app.shared.common.success'),
-        icon: 'pi pi-info-circle',
+        icon: 'info-circle',
         rejectButtonProps: {
           label: this.transloco.translate(
             'app.shared.createEntityForm.success.stayHere',

@@ -1,31 +1,29 @@
+import { Icon } from '../utils/icon';
+import { PopoverTrigger, Button, Popover } from '@sushi-kit/angular';
 import { Component, computed, inject, Signal } from '@angular/core';
-import { Menubar } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
+
 import { BackButtonComponent } from '../utils/back-button.component';
 import { isActive, Router, RouterLink } from '@angular/router';
 import { CreateEntity } from '../create-entity/create-entity';
-import { Button, ButtonDirective } from 'primeng/button';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { Popover } from 'primeng/popover';
 import { LanguageService } from '../language.service';
 import {
   AVAILABLE_LANGUAGES,
   LanguageKey,
 } from '../models/config/LanguageOptions';
 import { ConfigService } from '../config-module/config.service';
-import { Nullable } from 'primeng/ts-helpers';
 
 @Component({
   selector: 'app-navbar',
   imports: [
-    Menubar,
+    Icon,
     BackButtonComponent,
     RouterLink,
     CreateEntity,
-    ButtonDirective,
     Button,
     TranslocoDirective,
     Popover,
+    PopoverTrigger,
   ],
   templateUrl: './navbar.html',
 })
@@ -41,8 +39,6 @@ export class Navbar {
     matrixParams: 'ignored',
   });
 
-  protected items: MenuItem[] = [];
-
   protected readonly activeLanguage: Signal<LanguageKey | undefined> =
     this.languageService.activeLanguage;
   protected readonly languages: Signal<LanguageKey[]> = computed(
@@ -55,27 +51,11 @@ export class Navbar {
     },
   );
 
-  protected handleOpenLanguages(popover: Popover, event: Event): void {
-    popover.toggle(event);
-
-    requestAnimationFrame((): void => {
-      popover.align();
-      this.resetPopoverOffset(popover);
-    });
-  }
-
   protected handleLanguageChange(
     language: LanguageKey,
     popover: Popover,
   ): void {
     popover.hide();
     this.languageService.setActiveLanguage(language);
-  }
-
-  private resetPopoverOffset(popover: Popover): void {
-    const container: Nullable<HTMLElement> = popover.container;
-    if (!container) return;
-    container.style.top = `${container.offsetTop - window.scrollY}px`;
-    container.style.left = `${container.offsetLeft + 15 - window.scrollX}px`;
   }
 }

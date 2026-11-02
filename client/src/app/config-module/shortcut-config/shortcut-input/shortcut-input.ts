@@ -1,12 +1,12 @@
+import { Icon } from '../../../utils/icon';
+import { Button } from '@sushi-kit/angular';
 import { Component, effect, inject, input, output } from '@angular/core';
-import { ButtonDirective } from 'primeng/button';
 import { ShortcutValidationError } from '../../../shortcuts/shortcut-key-normalizer';
 import { ShortcutInputVm } from './shortcut-input.vm';
-import { ButtonGroup } from 'primeng/buttongroup';
 
 @Component({
   selector: 'app-shortcut-input',
-  imports: [ButtonDirective, ButtonGroup],
+  imports: [Icon, Button],
   providers: [ShortcutInputVm],
   templateUrl: './shortcut-input.html',
 })

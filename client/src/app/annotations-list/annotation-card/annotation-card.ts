@@ -1,15 +1,17 @@
+import { Icon } from '../../utils/icon';
+import { Button } from '@sushi-kit/angular';
 import { Component, inject, input } from '@angular/core';
-import { Button } from 'primeng/button';
 import { ConnectedNode } from '../connected-node/connected-node';
 import { NodeTypes } from '../node-types/node-types';
 import { AttributeList } from '../attribute-list/attribute-list';
 import { UpdateAnnotation } from '../../edit-annotation/update-annotation';
 import type { StatementAnnotationView } from '../annotation-list.model';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DialogService } from '../../utils/dialog/dialog.service';
 import { CreateAnnotationConnection } from '../../create-annotation-connection/create-annotation-connection';
 import { Annotation } from '../../../interfaces';
 import { AnnotationApiService } from '../../api/annotation-api.service';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmService } from '../../utils/confirm.service';
+import { NotificationService } from '../../utils/notification.service';
 import { UtilsService } from '../../utils/utils.service';
 import { EntityService } from '../../entity.service';
 import { NgClass } from '@angular/common';
@@ -18,6 +20,7 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-annotation-card',
   imports: [
+    Icon,
     Button,
     ConnectedNode,
     NodeTypes,
@@ -31,37 +34,23 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 export class AnnotationCard {
   private readonly dialogService = inject(DialogService);
   private readonly annotationApi = inject(AnnotationApiService);
-  private readonly confirmationService = inject(ConfirmationService);
-  private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmService);
+  private readonly messageService = inject(NotificationService);
   private readonly utils = inject(UtilsService);
   private readonly entityService = inject(EntityService);
   private readonly transloco = inject(TranslocoService);
 
   public annotation = input.required<StatementAnnotationView>();
 
-  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null =
-    null;
-
   protected clickCreateAnnotationConnection(annotation: Annotation) {
-    this.createAnnotationConnectionDialogRef = this.dialogService.open(
-      CreateAnnotationConnection,
-      {
-        inputValues: {
-          annotation: annotation,
-        },
-        header: this.transloco.translate(
-          'app.shared.createAnnotationConnection.header',
-        ),
-        styleClass: 'w-11 md:w-10 lg:w-9',
-        style: {
-          'min-height': '60vh',
-        },
-        contentStyle: {
-          'padding-top': '0.5rem',
-        },
-        closable: true,
+    this.dialogService.open(CreateAnnotationConnection, {
+      inputs: {
+        annotation: annotation,
       },
-    );
+      title: this.transloco.translate(
+        'app.shared.createAnnotationConnection.header',
+      ),
+    });
   }
 
   protected clickDeleteAnnotation(id: string, event?: Event) {
@@ -71,7 +60,7 @@ export class AnnotationCard {
         'app.shared.annotationCard.delete.confirm.message',
       ),
       header: this.transloco.translate('app.shared.common.dangerZone'),
-      icon: 'pi pi-info-circle',
+      icon: 'info-circle',
       rejectButtonProps: {
         label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',

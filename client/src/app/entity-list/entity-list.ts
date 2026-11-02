@@ -1,3 +1,5 @@
+import { Icon } from '../utils/icon';
+import { Spinner, Chip, Button, Tooltip } from '@sushi-kit/angular';
 import {
   booleanAttribute,
   Component,
@@ -9,23 +11,12 @@ import {
 } from '@angular/core';
 import { OldEntity } from '../../interfaces';
 import { NgClass } from '@angular/common';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { Chip } from 'primeng/chip';
-import { Button } from 'primeng/button';
-import { Tooltip } from 'primeng/tooltip';
 import { UtilsService } from '../utils/utils.service';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-entity-list',
-  imports: [
-    NgClass,
-    ProgressSpinner,
-    Chip,
-    Button,
-    Tooltip,
-    TranslocoDirective,
-  ],
+  imports: [Icon, NgClass, Spinner, Chip, Button, Tooltip, TranslocoDirective],
   templateUrl: './entity-list.html',
   styles: `
     :host {

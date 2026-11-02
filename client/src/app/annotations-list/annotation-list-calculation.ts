@@ -142,7 +142,6 @@ function toNodeView(
     node,
     id: keyValue ?? '',
     link: link,
-    directionIcon:
-      node.direction === 'OUTGOING' ? 'pi-arrow-right' : 'pi-arrow-left',
+    directionIcon: node.direction === 'OUTGOING' ? 'arrow-right' : 'arrow-left',
   };
 }

@@ -1,5 +1,5 @@
+import { Chip } from '@sushi-kit/angular';
 import { booleanAttribute, Component, computed, input } from '@angular/core';
-import { Chip } from 'primeng/chip';
 import {
   ANNOTATION_LABEL_NAME,
   COLLECTION_LABEL_NAME,

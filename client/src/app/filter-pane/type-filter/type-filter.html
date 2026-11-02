@@ -1,7 +1,14 @@
-<div class="formgrid grid flex gap-3">
+<div class="flex flex-wrap gap-3">
   @for (type of types(); track type) {
-    <div class="field col-fixed w-auto flex align-items-center align-content-center items-center gap-2">
-      <p-checkbox [value]="type" [inputId]="type" [formControl]="form()" />
+    <div class="flex flex-wrap gap-2 shrink-0 w-auto flex items-center content-center items-center gap-2">
+      <input
+        suiCheckbox
+        type="checkbox"
+        [id]="type"
+        [checked]="form().value.includes(type)"
+        [disabled]="form().disabled"
+        (change)="toggleType(type, $event)"
+      />
       <label [for]="type" class="p-0 m-0"> {{ type | titlecase }} </label>
     </div>
   }

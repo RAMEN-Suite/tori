@@ -1,7 +1,7 @@
+import { Checkbox } from '@sushi-kit/angular';
 import { Component, computed, effect, inject, model } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TitleCasePipe } from '@angular/common';
-import { Checkbox } from 'primeng/checkbox';
 import { ConfigService } from '../../config-module/config.service';
 
 @Component({
@@ -27,6 +27,17 @@ export class TypeFilter {
         this.form().setValue(next, { emitEvent: false });
       }
     });
+  }
+
+  protected toggleType(type: string, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.form().setValue(
+      checked
+        ? [...this.form().value, type]
+        : this.form().value.filter((value) => value !== type),
+    );
+    this.form().markAsDirty();
+    this.form().markAsTouched();
   }
 
   private arraysEqual(a: string[], b: string[]): boolean {

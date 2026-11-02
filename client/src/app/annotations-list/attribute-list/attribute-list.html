@@ -1,15 +1,15 @@
-<div *transloco="let t" class="flex flex-column gap-2">
+<div *transloco="let t" class="flex flex-col gap-2">
   @for (property of visibleProperties(properties()); track property.name) {
-    <div class="flex flex-row align-items-start">
-      <div class="flex w-4 flex-wrap" [class]="textSizeClass()" style="word-break: normal; overflow-wrap: anywhere">
+    <div class="flex flex-row items-start">
+      <div class="flex w-4/12 flex-wrap" [class]="textSizeClass()" style="word-break: normal; overflow-wrap: anywhere">
         {{ property.name }}
       </div>
-      <div class="flex w-1 justify-content-center">:</div>
-      <div class="flex w-7 align-items-center">
+      <div class="flex w-1/12 justify-center">:</div>
+      <div class="flex w-7/12 items-center">
         @if (isArrayValue(property.value)) {
           <div class="flex flex-wrap gap-1">
             @for (value of property.value; track $index) {
-              <p-chip [class]="textSizeClass()" [label]="displayValue(value)" class="py-1" />
+              <sui-chip [class]="textSizeClass()" [label]="displayValue(value)" class="py-1" />
             }
           </div>
         } @else {
@@ -26,7 +26,7 @@
   } @empty {
     <span class="text-gray-500" [class]="textSizeClass()">
       {{ t("app.shared.attributeList.empty.prefix") }}
-      <span [class]="iconSizeClass()" class="pi pi-pencil text-color-secondary"></span>
+      <app-icon name="pencil" class="text-slate-500" />
       {{ t("app.shared.attributeList.empty.suffix") }}
     </span>
   }

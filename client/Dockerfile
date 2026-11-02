@@ -23,7 +23,7 @@ COPY package.json package-lock.json* ./
 COPY .npmrc ./
 
 # Install dependencies using npm with caching to speed up subsequent builds
-RUN --mount=type=cache,target=/root/.npm npm install --force # rm --force when primeng is removed
+RUN --mount=type=cache,target=/root/.npm npm install
 
 # Copy all application source files into the container
 COPY . .
@@ -52,7 +52,7 @@ COPY package.json package-lock.json* ./
 COPY .npmrc ./
 
 # Install project dependencies using npm ci (ensures a clean, reproducible install)
-RUN --mount=type=cache,target=/root/.npm npm ci --force # rm --force when primeng is removed
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 # Copy the rest of the application source code into the container
 COPY . .

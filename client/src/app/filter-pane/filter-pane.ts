@@ -1,5 +1,15 @@
+import { OptionsPipe, compareSelectionValues } from '../utils/options.pipe';
+import { Icon } from '../utils/icon';
+import {
+  Autocomplete,
+  AutocompleteItemTemplate,
+  Button,
+  Select,
+  Tooltip,
+} from '@sushi-kit/angular';
 import {
   Component,
+  computed,
   DestroyRef,
   effect,
   inject,
@@ -13,14 +23,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import {
-  AutoCompleteCompleteEvent,
-  AutoCompleteModule,
-  AutoCompleteSelectEvent,
-} from 'primeng/autocomplete';
-import { Message } from 'primeng/message';
 import { SearchEntityService } from '../search-entity.service';
-import { Button } from 'primeng/button';
 import {
   CollectionName,
   EntityAutocompleteQuery,
@@ -28,7 +31,6 @@ import {
   EntitySearchQuery,
 } from '../../interfaces';
 import { CollectionService } from '../api/collection.service';
-import { Select } from 'primeng/select';
 import { distinctUntilChanged, firstValueFrom, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TypeFilter } from './type-filter/type-filter';
@@ -36,7 +38,6 @@ import { RouterLink } from '@angular/router';
 import { QueryParamsService } from '../utils/query-params.service';
 import { ConfigService } from '../config-module/config.service';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { Tooltip } from 'primeng/tooltip';
 
 interface CFOption {
   type: string;
@@ -46,9 +47,11 @@ interface CFOption {
 @Component({
   selector: 'app-filter-pane',
   imports: [
+    OptionsPipe,
+    Icon,
     ReactiveFormsModule,
-    AutoCompleteModule,
-    Message,
+    Autocomplete,
+    AutocompleteItemTemplate,
     Button,
     Select,
     TypeFilter,
@@ -59,6 +62,8 @@ interface CFOption {
   templateUrl: './filter-pane.html',
 })
 export class FilterPane {
+  protected readonly compareSelectionValues = compareSelectionValues;
+
   private destroyRef = inject(DestroyRef);
 
   private readonly searchService = inject(SearchEntityService);
@@ -99,6 +104,13 @@ export class FilterPane {
 
   protected collectionFilterOptions = signal<CFOption[]>([]);
   protected suggestions = signal<EntityNames[]>([]);
+  protected readonly suggestionOptions = computed(() =>
+    this.suggestions().map((entity) => ({
+      label: entity.label,
+      value: entity,
+      id: entity.id,
+    })),
+  );
   protected showEmptyMessage = signal<boolean>(false);
 
   public constructor() {
@@ -176,7 +188,19 @@ export class FilterPane {
     }
   }
 
-  protected async autocompleteChanges(e: AutoCompleteCompleteEvent) {
+  protected suggestionId(value: unknown): string | undefined {
+    return this.isEntityName(value) && 'id' in value ? value.id : undefined;
+  }
+
+  protected onSuggestionValue(value: unknown): void {
+    if (!this.isEntityName(value)) return;
+    queueMicrotask(() => {
+      this.form.controls.label.setValue(value.label);
+      void this.onSubmit();
+    });
+  }
+
+  protected async autocompleteChanges(queryText: string) {
     if (this.form.valid) {
       const types = this.form.controls.types.value;
       const collectionFilter = this.form.controls.collectionFilter.value;
@@ -193,7 +217,7 @@ export class FilterPane {
         query.collectionFilter = formatted;
       }
       const suggestions = await this.searchService.getSuggestions(
-        e.query,
+        queryText,
         query,
       );
       this.suggestions.set(suggestions);
@@ -303,12 +327,6 @@ export class FilterPane {
       ctrl.enable({ emitEvent: false });
     } else {
       ctrl.disable({ emitEvent: false });
-    }
-  }
-
-  protected onItemSelect(e: AutoCompleteSelectEvent) {
-    if (this.isEntityName(e.value)) {
-      this.form.controls.label.setValue(e.value.label);
     }
   }
 

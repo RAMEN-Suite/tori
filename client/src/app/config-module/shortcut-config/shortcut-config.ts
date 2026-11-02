@@ -1,12 +1,12 @@
+import { Button } from '@sushi-kit/angular';
 import { Component, inject } from '@angular/core';
 import { ShortcutConfigVm } from './shortcut-config.vm';
 import { ShortcutInput } from './shortcut-input/shortcut-input';
-import { ButtonDirective } from 'primeng/button';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-shortcut-config',
-  imports: [ShortcutInput, ButtonDirective, TranslocoDirective],
+  imports: [ShortcutInput, Button, TranslocoDirective],
   templateUrl: './shortcut-config.html',
 })
 export class ShortcutConfig {

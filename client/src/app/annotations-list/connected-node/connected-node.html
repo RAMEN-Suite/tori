@@ -1,47 +1,50 @@
 <div
-  class="flex flex-row w-full align-items-center border-bottom-1 border-gray-300 text-color"
-  [class.border-bottom-none]="!firstEntry()"
+  class="flex flex-row w-full items-center border-b border-gray-300 text-slate-900"
+  [class.border-b-0]="!firstEntry()"
   [class.hover:bg-gray-100]="node().link"
   style="min-height: 2rem"
 >
   @let link = node().link;
   @if (link && link.router) {
-    <a class="flex flex-row w-full align-items-center no-underline text-color" [routerLink]="$safeNavigationMigration(node().link?.href)">
+    <a class="flex flex-row w-full items-center no-underline text-slate-900" [routerLink]="$safeNavigationMigration(node().link?.href)">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
   } @else if (link && !link.router) {
-    <a class="flex flex-row w-full align-items-center no-underline text-color" [href]="$safeNavigationMigration(node().link?.href)">
+    <a class="flex flex-row w-full items-center no-underline text-slate-900" [href]="$safeNavigationMigration(node().link?.href)">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
   } @else {
-    <div class="flex flex-row w-full align-items-center no-underline text-color">
+    <div class="flex flex-row w-full items-center no-underline text-slate-900">
       <ng-container *ngTemplateOutlet="linkContent" />
     </div>
   }
 
   @if (node().id; as nodeId) {
-    <div class="flex flex-column justify-content-end px-2">
-      <p-button
-        (onClick)="clickDeleteAnnotationRelation(annotationId(), nodeId, $event)"
-        icon="pi pi-trash"
-        severity="danger"
-        outlined
-        size="small"
-      />
+    <div class="flex flex-col justify-end px-2">
+      <button
+        suiButton
+        (click)="clickDeleteAnnotationRelation(annotationId(), nodeId, $event)"
+        severity="error"
+        variant="outlined"
+        size="sm"
+        aria-label="Delete"
+      >
+        <app-icon name="trash" />
+      </button>
     </div>
   }
 </div>
 
 <ng-template #linkContent>
-  <div class="flex w-2 p-2 py-3 border-right-1 border-gray-300 justify-content-center">
-    <i class="pi" [class]="node().directionIcon"></i>
+  <div class="flex w-2/12 p-2 py-3 border-r border-gray-300 justify-center">
+    <app-icon [name]="node().directionIcon" />
   </div>
 
-  <div class="flex flex-row w-full px-2 align-items-center align-content-center gap-2">
-    <div class="flex flex-column max-w-6rem">
+  <div class="flex flex-row w-full px-2 items-center content-center gap-2">
+    <div class="flex flex-col max-w-24">
       <app-node-types [nodeTypes]="node().node.types" asChips hideRamenCoreTypes />
     </div>
 
-    <div class="flex flex-column w-full">{{ title() }}</div>
+    <div class="flex flex-col w-full">{{ title() }}</div>
   </div>
 </ng-template>

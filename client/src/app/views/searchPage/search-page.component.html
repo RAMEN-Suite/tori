@@ -1,15 +1,15 @@
-<div class="search-page w-12 flex justify-content-center">
+<div class="search-page w-full flex justify-center">
   <div
-    class="search-layout w-12 md:w-8 lg:w-5"
+    class="search-layout w-full md:w-8/12 lg:w-5/12"
     [class.search-layout--initial]="!hasSearched()"
     [class.search-layout--results]="hasSearched()"
     [class.search-layout--animated]="animationsEnabled()"
   >
-    <div class="filter-pane w-12 px-4 md:px-2">
+    <div class="filter-pane w-full px-4 md:px-2">
       <app-filter-pane [setQueryParams]="true" (searchSubmitted)="onSearch()" />
     </div>
 
-    <div class="entity-list w-12" [class.entity-list--visible]="hasSearched()">
+    <div class="entity-list w-full" [class.entity-list--visible]="hasSearched()">
       @if (hasSearched()) {
         <app-entity-list
           [entities]="entities()"

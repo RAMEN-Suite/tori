@@ -1,3 +1,4 @@
+import { Button } from '@sushi-kit/angular';
 import {
   Component,
   computed,
@@ -9,11 +10,10 @@ import {
 } from '@angular/core';
 import { UpdateAnnotationService } from '../update-annotation.service';
 import { FormsModule } from '@angular/forms';
-import { ButtonDirective } from 'primeng/button';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DialogRef } from '@angular/cdk/dialog';
 import { Annotation, EntityPropertyDto, GAttribute } from '../../../interfaces';
 import { getKeyProperty } from '../../utils/entity.utils';
-import { MessageService } from 'primeng/api';
+import { NotificationService } from '../../utils/notification.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, map, switchMap } from 'rxjs';
@@ -28,13 +28,13 @@ interface AttributeWithOptValue
 
 @Component({
   selector: 'app-update-annotation-form',
-  imports: [FormsModule, ButtonDirective, AttributeForm, TranslocoDirective],
+  imports: [FormsModule, Button, AttributeForm, TranslocoDirective],
   templateUrl: './update-annotation-form.html',
 })
 export class UpdateAnnotationForm {
   private readonly updateAnnotationService = inject(UpdateAnnotationService);
-  private readonly dialogRef = inject(DynamicDialogRef);
-  private messageService = inject(MessageService);
+  private readonly dialogRef = inject(DialogRef);
+  private messageService = inject(NotificationService);
   private readonly utilService = inject(UtilsService);
   private readonly transloco = inject(TranslocoService);
 

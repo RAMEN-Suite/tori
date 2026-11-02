@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { castValue, castValues } from './utils';
 import { EntityPropertyDto, GAttribute } from '../../interfaces';
 import { ConfigService } from '../config-module/config.service';
-import { MessageService } from 'primeng/api';
+import { NotificationService } from './notification.service';
 import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { TranslocoService } from '@jsverse/transloco';
 })
 export class UtilsService {
   private readonly configService = inject(ConfigService);
-  private readonly messageService = inject(MessageService);
+  private readonly messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
 
   public createPayload = (

@@ -1,3 +1,11 @@
+import {
+  Chip,
+  Input,
+  InputNumber,
+  Label,
+  ToastService,
+  Toggle,
+} from '@sushi-kit/angular';
 import { Component, computed, inject, input } from '@angular/core';
 import {
   FormControl,
@@ -12,14 +20,6 @@ import { ConfigService } from '../../config-module/config.service';
 import { EntityApiService } from '../../api/entity-api.service';
 import { castValue, castValues } from '../utils';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
-import {
-  Chip,
-  Input,
-  InputNumber,
-  Label,
-  ToastService,
-  Toggle,
-} from '@sushi-kit/angular';
 import { SushiToastTemplates } from '../../models/config/SushiToastTemplates';
 
 interface AttributeWithOptValue
@@ -37,7 +37,6 @@ interface AttributeWithOptValue
     Label,
     FormsModule,
     Toggle,
-    InputNumber,
     Chip,
   ],
   templateUrl: './attribute-form.html',

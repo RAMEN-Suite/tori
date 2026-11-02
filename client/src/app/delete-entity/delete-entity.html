@@ -1,1 +1,3 @@
-<p-button [loading]="loading()" (click)="clickDeleteBtn($event)" icon="pi pi-trash" severity="danger" [outlined]="true" />
+<button suiButton [loading]="loading()" (click)="clickDeleteBtn($event)" severity="error" variant="outlined" aria-label="Delete">
+  <app-icon name="trash" />
+</button>

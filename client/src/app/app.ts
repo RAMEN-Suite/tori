@@ -1,3 +1,12 @@
+import { Icon } from './utils/icon';
+import { ConfirmDialog } from './utils/confirm-dialog';
+import {
+  Spinner,
+  Button,
+  Skeleton,
+  Toast as SushiToast,
+  ToastContentTemplate,
+} from '@sushi-kit/angular';
 import {
   Component,
   computed,
@@ -9,32 +18,23 @@ import {
 } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { ConfigService } from './config-module/config.service';
-import { ProgressSpinner } from 'primeng/progressspinner';
-import { MenubarModule } from 'primeng/menubar';
-import { Button, ButtonDirective, ButtonLabel } from 'primeng/button';
+
 import { HealthService } from './health.service';
 import { filter } from 'rxjs';
-import { ConfirmDialog } from 'primeng/confirmdialog';
 import { Navbar } from './navbar/navbar';
-import { Skeleton } from 'primeng/skeleton';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { ShortcutService } from './shortcuts/shortcut.service';
 import { CreateEntityAction } from './actions/create-entity-action';
 
-import { Toast as PrimeToast } from 'primeng/toast';
-import { Toast as SushiToast, ToastContentTemplate } from '@sushi-kit/angular';
 import { SushiToastTemplates } from './models/config/SushiToastTemplates';
 
 @Component({
   selector: 'app-root',
   imports: [
+    Icon,
     RouterOutlet,
-    PrimeToast,
-    ProgressSpinner,
-    MenubarModule,
+    Spinner,
     Button,
-    ButtonDirective,
-    ButtonLabel,
     ConfirmDialog,
     Navbar,
     Skeleton,

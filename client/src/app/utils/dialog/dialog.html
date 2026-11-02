@@ -1,6 +1,7 @@
-<header suiDialogHeader>
-  <h2 id="menu-dialog-title" class="text-lg font-semibold">{{ data.title }}</h2>
+<header suiDialogHeader class="flex items-center justify-between gap-4">
+  <h2 class="text-lg font-semibold">{{ data.title }}</h2>
+  <button suiButton variant="text" (click)="dialog.close()" aria-label="Close dialog">×</button>
 </header>
-<div suiDialogBody>
+<div suiDialogBody class="overflow-y-auto">
   <ng-container *ngComponentOutlet="data.component; inputs: data.inputs" />
 </div>

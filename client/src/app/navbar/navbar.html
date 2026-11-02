@@ -1,46 +1,25 @@
-<p-menubar
-  *transloco="let t"
-  #menubar
-  [model]="items"
-  class="border-noround border-0 bg-primary-50 border-primary-50 px-5"
-  breakpoint="0px"
->
-  <ng-template #start>
-    <div class="flex text-center align-content-center align-items-center">
-      <div class="pr-5">
-        <a routerLink="/" class="flex items-center no-underline text-inherit">
-          <h1 class="text-3xl m-0 font-bold tracking-widest text-primary">TORI</h1>
-        </a>
+<nav *transloco="let t" class="flex flex-wrap items-center justify-between gap-3 border-b border-blue-100 bg-blue-50 px-5 py-3">
+  <div class="flex items-center gap-5">
+    <a routerLink="/" class="text-3xl font-bold tracking-widest text-blue-700">TORI</a>
+    @if (!isHomeRoute()) {
+      <app-back-button />
+    }
+  </div>
+  <div class="flex items-center gap-2">
+    <app-create-entity />
+    <a suiButton severity="secondary" variant="outlined" [routerLink]="['/config']" aria-label="Settings"><app-icon name="cog" /></a>
+    <button suiButton variant="outlined" [suiPopoverTrigger]="popover" aria-label="Language"><app-icon name="language" /></button>
+    <sui-popover #popover="suiPopover" placement="bottom">
+      <div class="flex min-w-44 flex-col gap-2 p-2">
+        @for (key of languages(); track key) {
+          <button suiButton [variant]="key === activeLanguage() ? null : 'outlined'" (click)="handleLanguageChange(key, popover)">
+            @if (key === activeLanguage()) {
+              <app-icon name="check" />
+            }
+            {{ t("app.languages." + key) }}
+          </button>
+        }
       </div>
-      @if (!isHomeRoute()) {
-        <app-back-button />
-      }
-    </div>
-  </ng-template>
-  <ng-template #end>
-    <div class="flex items-center align-content-center align-items-center gap-2 h-3rem">
-      <app-create-entity />
-      <a pButton class="no-underline" severity="secondary" size="large" outlined [routerLink]="['config']">
-        <span class="pi pi-cog"></span>
-      </a>
-      <p-button icon="pi pi-language" severity="primary" (onClick)="handleOpenLanguages(popover, $event)" outlined />
-      <p-popover #popover [appendTo]="menubar" styleClass="print:hidden">
-        <div class="flex min-w-44 flex-col gap-2 p-2">
-          @for (key of languages(); track key) {
-            @let isActiveLanguage = key === activeLanguage();
-
-            <p-button
-              [label]="t('app.languages.' + key)"
-              [icon]="isActiveLanguage ? 'pi pi-check' : 'fi fi-' + key"
-              [severity]="isActiveLanguage ? 'primary' : 'secondary'"
-              [outlined]="!isActiveLanguage"
-              size="small"
-              styleClass="w-full justify-start"
-              (onClick)="handleLanguageChange(key, popover)"
-            />
-          }
-        </div>
-      </p-popover>
-    </div>
-  </ng-template>
-</p-menubar>
+    </sui-popover>
+  </div>
+</nav>

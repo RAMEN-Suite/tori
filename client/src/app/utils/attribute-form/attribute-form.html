@@ -63,12 +63,6 @@
               </label>
             }
             @if (dataType.name.toLowerCase() === "boolean") {
-              <!--            <p-toggle-button-->
-              <!--              [formControlName]="property.name"-->
-              <!--              [onLabel]="property.name"-->
-              <!--              [offLabel]="t('app.shared.attributeForm.boolean.offLabel', { name: property.name })"-->
-              <!--              [id]="fieldId"-->
-              <!--            />-->
               <label suiLabel [for]="fieldId" class="flex items-center gap-2">
                 {{ property.name }}
                 <input suiToggle [id]="fieldId" type="checkbox" size="sm" checked [formControlName]="property.name" />

@@ -1,3 +1,4 @@
+import { Button } from '@sushi-kit/angular';
 import {
   Component,
   computed,
@@ -9,9 +10,8 @@ import {
 } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Entity, EntityPropertyDto, GAttribute } from '../../../interfaces';
-import { ButtonDirective } from 'primeng/button';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
-import { MessageService } from 'primeng/api';
+import { DialogRef } from '@angular/cdk/dialog';
+import { NotificationService } from '../../utils/notification.service';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { EditEntityService } from '../edit-entity.service';
 import { getKeyProperty } from '../../utils/entity.utils';
@@ -29,21 +29,16 @@ interface AttributeWithOptValue
 
 @Component({
   selector: 'app-create-entity-form',
-  imports: [
-    ReactiveFormsModule,
-    AttributeForm,
-    ButtonDirective,
-    TranslocoDirective,
-  ],
+  imports: [ReactiveFormsModule, AttributeForm, Button, TranslocoDirective],
   templateUrl: './edit-entity-form.html',
 })
 export class EditEntityForm {
   private readonly entityService = inject(EntityService);
   private readonly editEntityService = inject(EditEntityService);
   private readonly utilService = inject(UtilsService);
-  private readonly messageService = inject(MessageService);
+  private readonly messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
-  private dialogRef = inject(DynamicDialogRef);
+  private dialogRef = inject(DialogRef);
 
   public entity = input.required<Entity>();
   protected loading = signal<boolean>(false);
@@ -80,7 +75,6 @@ export class EditEntityForm {
         summary: this.transloco.translate(
           'app.shared.editEntityForm.errors.missingKey',
         ),
-        closable: true,
       });
       return;
     }
@@ -96,7 +90,6 @@ export class EditEntityForm {
         summary: this.transloco.translate(
           'app.shared.editEntityForm.success.updated',
         ),
-        closable: true,
       });
       await this.entityService.reloadEntity();
       this.dialogRef.close();

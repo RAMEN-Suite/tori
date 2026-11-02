@@ -1,6 +1,7 @@
+import { Icon } from '../utils/icon';
+import { Button } from '@sushi-kit/angular';
 import { Component, inject, input } from '@angular/core';
-import { Button } from 'primeng/button';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DialogService } from '../utils/dialog/dialog.service';
 import { UpdateAnnotationService } from './update-annotation.service';
 import { UpdateAnnotationForm } from './update-annotation-form/update-annotation-form';
 import { Annotation } from '../../interfaces';
@@ -9,7 +10,7 @@ import { TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-update-annotation',
   providers: [UpdateAnnotationService],
-  imports: [Button],
+  imports: [Icon, Button],
   templateUrl: './update-annotation.html',
 })
 export class UpdateAnnotation {
@@ -18,30 +19,16 @@ export class UpdateAnnotation {
 
   public annotation = input.required<Annotation>();
   public label = input<string>();
-  public icon = input<string>('pi pi-pencil');
-
-  private updateAnnotationDialogRef: DynamicDialogRef<UpdateAnnotationForm> | null =
-    null;
+  public icon = input<string>('pencil');
 
   protected clickUpdateBtn() {
-    this.updateAnnotationDialogRef = this.dialogService.open(
-      UpdateAnnotationForm,
-      {
-        inputValues: {
-          annotation: this.annotation(),
-        },
-        header: this.transloco.translate(
-          'app.shared.updateAnnotation.dialog.header',
-        ),
-        styleClass: 'w-11 md:w-9 lg:w-8',
-        style: {
-          'min-height': '20vh',
-        },
-        contentStyle: {
-          'padding-top': '0.5rem',
-        },
-        closable: true,
+    this.dialogService.open(UpdateAnnotationForm, {
+      inputs: {
+        annotation: this.annotation(),
       },
-    );
+      title: this.transloco.translate(
+        'app.shared.updateAnnotation.dialog.header',
+      ),
+    });
   }
 }

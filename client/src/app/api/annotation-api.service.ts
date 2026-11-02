@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { MessageService } from 'primeng/api';
+import { NotificationService } from '../utils/notification.service';
 import { catchError, firstValueFrom, map } from 'rxjs';
 import { Annotation } from '../../interfaces';
 import { TranslocoService } from '@jsverse/transloco';
@@ -10,7 +10,7 @@ import { TranslocoService } from '@jsverse/transloco';
 })
 export class AnnotationApiService {
   private readonly http = inject(HttpClient);
-  private readonly messageService = inject(MessageService);
+  private readonly messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
 
   public async get(id: string) {
@@ -58,7 +58,6 @@ export class AnnotationApiService {
                 detail: Array.isArray(error.message)
                   ? error.message.join('\n')
                   : error.message,
-                closable: true,
                 sticky: true,
               });
             } else {
@@ -154,7 +153,6 @@ export class AnnotationApiService {
               detail: Array.isArray(error.message)
                 ? error.message.join('\n')
                 : error.message,
-              closable: true,
               sticky: true,
             });
           } else {

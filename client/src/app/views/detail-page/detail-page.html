@@ -7,16 +7,16 @@
   <!--</div>-->
   @if (entity(); as entity) {
     <div class="detail-page">
-      <!--  <div class="col-1 px-3 md:flex flex-order-0 md:flex-order-0 align-self-start sticky top-0"></div>-->
-      <!--  <div class="col-fixed w-auto px-3 flex gap-2 justify-content-end flex-order-1 md:flex-order-2 align-self-start sticky top-0">-->
+      <!--  <div class="w-1/12 px-3 md:flex order-0 md:order-0 self-start sticky top-0"></div>-->
+      <!--  <div class="shrink-0 w-auto px-3 flex gap-2 justify-end order-1 md:order-2 self-start sticky top-0">-->
 
       <!--  </div>-->
-      <div class="detail-layout grid flex justify-content-center">
-        <div class="detail-columns col-12 px-5 flex-order-2 md:flex-order-1 grid flex md:gap-6 align-content-start">
-          <section class="detail-card col-12 md:col-5 card flex flex-column gap-3 h-min">
-            <div class="detail-card-header col-12 flex flex-row gap-2 justify-content-between">
-              <div class="w-8 flex flex-column gap-2">
-                <span class="text-4xl font-bold w-12"> {{ entity.label }} </span>
+      <div class="detail-layout flex flex-wrap justify-center">
+        <div class="detail-columns w-full px-5 order-2 md:order-1 flex flex-wrap md:gap-6 content-start">
+          <section class="detail-card w-full md:w-5/12 card flex flex-col gap-3 h-min">
+            <div class="detail-card-header w-full flex flex-row gap-2 justify-between">
+              <div class="w-8/12 flex flex-col gap-2">
+                <span class="text-4xl font-bold w-full"> {{ entity.label }} </span>
                 <div class="flex">
                   <app-node-types [nodeTypes]="entity.types" asChips class="flex gap-2" />
                 </div>
@@ -27,16 +27,16 @@
               </div>
             </div>
             @if (visibleProperties(entity.properties).length > 0) {
-              <div class="entity-properties-scroll col-12 flex flex-column gap-3 h-min">
+              <div class="entity-properties-scroll w-full flex flex-col gap-3 h-min">
                 <app-attribute-list [properties]="entity.properties" [textSize]="5" />
               </div>
             }
           </section>
 
-          <section class="detail-card col-12 md:col card">
-            <div class="detail-card-header col-12 flex justify-content-between">
+          <section class="detail-card w-full md:flex-1 min-w-0 card">
+            <div class="detail-card-header w-full flex justify-between">
               <span class="text-4xl font-bold">{{ t("app.screens.detail.annotations.title") }}</span>
-              <app-create-annotation [entityId]="entityId()" label="" icon="pi pi-plus" />
+              <app-create-annotation [entityId]="entityId()" label="" icon="plus" />
             </div>
             <div class="annotations-scroll w-full">
               @if (annotations().length > 0) {
@@ -44,7 +44,7 @@
               } @else {
                 <span class="text-base text-gray-500 h-min p-2">
                   {{ t("app.screens.detail.annotations.empty.prefix") }}
-                  <span class="pi pi-plus text-primary text-sm"></span>
+                  <app-icon name="plus" class="text-blue-700 text-sm" />
                   {{ t("app.screens.detail.annotations.empty.suffix") }}
                 </span>
               }
@@ -55,7 +55,7 @@
     </div>
   } @else {
     <div class="loading-wrapper">
-      <p-progress-spinner [ariaLabel]="t('app.screens.common.loading')" />
+      <span suiSpinner role="status" [attr.aria-label]="t('app.screens.common.loading')"></span>
     </div>
   }
 </ng-container>

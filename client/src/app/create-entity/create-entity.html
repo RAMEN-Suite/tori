@@ -1,7 +1,11 @@
-<p-splitbutton
-  *transloco="let t"
-  [label]="t('app.shared.createEntity.label')"
-  (onClick)="clickCreateEntityBtn()"
-  [model]="btnItems()"
-  outlined
-/>
+<div *transloco="let t" class="flex items-center gap-1">
+  <button suiButton variant="outlined" (click)="clickCreateEntityBtn()">{{ t("app.shared.createEntity.label") }}</button>
+  <button suiButton variant="outlined" [suiPopoverTrigger]="types" aria-label="Entity type"><app-icon name="chevron-down" /></button>
+  <sui-popover #types="suiPopover">
+    <div class="flex flex-col gap-1 p-2">
+      @for (item of btnItems(); track item.label) {
+        <button suiButton variant="text" (click)="types.hide(); item.command()">{{ item.label }}</button>
+      }
+    </div>
+  </sui-popover>
+</div>
