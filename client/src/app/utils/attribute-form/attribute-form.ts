@@ -1,23 +1,19 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { AutoComplete } from 'primeng/autocomplete';
-import { FloatLabel } from 'primeng/floatlabel';
-import { InputNumber } from 'primeng/inputnumber';
 import {
   FormControl,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ToggleButton } from 'primeng/togglebutton';
 import { ENTITY_NAME_PROPERTY } from '../../../constants';
 import { EntityPropertyDto } from '../../../interfaces';
 import { ConfigService } from '../../config-module/config.service';
 import { EntityApiService } from '../../api/entity-api.service';
 import { MessageService } from 'primeng/api';
-import { KeyFilter } from 'primeng/keyfilter';
 import { castValue, castValues } from '../utils';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
-import { Input, Label } from '@sushi-kit/angular';
+import { Chip, Input, InputNumber, Label, Toggle } from '@sushi-kit/angular';
 
 interface AttributeWithOptValue
   extends
@@ -27,15 +23,15 @@ interface AttributeWithOptValue
 @Component({
   selector: 'app-attribute-form',
   imports: [
-    AutoComplete,
-    FloatLabel,
     InputNumber,
     ReactiveFormsModule,
-    ToggleButton,
-    KeyFilter,
     TranslocoDirective,
     Input,
     Label,
+    FormsModule,
+    Toggle,
+    InputNumber,
+    Chip,
   ],
   templateUrl: './attribute-form.html',
 })
@@ -53,6 +49,8 @@ export class AttributeForm {
     const props = this.properties();
     return this.buildFormGroup(props);
   });
+
+  public readonly locale = this.transloco.getActiveLang();
 
   private buildFormGroup(props: AttributeWithOptValue[]) {
     const controlls: Record<string, FormControl> = {};
@@ -167,6 +165,34 @@ export class AttributeForm {
       detail: detailMsg.join('\n'),
       life: 11000,
     });
+  }
+
+  protected addArrayValue(
+    property: AttributeWithOptValue,
+    inputEl: HTMLInputElement,
+  ): void {
+    const control = this.propertiesForm().get(property.name);
+    const value = inputEl.value.trim();
+
+    if (!control || control.disabled || !value) return;
+
+    const values = (control.value ?? []) as string[];
+    const max = property.bounds.upperBound;
+
+    if (max !== -1 && values.length >= max) return;
+
+    control.setValue([...values, value]);
+    control.markAsDirty();
+    inputEl.value = '';
+  }
+
+  protected removeArrayValue(name: string, index: number): void {
+    const control = this.propertiesForm().get(name);
+    if (!control || control.disabled) return;
+
+    const values = (control.value ?? []) as string[];
+    control.setValue(values.filter((_, i) => i !== index));
+    control.markAsDirty();
   }
 
   protected readonly ENTITY_NAME_PROPERTY = ENTITY_NAME_PROPERTY;
