@@ -1,62 +1,117 @@
 <ng-container *transloco="let t">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-wrap">
-    <div class="flex flex-wrap gap-2 w-full">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex min-w-0 flex-col" [class.gap-5]="!workspace()">
+    <div
+      class="flex min-w-0 items-center gap-1"
+      [class]="workspace() ? 'rounded-full bg-blue-50 px-2 py-1' : 'flex-col items-stretch gap-2'"
+    >
+      @if (!workspace()) {
+        <span class="text-sm font-semibold">{{ t("app.screens.search.inputLabel") }}</span>
+      }
       <sui-autocomplete
+        class="min-w-0 flex-1"
+        [class]="
+          workspace()
+            ? '[&_.sui-form-control]:border-transparent [&_.sui-form-control]:bg-transparent [&_.sui-form-control]:shadow-none'
+            : ''
+        "
+        [ariaLabel]="t('app.screens.search.inputLabel')"
+        [placeholder]="t('app.screens.search.placeholder')"
+        [minQueryLength]="3"
         formControlName="label"
         [options]="suggestionOptions()"
         [invalid]="form.controls.label.invalid && form.controls.label.touched"
         (queryChange)="autocompleteChanges($event)"
         (valueChange)="onSuggestionValue($event)"
         fluid
-        autofocus
       >
+        <ng-template suiAutocompletePrefix><app-icon name="search" class="text-slate-500" /></ng-template>
         <ng-template let-entity suiAutocompleteItem>
-          @if (enableLinkToEntity()) {
+          @if (enableLinkToEntity() && !workspace()) {
             <a
               [routerLink]="['/', 'entity', suggestionId(entity.value)]"
               [target]="openLinkInNewTab() ? '_blank' : ''"
-              class="flex items-center gap-2"
+              class="block wrap-anywhere text-slate-900"
+              >{{ entity.label }}</a
             >
-              <span class="text-black/90">{{ entity.label }}</span>
-            </a>
           } @else {
-            <div class="flex items-center gap-2">
-              <span class="text-black/90">{{ entity.label }}</span>
-            </div>
+            <span class="wrap-anywhere text-slate-900">{{ entity.label }}</span>
           }
         </ng-template>
       </sui-autocomplete>
-      @if (form.controls.label.invalid && form.controls.label.touched) {
-        <div severity="error" size="sm" role="alert" class="text-sm text-red-700">{{ t("app.shared.filterPane.label.error") }}</div>
+      @if (workspace()) {
+        <button
+          suiButton
+          variant="text"
+          severity="secondary"
+          shape="circle"
+          class="shrink-0 px-2.5"
+          type="button"
+          [suiPopoverTrigger]="filters"
+          [attr.aria-label]="t('app.screens.workspace.filters')"
+        >
+          <app-icon name="sliders" />
+        </button>
+        <button
+          suiButton
+          variant="text"
+          severity="secondary"
+          shape="circle"
+          class="shrink-0 px-2.5"
+          type="submit"
+          [loading]="searching()"
+          [attr.aria-label]="t('app.shared.filterPane.submitBtn.label')"
+        >
+          <app-icon name="arrow-right" />
+        </button>
+        <sui-popover #filters="suiPopover" placement="bottom">
+          <div class="grid w-80 max-w-[calc(100vw-4rem)] gap-4 p-3">
+            <h2 class="text-base font-semibold">{{ t("app.screens.workspace.filters") }}</h2>
+            <ng-container *ngTemplateOutlet="filterFields" />
+            <div class="flex flex-wrap items-center justify-end gap-2">
+              <button suiButton type="button" variant="text" severity="secondary" (click)="resetFilterClicked(); filters.hide()">
+                {{ t("app.shared.filterPane.resetBtn.tooltip") }}
+              </button>
+              <button suiButton type="button" [loading]="searching()" (click)="filters.hide(); onSubmit()">
+                {{ t("app.shared.filterPane.submitBtn.label") }}
+              </button>
+            </div>
+          </div>
+        </sui-popover>
       }
     </div>
-    @for (input of collectionFilterOptions(); track $index) {
-      <div [formGroup]="form.controls.collectionFilter" class="flex flex-wrap gap-2 w-full md:flex-1 min-w-0">
-        <sui-select
-          [compareWith]="compareSelectionValues"
-          [options]="input.values | options"
-          [formControlName]="input.type"
-          [placeholder]="t('app.shared.filterPane.collection.placeholder', { collectionType: input.type })"
-          showClear
-          filter
-          class="w-full"
-        />
+    @if (form.controls.label.invalid && form.controls.label.touched) {
+      <div role="alert" class="px-2 pt-1 text-sm text-red-700">{{ t("app.shared.filterPane.label.error") }}</div>
+    }
+    @if (!workspace()) {
+      <ng-container *ngTemplateOutlet="filterFields" />
+      <div class="flex flex-wrap items-center justify-end gap-2 border-t border-slate-100 pt-4">
+        <button suiButton type="button" variant="text" (click)="resetFilterClicked()">
+          <app-icon name="undo" />{{ t("app.shared.filterPane.resetBtn.tooltip") }}
+        </button>
+        <button suiButton type="submit" [loading]="searching()">{{ t("app.shared.filterPane.submitBtn.label") }}</button>
       </div>
     }
-    <div class="flex flex-wrap gap-2 w-full">
-      <app-type-filter [(form)]="form.controls.types" />
-    </div>
-    <div class="flex flex-wrap gap-2 w-full flex justify-end gap-2">
-      <button
-        suiButton
-        variant="text"
-        type="button"
-        [suiTooltip]="t('app.shared.filterPane.resetBtn.tooltip')"
-        (click)="resetFilterClicked()"
-      >
-        <app-icon name="undo" />
-      </button>
-      <button suiButton type="submit">{{ t("app.shared.filterPane.submitBtn.label") }}</button>
-    </div>
   </form>
+
+  <ng-template #filterFields>
+    <div class="grid min-w-0 gap-4" [formGroup]="form">
+      @for (input of collectionFilterOptions(); track input.type) {
+        <div [formGroup]="form.controls.collectionFilter" class="min-w-0">
+          <sui-select
+            [compareWith]="compareSelectionValues"
+            [options]="input.values | options"
+            [formControlName]="input.type"
+            [placeholder]="t('app.shared.filterPane.collection.placeholder', { collectionType: input.type })"
+            showClear
+            filter
+            fluid
+          />
+        </div>
+      }
+      <div class="grid gap-2">
+        <span class="text-sm font-semibold">{{ t("app.screens.search.types") }}</span>
+        <app-type-filter [compact]="workspace()" [(form)]="form.controls.types" />
+      </div>
+    </div>
+  </ng-template>
 </ng-container>

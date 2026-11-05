@@ -3,9 +3,11 @@ import { Icon } from '../utils/icon';
 import {
   Autocomplete,
   AutocompleteItemTemplate,
+  AutocompletePrefixTemplate,
+  Popover,
+  PopoverTrigger,
   Button,
   Select,
-  Tooltip,
 } from '@sushi-kit/angular';
 import {
   Component,
@@ -34,6 +36,7 @@ import { CollectionService } from '../api/collection.service';
 import { distinctUntilChanged, firstValueFrom, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TypeFilter } from './type-filter/type-filter';
+import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { QueryParamsService } from '../utils/query-params.service';
 import { ConfigService } from '../config-module/config.service';
@@ -52,12 +55,15 @@ interface CFOption {
     ReactiveFormsModule,
     Autocomplete,
     AutocompleteItemTemplate,
+    AutocompletePrefixTemplate,
+    Popover,
+    PopoverTrigger,
+    NgTemplateOutlet,
     Button,
     Select,
     TypeFilter,
     RouterLink,
     TranslocoDirective,
-    Tooltip,
   ],
   templateUrl: './filter-pane.html',
 })
@@ -75,7 +81,10 @@ export class FilterPane {
   public enableLinkToEntity = input<boolean>(true);
   public setQueryParams = input<boolean>(false);
 
+  public readonly workspace = input(false);
   public readonly searchSubmitted = output();
+  public readonly searchReset = output();
+  public readonly suggestionSelected = output<EntityNames>();
 
   protected remoteConfig = this.configService.getRemoteConfig();
   protected config = this.configService.getConfig();
@@ -103,6 +112,7 @@ export class FilterPane {
   });
 
   protected collectionFilterOptions = signal<CFOption[]>([]);
+  protected readonly searching = this.searchService.getEntitiesLoading();
   protected suggestions = signal<EntityNames[]>([]);
   protected readonly suggestionOptions = computed(() =>
     this.suggestions().map((entity) => ({
@@ -196,12 +206,19 @@ export class FilterPane {
     if (!this.isEntityName(value)) return;
     queueMicrotask(() => {
       this.form.controls.label.setValue(value.label);
-      void this.onSubmit();
+      if (this.workspace()) {
+        this.suggestionSelected.emit(value);
+      } else {
+        void this.onSubmit();
+      }
     });
   }
 
+  private suggestionRequest = 0;
+
   protected async autocompleteChanges(queryText: string) {
-    if (this.form.valid) {
+    const request = ++this.suggestionRequest;
+    if (queryText.trim().length >= 3) {
       const types = this.form.controls.types.value;
       const collectionFilter = this.form.controls.collectionFilter.value;
       const formatted: Record<string, string[]> = {};
@@ -220,6 +237,11 @@ export class FilterPane {
         queryText,
         query,
       );
+      if (
+        request !== this.suggestionRequest ||
+        this.form.controls.label.value !== queryText
+      )
+        return;
       this.suggestions.set(suggestions);
     } else {
       this.suggestions.set([]);
@@ -228,6 +250,7 @@ export class FilterPane {
   }
 
   protected async onSubmit() {
+    if (this.searchService.getEntitiesLoading()()) return;
     if (!this.form.valid) {
       Object.values(this.form.controls).forEach((ctrl) => ctrl.markAsTouched());
       return;
@@ -249,7 +272,11 @@ export class FilterPane {
       query.collectionFilter = formatted;
     }
 
-    await this.searchService.searchEntities(query);
+    try {
+      await this.searchService.searchEntities(query);
+    } catch {
+      return; // The API service already reports the error.
+    }
     this.searchSubmitted.emit();
     if (this.setQueryParams()) {
       const queryParams = this.queryParamService.transformQueryParams(
@@ -365,9 +392,11 @@ export class FilterPane {
     );
   }
 
-  protected async resetFilterClicked(): Promise<void> {
+  public async resetFilterClicked(): Promise<void> {
+    if (this.searchService.getEntitiesLoading()()) return;
     this.resetForm();
     this.searchService.resetEntityList();
-    await this.queryParamService.setQueryParams({});
+    if (this.setQueryParams()) await this.queryParamService.setQueryParams({});
+    this.searchReset.emit();
   }
 }

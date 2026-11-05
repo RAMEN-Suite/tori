@@ -2,15 +2,15 @@
   @if (annotation().id) {
     @let annotationId = annotation().id!;
 
-    <div class="card p-0 w-full flex flex-row" style="min-height: 12rem">
-      <div class="w-6/12 flex flex-col p-3 pr-2 border-r border-gray-200">
+    <div class="grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white xl:grid-cols-2">
+      <div class="flex min-w-0 flex-col gap-4 p-4">
         <div class="mb-3">
           <app-node-types [nodeTypes]="annotation().annotation.types" asChips class="flex flex-col gap-1" />
         </div>
         <div>
           <app-attribute-list [properties]="annotation().annotation.properties" />
         </div>
-        <div class="flex flex-row gap-1 justify-start content-end mt-auto">
+        <div class="mt-auto flex flex-wrap gap-2 border-t border-slate-100 pt-3">
           <button
             suiButton
             severity="error"
@@ -35,15 +35,15 @@
         </div>
       </div>
       <div
-        class="w-6/12 p-0 max-h-[30rem] overflow-y-auto"
+        class="min-w-0 border-t border-slate-200 bg-slate-50/60 xl:border-t-0 xl:border-l"
         [ngClass]="{
-          'items-center justify-center flex p-3': annotation().nodes.length <= 0,
+          'flex items-center p-4': annotation().nodes.length <= 0,
         }"
       >
         @for (node of annotation().nodes; track node.id; let first = $first; let last = $last) {
           <app-connected-node [annotationId]="annotationId" [node]="node" [firstEntry]="first" [lastEntry]="last" />
         } @empty {
-          <span class="text-base text-gray-500 h-min">
+          <span class="text-sm leading-relaxed text-slate-500">
             {{ t("app.shared.annotationCard.emptyNodes.prefix") }}
             <app-icon name="plus-circle" class="text-blue-700 text-sm" />
             {{ t("app.shared.annotationCard.emptyNodes.suffix") }}

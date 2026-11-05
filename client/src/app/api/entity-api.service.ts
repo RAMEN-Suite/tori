@@ -24,6 +24,12 @@ export class EntityApiService {
   private readonly messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
 
+  public getWorkspaceEntities(feed: 'recently-updated' | 'suggested') {
+    return this.http.get<PageDto<OldEntity>>(`/api/entity/${feed}`, {
+      params: { take: 12 },
+    });
+  }
+
   public searchEntities(query: EntitySearchQuery): Promise<PageDto<OldEntity>> {
     const httpParams = this.queryParamService.transformQueryParams(query);
 

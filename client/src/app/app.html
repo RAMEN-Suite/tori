@@ -8,72 +8,68 @@
   </ng-template>
 </sui-toast>
 
-<div class="app-shell">
-  <app-navbar class="topbar" />
+<div class="flex h-dvh flex-col overflow-hidden bg-slate-50 font-sans text-slate-900">
+  @if (!isWorkspace()) {
+    <app-navbar class="shrink-0" />
+  }
 
-  <div class="app-content" #appContent (scroll)="onContentScroll($event)">
-    @if (loaded()) {
-      <router-outlet />
-    } @else {
-      <div class="loading-wrapper" *transloco="let t">
-        <span suiSpinner role="status" [attr.aria-label]="t('app.shared.common.loading')"></span>
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto" #appContent (scroll)="onContentScroll($event)">
+    <main class="flex-1 shrink-0">
+      @if (loaded()) {
+        <router-outlet />
+      } @else {
+        <div class="flex min-h-[60vh] items-center justify-center" *transloco="let t">
+          <span suiSpinner role="status" [attr.aria-label]="t('app.shared.common.loading')"></span>
+        </div>
+      }
+    </main>
+
+    <!-- Scroll-to-top Button -->
+    <button
+      suiButton
+      class="fixed right-4 bottom-4 z-10 shadow-sm"
+      [class.hidden]="!showScrollTop"
+      severity="accent"
+      variant="outlined"
+      shape="circle"
+      (click)="scrollToTop()"
+      aria-label="Scroll to top"
+    >
+      <app-icon name="arrow-up" />
+    </button>
+
+    <footer class="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-4 px-4 py-5 text-xs text-slate-500 sm:px-6">
+      <a
+        class="rounded-sm hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-4"
+        [href]="'https://github.com/RAMEN-Suite/AWEN'"
+        target="_blank"
+      >
+        <div class="flex items-center gap-1.5">
+          <span>TORI</span>
+          @if (healthStatusLoaded()) {
+            <small>v{{ appVersion() }}</small>
+          } @else {
+            <div suiSkeleton></div>
+          }
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <a
+          class="rounded-sm hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-4"
+          [href]="'https://ramen-schema.org'"
+          target="_blank"
+        >
+          <div class="flex items-center gap-1.5">
+            <span>RAMEN</span>
+            @if (healthStatusLoaded()) {
+              <small>v{{ ramenVersion() }}</small>
+            } @else {
+              <div suiSkeleton></div>
+            }
+          </div>
+        </a>
       </div>
-    }
+    </footer>
   </div>
 </div>
-
-<!-- Scroll-to-top Button -->
-<button
-  suiButton
-  class="scroll-top-btn"
-  [class.visible]="showScrollTop"
-  severity="accent"
-  variant="outlined"
-  shape="circle"
-  (click)="scrollToTop()"
-  aria-label="Scroll to top"
->
-  <app-icon name="arrow-up" />
-</button>
-
-<footer class="configMenuBar flex gap-2">
-  <a
-    suiButton
-    class="no-underline h-12"
-    size="sm"
-    severity="secondary"
-    variant="outlined"
-    [href]="'https://github.com/RAMEN-Suite/AWEN'"
-    target="_blank"
-  >
-    <div class="flex flex-col justify-center text-center gap-1">
-      <span>TORI</span>
-      @if (healthStatusLoaded()) {
-        <small>v{{ appVersion() }}</small>
-      } @else {
-        <div suiSkeleton></div>
-      }
-    </div>
-  </a>
-
-  <div class="flex items-center gap-2 h-12">
-    <a
-      suiButton
-      class="no-underline h-12"
-      size="sm"
-      severity="secondary"
-      variant="outlined"
-      [href]="'https://ramen-schema.org'"
-      target="_blank"
-    >
-      <div class="flex flex-col justify-center text-center gap-1">
-        <span>RAMEN</span>
-        @if (healthStatusLoaded()) {
-          <small>v{{ ramenVersion() }}</small>
-        } @else {
-          <div suiSkeleton></div>
-        }
-      </div>
-    </a>
-  </div>
-</footer>

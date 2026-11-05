@@ -1,14 +1,14 @@
 <ng-container *transloco="let t">
   @for (property of properties(); track property.name) {
     @if (findDataType(property.typeId); as dataType) {
-      <div class="grid gap-5" [formGroup]="propertiesForm()">
+      <div class="grid min-w-0 content-start gap-2" [formGroup]="propertiesForm()">
         @let isArray = property.bounds.upperBound === -1 || property.bounds.upperBound > 1;
-        @let fieldId = "create-entity-form_" + formName + "_" + property.name;
+        @let fieldId = "create-entity-form_" + formName() + "_" + property.name;
         @if (isArray) {
           @let control = propertiesForm().get(property.name);
 
           <div class="grid gap-2">
-            <label suiLabel [for]="fieldId">
+            <label suiLabel [for]="fieldId" class="flex w-full flex-col items-start gap-2 text-sm font-medium">
               {{ property.name }}
               @if (property.bounds.upperBound !== -1) {
                 <small class="text-gray-400"> ({{ t("app.shared.attributeForm.max", { max: property.bounds.upperBound }) }}) </small>
@@ -31,6 +31,7 @@
               <input
                 #entry
                 suiInput
+                fluid
                 [id]="fieldId"
                 [placeholder]="property.name"
                 [disabled]="control?.disabled ?? false"
@@ -45,7 +46,7 @@
             <!-- Single Value Inputs -->
             @if (dataType.name.toLowerCase() === "string") {
               @let isLabel = property.name === ENTITY_NAME_PROPERTY;
-              <label suiLabel floating [for]="fieldId">
+              <label suiLabel [for]="fieldId" class="flex w-full flex-col items-start gap-2 text-sm font-medium">
                 <span>
                   {{ property.name }}
                   @if (property.bounds.lowerBound > 0) {
@@ -54,6 +55,7 @@
                 </span>
                 <input
                   suiInput
+                  fluid
                   [formControlName]="property.name"
                   (blur)="isLabel ? onLabelBlur($event) : null"
                   [id]="fieldId"
@@ -69,7 +71,7 @@
               </label>
             }
             @if (dataType.name.toLowerCase() === "integer") {
-              <label suiLabel floating [for]="fieldId" class="w-full">
+              <label suiLabel [for]="fieldId" class="flex w-full flex-col items-start gap-2 text-sm font-medium">
                 <span>
                   {{ property.name }}
                   @if (property.bounds.lowerBound > 0) {
@@ -87,7 +89,7 @@
               </label>
             }
             @if (dataType.name.toLowerCase() === "float") {
-              <label suiLabel floating [for]="fieldId" class="w-full">
+              <label suiLabel [for]="fieldId" class="flex w-full flex-col items-start gap-2 text-sm font-medium">
                 <span>
                   {{ property.name }}
                   @if (property.bounds.lowerBound > 0) {
@@ -125,5 +127,5 @@
       </div>
     }
   }
-  <small><span class="text-red-400">*</span> {{ t("app.shared.attributeForm.mandatory") }}</small>
+  <small class="text-slate-500 sm:col-span-2"><span class="text-red-400">*</span> {{ t("app.shared.attributeForm.mandatory") }}</small>
 </ng-container>

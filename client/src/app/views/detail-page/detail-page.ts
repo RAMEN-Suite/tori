@@ -35,7 +35,7 @@ import { CreateAnnotationAction } from '../../actions/create-annotation-action';
     AttributeList,
     TranslocoDirective,
   ],
-  styleUrl: './detail-page.scss',
+  host: { class: 'block' },
   templateUrl: './detail-page.html',
 })
 export class DetailPage implements OnDestroy, OnInit {

@@ -20,6 +20,12 @@ import {
   LucideFolder,
   LucideUndo,
   LucideInfo,
+  LucideSearch,
+  LucideSlidersHorizontal,
+  LucideHouse,
+  LucideClock,
+  LucideTrendingUp,
+  LucidePanelLeft,
 } from '@lucide/angular';
 
 const icons: Partial<Record<string, LucideIconData>> = {
@@ -41,6 +47,12 @@ const icons: Partial<Record<string, LucideIconData>> = {
   folder: LucideFolder.icon,
   undo: LucideUndo.icon,
   'info-circle': LucideInfo.icon,
+  search: LucideSearch.icon,
+  sliders: LucideSlidersHorizontal.icon,
+  house: LucideHouse.icon,
+  clock: LucideClock.icon,
+  trending: LucideTrendingUp.icon,
+  sidebar: LucidePanelLeft.icon,
 };
 @Component({
   selector: 'app-icon',

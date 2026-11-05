@@ -92,6 +92,34 @@
         "entries": "Entries for: {{ value }}",
         "empty": "No entries could be found.",
         "default": "All registers"
+      },
+      "workspace": {
+        "shortcuts": "Quick access",
+        "toggleSidebar": "Toggle quick access",
+        "overview": "Overview",
+        "recent": "Recently edited",
+        "frequent": "Frequently used",
+        "results": "Search results",
+        "description": "Quickly access recently edited and frequently opened entities.",
+        "filters": "Search filters",
+        "more": "Load more results",
+        "showMore": "Show more",
+        "feedError": "This section could not be loaded.",
+        "retry": "Try again",
+        "recentEmpty": "Entities will appear here after they are edited.",
+        "frequentEmpty": "Frequently opened entities will appear here.",
+        "preview": "Preview",
+        "closePreview": "Close preview",
+        "previewError": "The preview could not be loaded.",
+        "openDetails": "Open details"
+      },
+      "search": {
+        "title": "Search entities",
+        "description": "Find people, places and terms and explore their connections.",
+        "inputLabel": "Search term",
+        "placeholder": "Enter a name or label …",
+        "types": "Entity types",
+        "results": "Search results"
       }
     },
     "shared": {

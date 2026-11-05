@@ -1,6 +1,12 @@
 import { Icon } from '../utils/icon';
-import { Button, Popover, PopoverTrigger } from '@sushi-kit/angular';
-import { Component, computed, inject } from '@angular/core';
+import {
+  Button,
+  Join,
+  JoinItem,
+  Popover,
+  PopoverTrigger,
+} from '@sushi-kit/angular';
+import { Component, computed, inject, input } from '@angular/core';
 import { CreateEntityService } from './create-entity.service';
 
 import { TranslocoDirective } from '@jsverse/transloco';
@@ -8,11 +14,21 @@ import { CreateEntityDialogService } from './create-entity-dialog.service';
 
 @Component({
   selector: 'app-create-entity',
-  imports: [Icon, Button, Popover, PopoverTrigger, TranslocoDirective],
+  imports: [
+    Icon,
+    Button,
+    Popover,
+    PopoverTrigger,
+    TranslocoDirective,
+    Join,
+    JoinItem,
+  ],
   providers: [CreateEntityService],
   templateUrl: './create-entity.html',
 })
 export class CreateEntity {
+  public readonly compact = input(false);
+
   private readonly createEntityService = inject(CreateEntityService);
   private readonly createEntityDialog = inject(CreateEntityDialogService);
 

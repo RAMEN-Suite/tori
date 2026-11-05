@@ -1,6 +1,7 @@
 <ng-container *transloco="let t">
   <div class="w-full flex flex-col gap-2">
     <sui-select-button
+      class="max-w-full [&_button]:min-w-0 [&_button]:whitespace-normal [&_button]:px-2"
       [options]="[
         { label: t('app.shared.annotationList.directions.outgoing'), value: 'OUTGOING' },
         { label: t('app.shared.annotationList.directions.incoming'), value: 'INCOMING' },
@@ -13,6 +14,7 @@
     </sui-select-button>
     @if (annotationNodeLabels().length > 1) {
       <sui-select-button
+        class="max-w-full [&_button]:min-w-0 [&_button]:whitespace-normal [&_button]:px-2"
         [options]="annotationNodeLabels() | options"
         [ngModel]="selectedNodeLabel()"
         (ngModelChange)="setSelectedNodeLabel($event)"
@@ -21,7 +23,7 @@
       />
     }
   </div>
-  <div class="w-full flex flex-row justify-end gap-2">
+  <div class="flex flex-wrap items-center justify-end gap-2">
     <button suiButton (click)="expandAll()" severity="secondary" variant="outlined">
       <app-icon name="chevron-down" />{{ t("app.shared.annotationList.expandAll") }}
     </button>
@@ -29,13 +31,13 @@
       <app-icon name="chevron-up" />{{ t("app.shared.annotationList.collapseAll") }}
     </button>
   </div>
-  <div class="annotation-list-scroll">
+  <div class="min-w-0">
     @if (annotationListLoaded()) {
       <sui-accordion [multiple]="true" class="w-full" [value]="activeAccordionPanels()" (valueChange)="setActiveAccordionPanels($event)">
         @for (group of groupedAnnotations(); track group.type) {
           <ng-template suiAccordionItem [value]="group.type" [label]="group.type + ' (' + group.annotations.length + ')'">
             @if (activeAccordionPanels().includes(group.type)) {
-              <div class="w-full mx-0 flex flex-col gap-3">
+              <div class="flex min-w-0 flex-col gap-3">
                 @for (annotation of group.annotations; track annotation.id ?? $index) {
                   <app-annotation-card [annotation]="annotation" />
                 }

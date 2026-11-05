@@ -1,26 +1,222 @@
-<div class="search-page w-full flex justify-center">
-  <div
-    class="search-layout w-full md:w-8/12 lg:w-5/12"
-    [class.search-layout--initial]="!hasSearched()"
-    [class.search-layout--results]="hasSearched()"
-    [class.search-layout--animated]="animationsEnabled()"
-  >
-    <div class="filter-pane w-full px-4 md:px-2">
-      <app-filter-pane [setQueryParams]="true" (searchSubmitted)="onSearch()" />
-    </div>
+<ng-container *transloco="let t">
+  <app-navbar class="sticky top-0 z-20 block" [workspace]="true" (homeClicked)="search.resetFilterClicked()">
+    <app-filter-pane
+      #search
+      navbar-search
+      class="block"
+      [workspace]="true"
+      [setQueryParams]="true"
+      (searchSubmitted)="onSearch()"
+      (searchReset)="onReset()"
+      (suggestionSelected)="selectEntity($event)"
+    />
+  </app-navbar>
 
-    <div class="entity-list w-full" [class.entity-list--visible]="hasSearched()">
-      @if (hasSearched()) {
-        <app-entity-list
-          [entities]="entities()"
-          [entitiesLoading]="loading()"
-          [onSelect]="navigateToDetailPage"
-          [loading]="loading()"
-          (atBottom)="nextPage()"
-          height="60vh"
-          enableInfiniteScroll
-        />
+  <div class="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-3 py-4 sm:px-6 lg:flex-row lg:gap-6">
+    <nav
+      class="shrink-0 lg:sticky lg:top-24 lg:self-start"
+      [class]="sidebarCollapsed() ? 'lg:w-12' : 'lg:w-52'"
+      [attr.aria-label]="t('app.screens.workspace.shortcuts')"
+    >
+      <div class="mb-3 hidden items-center justify-between gap-2 px-2 lg:flex" [class.justify-center]="sidebarCollapsed()">
+        @if (!sidebarCollapsed()) {
+          <span class="text-xs font-semibold tracking-wide text-slate-500 uppercase">{{ t("app.screens.workspace.shortcuts") }}</span>
+        }
+        <button
+          suiButton
+          variant="text"
+          severity="secondary"
+          shape="circle"
+          size="sm"
+          (click)="sidebarCollapsed.update((value) => !value)"
+          [attr.aria-expanded]="!sidebarCollapsed()"
+          [attr.aria-label]="t('app.screens.workspace.toggleSidebar')"
+        >
+          <app-icon name="sidebar" />
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-1.5 lg:flex-col">
+        @for (item of views; track item.id) {
+          <ng-container *ngTemplateOutlet="viewButton; context: { id: item.id, icon: item.icon }" />
+        }
+        @if (hasSearched()) {
+          <ng-container *ngTemplateOutlet="viewButton; context: { id: 'results', icon: 'search' }" />
+        }
+      </div>
+    </nav>
+
+    <div class="grid min-w-0 flex-1 items-start gap-4" [class]="selected() ? 'xl:grid-cols-[minmax(0,1fr)_24rem]' : ''">
+      <section class="min-w-0 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6" [class]="selected() ? 'hidden xl:block' : ''">
+        <header class="mb-6">
+          <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">{{ t("app.screens.workspace." + view()) }}</h1>
+          @if (view() === "overview") {
+            <p class="mt-1 text-sm leading-relaxed text-slate-500">{{ t("app.screens.workspace.description") }}</p>
+          }
+        </header>
+
+        @if (view() === "results") {
+          @if (entities().length > 0) {
+            <ul class="divide-y divide-slate-100">
+              @for (entity of entities(); track entity.id) {
+                <ng-container *ngTemplateOutlet="entityRow; context: { $implicit: entity }" />
+              }
+            </ul>
+            @if (meta().hasNextPage) {
+              <div class="mt-4 flex justify-center">
+                <button suiButton variant="outlined" severity="secondary" [loading]="loading()" (click)="nextPage()">
+                  {{ t("app.screens.workspace.more") }}
+                </button>
+              </div>
+            }
+          } @else if (loading()) {
+            <ng-container *ngTemplateOutlet="loadingIndicator" />
+          } @else {
+            <p class="rounded-2xl bg-slate-50 p-5 text-sm text-slate-500">{{ t("app.shared.entityList.empty") }}</p>
+          }
+        } @else {
+          <div class="grid gap-8">
+            @for (section of sections(); track section.id) {
+              <section>
+                @if (view() === "overview") {
+                  <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <h2 class="flex items-center gap-2 text-base font-semibold">
+                      <app-icon [name]="section.icon" class="text-slate-500" />{{ t("app.screens.workspace." + section.id) }}
+                    </h2>
+                    @if (section.feed.hasValue() && section.feed.value().data.length > section.limit) {
+                      <button suiButton size="sm" variant="text" severity="secondary" (click)="showView(section.id)">
+                        {{ t("app.screens.workspace.showMore") }} <app-icon name="arrow-right" />
+                      </button>
+                    }
+                  </div>
+                }
+                @if (section.feed.isLoading()) {
+                  <ng-container *ngTemplateOutlet="loadingIndicator" />
+                } @else if (section.feed.error()) {
+                  <div class="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-slate-50 p-4 text-sm">
+                    <span role="status">{{ t("app.screens.workspace.feedError") }}</span>
+                    <button suiButton size="sm" variant="outlined" severity="secondary" (click)="section.feed.reload()">
+                      {{ t("app.screens.workspace.retry") }}
+                    </button>
+                  </div>
+                } @else if (section.feed.hasValue() && section.feed.value().data.length > 0) {
+                  @let entries = view() === "overview" ? section.feed.value().data.slice(0, section.limit) : section.feed.value().data;
+                  @if (section.id === "recent" && view() === "overview") {
+                    <ul class="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2" [class]="selected() ? '' : 'xl:grid-cols-4'">
+                      @for (entity of entries; track entity.id) {
+                        <li class="min-w-0">
+                          <button
+                            type="button"
+                            class="flex h-full w-full min-w-0 items-center gap-3 rounded-2xl bg-slate-100 p-3 text-start hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-600"
+                            [class.bg-blue-100]="selected()?.id === entity.id"
+                            [attr.aria-pressed]="selected()?.id === entity.id"
+                            (click)="selectEntity(entity)"
+                          >
+                            <ng-container *ngTemplateOutlet="entityIdentity; context: { $implicit: entity }" />
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <ul class="divide-y divide-slate-100">
+                      @for (entity of entries; track entity.id) {
+                        <ng-container *ngTemplateOutlet="entityRow; context: { $implicit: entity }" />
+                      }
+                    </ul>
+                  }
+                } @else {
+                  <p class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm leading-relaxed text-slate-500">
+                    {{ t("app.screens.workspace." + section.id + "Empty") }}
+                  </p>
+                }
+              </section>
+            }
+          </div>
+        }
+      </section>
+
+      @if (selected(); as selection) {
+        <aside
+          class="min-w-0 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 xl:sticky xl:top-24"
+          [attr.aria-label]="t('app.screens.workspace.preview')"
+        >
+          <header class="mb-4 flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
+            <div class="min-w-0">
+              <p class="mb-1 text-xs font-medium text-slate-500">{{ t("app.screens.workspace.preview") }}</p>
+              <h2 class="wrap-anywhere text-xl font-semibold tracking-tight">{{ selection.label }}</h2>
+            </div>
+            <button
+              suiButton
+              variant="text"
+              severity="secondary"
+              shape="circle"
+              class="shrink-0 px-2.5"
+              [attr.aria-label]="t('app.screens.workspace.closePreview')"
+              (click)="selected.set(undefined)"
+            >
+              <app-icon name="times" />
+            </button>
+          </header>
+          @if (preview.isLoading()) {
+            <ng-container *ngTemplateOutlet="loadingIndicator" />
+          } @else if (preview.hasValue()) {
+            @let entity = preview.value();
+            <app-node-types [nodeTypes]="entity.types" asChips class="mb-5 flex flex-wrap gap-2" />
+            @if (visibleProperties(entity.properties).length > 0) {
+              <app-attribute-list [properties]="entity.properties" [textSize]="2" />
+            }
+          } @else if (preview.error()) {
+            <p role="status" class="text-sm text-slate-600">{{ t("app.screens.workspace.previewError") }}</p>
+          }
+          <a suiButton variant="outlined" severity="secondary" class="mt-5" [routerLink]="['/entity', selection.id]">
+            {{ t("app.screens.workspace.openDetails") }}<app-icon name="arrow-right" />
+          </a>
+        </aside>
       }
     </div>
   </div>
-</div>
+
+  <ng-template #viewButton let-id="id" let-icon="icon">
+    <button
+      type="button"
+      class="flex min-h-10 items-center gap-2 rounded-full px-3 text-start text-sm font-medium text-slate-700 hover:bg-slate-200/70 focus-visible:outline-2 focus-visible:outline-blue-600"
+      [class.bg-blue-100]="view() === id"
+      [class.text-blue-950]="view() === id"
+      [class.lg:justify-center]="sidebarCollapsed()"
+      [attr.aria-current]="view() === id ? 'page' : null"
+      [attr.title]="sidebarCollapsed() ? t('app.screens.workspace.' + id) : null"
+      (click)="showView(id)"
+    >
+      <app-icon [name]="icon" />
+      <span [class]="sidebarCollapsed() ? 'lg:sr-only' : ''">{{ t("app.screens.workspace." + id) }}</span>
+    </button>
+  </ng-template>
+
+  <ng-template #entityRow let-entity>
+    <li class="min-w-0">
+      <button
+        type="button"
+        class="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-start hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-600 sm:px-3"
+        [class.bg-blue-100]="selected()?.id === entity.id"
+        [attr.aria-pressed]="selected()?.id === entity.id"
+        (click)="selectEntity(entity)"
+      >
+        <ng-container *ngTemplateOutlet="entityIdentity; context: { $implicit: entity }" />
+        <app-icon name="arrow-right" class="ml-auto text-slate-400" />
+      </button>
+    </li>
+  </ng-template>
+
+  <ng-template #entityIdentity let-entity>
+    <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700"><app-icon name="tag" /></span>
+    <span class="min-w-0">
+      <span class="block wrap-anywhere text-sm font-semibold text-slate-900">{{ entity.label }}</span>
+      <span class="block wrap-anywhere text-xs text-slate-500">{{ entityType(entity) }}</span>
+    </span>
+  </ng-template>
+
+  <ng-template #loadingIndicator>
+    <div class="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500" role="status">
+      <span suiSpinner size="sm"></span>{{ t("app.screens.common.loading") }}
+    </div>
+  </ng-template>
+</ng-container>

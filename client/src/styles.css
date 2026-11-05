@@ -1,9 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import "@sushi-kit/angular/styles.css";
 @import "tailwindcss";
 @import "@angular/cdk/overlay-prebuilt.css";
-
-@import "@sushi-kit/angular/styles.css";
 
 html,
 body {

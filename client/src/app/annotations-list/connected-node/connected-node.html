@@ -1,20 +1,19 @@
 <div
-  class="flex flex-row w-full items-center border-b border-gray-300 text-slate-900"
-  [class.border-b-0]="!firstEntry()"
+  class="flex min-w-0 items-center border-b border-slate-200 py-2 text-slate-900"
+  [class.border-b-0]="lastEntry()"
   [class.hover:bg-gray-100]="node().link"
-  style="min-height: 2rem"
 >
   @let link = node().link;
   @if (link && link.router) {
-    <a class="flex flex-row w-full items-center no-underline text-slate-900" [routerLink]="$safeNavigationMigration(node().link?.href)">
+    <a class="flex min-w-0 flex-1 items-center text-slate-900 no-underline" [routerLink]="$safeNavigationMigration(node().link?.href)">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
   } @else if (link && !link.router) {
-    <a class="flex flex-row w-full items-center no-underline text-slate-900" [href]="$safeNavigationMigration(node().link?.href)">
+    <a class="flex min-w-0 flex-1 items-center text-slate-900 no-underline" [href]="$safeNavigationMigration(node().link?.href)">
       <ng-container *ngTemplateOutlet="linkContent" />
     </a>
   } @else {
-    <div class="flex flex-row w-full items-center no-underline text-slate-900">
+    <div class="flex min-w-0 flex-1 items-center text-slate-900 no-underline">
       <ng-container *ngTemplateOutlet="linkContent" />
     </div>
   }
@@ -36,15 +35,15 @@
 </div>
 
 <ng-template #linkContent>
-  <div class="flex w-2/12 p-2 py-3 border-r border-gray-300 justify-center">
+  <div class="flex shrink-0 justify-center px-3 py-2">
     <app-icon [name]="node().directionIcon" />
   </div>
 
-  <div class="flex flex-row w-full px-2 items-center content-center gap-2">
+  <div class="flex min-w-0 flex-1 flex-col items-start gap-1 py-2">
     <div class="flex flex-col max-w-24">
       <app-node-types [nodeTypes]="node().node.types" asChips hideRamenCoreTypes />
     </div>
 
-    <div class="flex flex-col w-full">{{ title() }}</div>
+    <div class="min-w-0 wrap-anywhere text-sm font-medium">{{ title() }}</div>
   </div>
 </ng-template>

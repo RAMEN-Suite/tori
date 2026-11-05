@@ -1,6 +1,13 @@
 import { Icon } from '../utils/icon';
 import { PopoverTrigger, Button, Popover } from '@sushi-kit/angular';
-import { Component, computed, inject, Signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  Signal,
+} from '@angular/core';
 
 import { BackButtonComponent } from '../utils/back-button.component';
 import { isActive, Router, RouterLink } from '@angular/router';
@@ -28,6 +35,9 @@ import { ConfigService } from '../config-module/config.service';
   templateUrl: './navbar.html',
 })
 export class Navbar {
+  public readonly workspace = input(false);
+  public readonly homeClicked = output();
+
   private router = inject(Router);
   private readonly languageService = inject(LanguageService);
   private readonly config: ConfigService = inject(ConfigService);

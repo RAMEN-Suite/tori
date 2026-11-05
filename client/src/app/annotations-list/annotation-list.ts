@@ -44,7 +44,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
     TranslocoDirective,
   ],
   templateUrl: './annotation-list.html',
-  styleUrl: './annotation-list.scss',
+  host: { class: 'flex min-w-0 flex-col gap-4' },
 })
 export class AnnotationList {
   private readonly entityService = inject(EntityService);

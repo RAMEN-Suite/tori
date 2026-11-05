@@ -1,5 +1,12 @@
 import { Checkbox } from '@sushi-kit/angular';
-import { Component, computed, effect, inject, model } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  model,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TitleCasePipe } from '@angular/common';
 import { ConfigService } from '../../config-module/config.service';
@@ -12,6 +19,7 @@ import { ConfigService } from '../../config-module/config.service';
 export class TypeFilter {
   private configService = inject(ConfigService);
 
+  public readonly compact = input(false);
   public form = model.required<FormControl<string[]>>();
 
   protected config = this.configService.getConfig();

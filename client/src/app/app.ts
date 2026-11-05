@@ -16,7 +16,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { isActive, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { ConfigService } from './config-module/config.service';
 
 import { HealthService } from './health.service';
@@ -42,7 +42,7 @@ import { SushiToastTemplates } from './models/config/SushiToastTemplates';
     SushiToast,
     ToastContentTemplate,
   ],
-  styleUrl: './app.scss',
+  host: { class: 'block h-full' },
   templateUrl: './app.html',
 })
 export class App implements OnInit {
@@ -53,6 +53,12 @@ export class App implements OnInit {
 
   private readonly destroyRef = inject(DestroyRef);
   private router = inject(Router);
+  protected readonly isWorkspace = isActive('/', this.router, {
+    paths: 'exact',
+    queryParams: 'ignored',
+    fragment: 'ignored',
+    matrixParams: 'ignored',
+  });
 
   @ViewChild('appContent') private appContent!: ElementRef<HTMLDivElement>;
 

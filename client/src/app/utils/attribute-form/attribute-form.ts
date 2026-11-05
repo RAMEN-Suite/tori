@@ -40,6 +40,7 @@ interface AttributeWithOptValue
     Chip,
   ],
   templateUrl: './attribute-form.html',
+  host: { class: 'grid min-w-0 gap-5 sm:grid-cols-2' },
 })
 export class AttributeForm {
   private readonly configService = inject(ConfigService);
