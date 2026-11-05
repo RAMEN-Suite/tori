@@ -1,0 +1,37 @@
+<ng-container *transloco="let t">
+  <aside class="min-w-0 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6" [attr.aria-label]="t('app.screens.workspace.preview')">
+    <header class="mb-4 flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
+      <div class="min-w-0">
+        <p class="mb-1 text-xs font-medium text-slate-500">{{ t("app.screens.workspace.preview") }}</p>
+        <h2 class="wrap-anywhere text-xl font-semibold tracking-tight">{{ selection().label }}</h2>
+      </div>
+      <button
+        suiButton
+        variant="text"
+        severity="secondary"
+        shape="circle"
+        class="shrink-0 px-2.5"
+        [attr.aria-label]="t('app.screens.workspace.closePreview')"
+        (click)="closed.emit()"
+      >
+        <app-icon name="times" />
+      </button>
+    </header>
+    @if (preview.isLoading()) {
+      <div class="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500" role="status">
+        <span suiSpinner size="sm"></span>{{ t("app.screens.common.loading") }}
+      </div>
+    } @else if (preview.hasValue()) {
+      @let entity = preview.value();
+      <app-node-types [nodeTypes]="entity.types" asChips class="mb-5 flex flex-wrap gap-2" />
+      @if (visibleProperties(entity.properties).length > 0) {
+        <app-attribute-list [properties]="entity.properties" [textSize]="2" />
+      }
+    } @else if (preview.error()) {
+      <p role="status" class="text-sm text-slate-600">{{ t("app.screens.workspace.previewError") }}</p>
+    }
+    <a suiButton variant="outlined" severity="secondary" class="mt-5" [routerLink]="['/entity', selection().id]">
+      {{ t("app.screens.workspace.openDetails") }}<app-icon name="arrow-right" />
+    </a>
+  </aside>
+</ng-container>

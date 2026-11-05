@@ -1,0 +1,35 @@
+<nav *transloco="let t" [class]="collapsed() ? 'lg:w-12' : 'lg:w-52'" [attr.aria-label]="t('app.screens.workspace.shortcuts')">
+  <div class="mb-3 hidden items-center justify-between gap-2 px-2 lg:flex" [class.justify-center]="collapsed()">
+    @if (!collapsed()) {
+      <span class="text-xs font-semibold tracking-wide text-slate-500 uppercase">{{ t("app.screens.workspace.shortcuts") }}</span>
+    }
+    <button
+      suiButton
+      variant="text"
+      severity="secondary"
+      shape="circle"
+      size="sm"
+      (click)="collapsed.set(!collapsed())"
+      [attr.aria-expanded]="!collapsed()"
+      [attr.aria-label]="t('app.screens.workspace.toggleSidebar')"
+    >
+      <app-icon name="sidebar" />
+    </button>
+  </div>
+  <div class="flex flex-wrap gap-1.5 lg:flex-col">
+    @for (item of items(); track item.id) {
+      <button
+        type="button"
+        class="flex min-h-10 items-center gap-2 rounded-full px-3 text-start text-sm font-medium text-slate-700 hover:bg-slate-200/70 focus-visible:outline-2 focus-visible:outline-blue-600"
+        [class.bg-blue-100]="active() === item.id"
+        [class.text-blue-950]="active() === item.id"
+        [class.lg:justify-center]="collapsed()"
+        [attr.aria-current]="active() === item.id ? 'page' : null"
+        [attr.title]="collapsed() ? t('app.screens.workspace.' + item.id) : null"
+        (click)="viewSelected.emit(item.id)"
+      >
+        <app-icon [name]="item.icon" /><span [class]="collapsed() ? 'lg:sr-only' : ''">{{ t("app.screens.workspace." + item.id) }}</span>
+      </button>
+    }
+  </div>
+</nav>

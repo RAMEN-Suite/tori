@@ -1,0 +1,26 @@
+<ul
+  [class]="cards() ? 'grid grid-cols-1 gap-2 min-[360px]:grid-cols-2' : 'divide-y divide-slate-100'"
+  [class.xl:grid-cols-4]="cards() && !selectedId()"
+>
+  @for (entity of entities(); track entity.id) {
+    <li class="min-w-0">
+      <button
+        type="button"
+        class="flex w-full min-w-0 items-center gap-3 text-start focus-visible:outline-2 focus-visible:outline-blue-600"
+        [class]="cards() ? 'h-full rounded-2xl bg-slate-100 p-3 hover:bg-blue-100' : 'rounded-xl px-2 py-2.5 hover:bg-blue-50 sm:px-3'"
+        [class.bg-blue-100]="selectedId() === entity.id"
+        [attr.aria-pressed]="selectedId() === entity.id"
+        (click)="entitySelected.emit(entity)"
+      >
+        <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700"><app-icon name="tag" /></span>
+        <span class="min-w-0">
+          <span class="block wrap-anywhere text-sm font-semibold text-slate-900">{{ entity.label }}</span>
+          <span class="block wrap-anywhere text-xs text-slate-500">{{ typeOf(entity) }}</span>
+        </span>
+        @if (!cards()) {
+          <app-icon name="arrow-right" class="ml-auto text-slate-400" />
+        }
+      </button>
+    </li>
+  }
+</ul>

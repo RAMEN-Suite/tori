@@ -1,0 +1,18 @@
+<div *transloco="let t" class="grid min-w-0 gap-4">
+  @for (filter of search.collectionFilters(); track filter.type) {
+    <sui-select
+      [compareWith]="compareSelectionValues"
+      [options]="filter.options | options"
+      [formControl]="filter.control"
+      [ariaLabel]="filter.type"
+      [placeholder]="t('app.shared.filterPane.collection.placeholder', { collectionType: filter.type })"
+      showClear
+      filter
+      fluid
+    />
+  }
+  <div class="grid gap-2">
+    <span class="text-sm font-semibold">{{ t("app.screens.search.types") }}</span>
+    <app-type-filter [compact]="compact()" [form]="search.form.controls.types" />
+  </div>
+</div>
