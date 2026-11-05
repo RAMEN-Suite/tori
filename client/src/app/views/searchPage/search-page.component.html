@@ -1,48 +1,23 @@
 <ng-container *transloco="let t">
-  <app-navbar class="sticky top-0 z-20 block" [workspace]="true" (homeClicked)="search.resetFilterClicked()">
-    <app-filter-pane
-      #search
-      navbar-search
-      class="block"
-      [workspace]="true"
-      [setQueryParams]="true"
-      (searchSubmitted)="onSearch()"
-      (searchReset)="onReset()"
-    />
+  <app-navbar class="sticky top-0 z-20 block" [workspace]="true" (homeClicked)="resetSearch()">
+    <div navbar-search cdkOverlayOrigin #searchOrigin="cdkOverlayOrigin">
+      <app-search-bar
+        [workspace]="true"
+        [filtersOpen]="filtersOpen()"
+        (searchRequested)="submitSearch()"
+        (filtersRequested)="filtersOpen.set(!filtersOpen())"
+        (entitySelected)="openEntity($event)"
+      />
+    </div>
   </app-navbar>
 
   <div class="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-3 py-4 sm:px-6 lg:flex-row lg:gap-6">
-    <nav
-      class="shrink-0 lg:sticky lg:top-24 lg:self-start"
-      [class]="sidebarCollapsed() ? 'lg:w-12' : 'lg:w-52'"
-      [attr.aria-label]="t('app.screens.workspace.shortcuts')"
-    >
-      <div class="mb-3 hidden items-center justify-between gap-2 px-2 lg:flex" [class.justify-center]="sidebarCollapsed()">
-        @if (!sidebarCollapsed()) {
-          <span class="text-xs font-semibold tracking-wide text-slate-500 uppercase">{{ t("app.screens.workspace.shortcuts") }}</span>
-        }
-        <button
-          suiButton
-          variant="text"
-          severity="secondary"
-          shape="circle"
-          size="sm"
-          (click)="sidebarCollapsed.update((value) => !value)"
-          [attr.aria-expanded]="!sidebarCollapsed()"
-          [attr.aria-label]="t('app.screens.workspace.toggleSidebar')"
-        >
-          <app-icon name="sidebar" />
-        </button>
-      </div>
-      <div class="flex flex-wrap gap-1.5 lg:flex-col">
-        @for (item of views; track item.id) {
-          <ng-container *ngTemplateOutlet="viewButton; context: { id: item.id, icon: item.icon }" />
-        }
-        @if (hasSearched()) {
-          <ng-container *ngTemplateOutlet="viewButton; context: { id: 'results', icon: 'search' }" />
-        }
-      </div>
-    </nav>
+    <app-workspace-sidebar
+      [active]="view()"
+      [hasResults]="hasSearched()"
+      [(collapsed)]="sidebarCollapsed"
+      (viewSelected)="showView($event)"
+    />
 
     <div class="grid min-w-0 flex-1 items-start gap-4" [class]="selected() ? 'xl:grid-cols-[minmax(0,1fr)_24rem]' : ''">
       <section class="min-w-0 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6" [class]="selected() ? 'hidden xl:block' : ''">
@@ -54,13 +29,9 @@
         </header>
 
         @if (view() === "results") {
-          <ng-container *ngTemplateOutlet="search.resultFilters() ?? null" />
+          <app-search-result-filters />
           @if (entities().length > 0) {
-            <ul class="divide-y divide-slate-100">
-              @for (entity of entities(); track entity.id) {
-                <ng-container *ngTemplateOutlet="entityRow; context: { $implicit: entity }" />
-              }
-            </ul>
+            <app-workspace-entities [entities]="entities()" [selectedId]="selected()?.id" (entitySelected)="selectEntity($event)" />
             @if (meta().hasNextPage) {
               <div class="mt-4 flex justify-center">
                 <button suiButton variant="outlined" severity="secondary" [loading]="loading()" (click)="nextPage()">
@@ -100,29 +71,12 @@
                   </div>
                 } @else if (section.feed.hasValue() && section.feed.value().data.length > 0) {
                   @let entries = view() === "overview" ? section.feed.value().data.slice(0, section.limit) : section.feed.value().data;
-                  @if (section.id === "recent" && view() === "overview") {
-                    <ul class="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2" [class]="selected() ? '' : 'xl:grid-cols-4'">
-                      @for (entity of entries; track entity.id) {
-                        <li class="min-w-0">
-                          <button
-                            type="button"
-                            class="flex h-full w-full min-w-0 items-center gap-3 rounded-2xl bg-slate-100 p-3 text-start hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-600"
-                            [class.bg-blue-100]="selected()?.id === entity.id"
-                            [attr.aria-pressed]="selected()?.id === entity.id"
-                            (click)="selectEntity(entity)"
-                          >
-                            <ng-container *ngTemplateOutlet="entityIdentity; context: { $implicit: entity }" />
-                          </button>
-                        </li>
-                      }
-                    </ul>
-                  } @else {
-                    <ul class="divide-y divide-slate-100">
-                      @for (entity of entries; track entity.id) {
-                        <ng-container *ngTemplateOutlet="entityRow; context: { $implicit: entity }" />
-                      }
-                    </ul>
-                  }
+                  <app-workspace-entities
+                    [entities]="entries"
+                    [cards]="section.id === 'recent' && view() === 'overview'"
+                    [selectedId]="selected()?.id"
+                    (entitySelected)="selectEntity($event)"
+                  />
                 } @else {
                   <p class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm leading-relaxed text-slate-500">
                     {{ t("app.screens.workspace." + section.id + "Empty") }}
@@ -135,88 +89,30 @@
       </section>
 
       @if (selected(); as selection) {
-        <aside
-          class="min-w-0 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 xl:sticky xl:top-24"
-          [attr.aria-label]="t('app.screens.workspace.preview')"
-        >
-          <header class="mb-4 flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
-            <div class="min-w-0">
-              <p class="mb-1 text-xs font-medium text-slate-500">{{ t("app.screens.workspace.preview") }}</p>
-              <h2 class="wrap-anywhere text-xl font-semibold tracking-tight">{{ selection.label }}</h2>
-            </div>
-            <button
-              suiButton
-              variant="text"
-              severity="secondary"
-              shape="circle"
-              class="shrink-0 px-2.5"
-              [attr.aria-label]="t('app.screens.workspace.closePreview')"
-              (click)="selected.set(undefined)"
-            >
-              <app-icon name="times" />
-            </button>
-          </header>
-          @if (preview.isLoading()) {
-            <ng-container *ngTemplateOutlet="loadingIndicator" />
-          } @else if (preview.hasValue()) {
-            @let entity = preview.value();
-            <app-node-types [nodeTypes]="entity.types" asChips class="mb-5 flex flex-wrap gap-2" />
-            @if (visibleProperties(entity.properties).length > 0) {
-              <app-attribute-list [properties]="entity.properties" [textSize]="2" />
-            }
-          } @else if (preview.error()) {
-            <p role="status" class="text-sm text-slate-600">{{ t("app.screens.workspace.previewError") }}</p>
-          }
-          <a suiButton variant="outlined" severity="secondary" class="mt-5" [routerLink]="['/entity', selection.id]">
-            {{ t("app.screens.workspace.openDetails") }}<app-icon name="arrow-right" />
-          </a>
-        </aside>
+        <app-entity-preview [selection]="selection" (closed)="selected.set(undefined)" />
       }
     </div>
   </div>
-
-  <ng-template #viewButton let-id="id" let-icon="icon">
-    <button
-      type="button"
-      class="flex min-h-10 items-center gap-2 rounded-full px-3 text-start text-sm font-medium text-slate-700 hover:bg-slate-200/70 focus-visible:outline-2 focus-visible:outline-blue-600"
-      [class.bg-blue-100]="view() === id"
-      [class.text-blue-950]="view() === id"
-      [class.lg:justify-center]="sidebarCollapsed()"
-      [attr.aria-current]="view() === id ? 'page' : null"
-      [attr.title]="sidebarCollapsed() ? t('app.screens.workspace.' + id) : null"
-      (click)="showView(id)"
-    >
-      <app-icon [name]="icon" />
-      <span [class]="sidebarCollapsed() ? 'lg:sr-only' : ''">{{ t("app.screens.workspace." + id) }}</span>
-    </button>
-  </ng-template>
-
-  <ng-template #entityRow let-entity>
-    <li class="min-w-0">
-      <button
-        type="button"
-        class="flex w-full items-center gap-3 rounded-xl px-2 py-2.5 text-start hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-600 sm:px-3"
-        [class.bg-blue-100]="selected()?.id === entity.id"
-        [attr.aria-pressed]="selected()?.id === entity.id"
-        (click)="selectEntity(entity)"
-      >
-        <ng-container *ngTemplateOutlet="entityIdentity; context: { $implicit: entity }" />
-        <app-icon name="arrow-right" class="ml-auto text-slate-400" />
-      </button>
-    </li>
-  </ng-template>
-
-  <ng-template #entityIdentity let-entity>
-    <span class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-700"><app-icon name="tag" /></span>
-    <span class="min-w-0">
-      <span class="block wrap-anywhere text-sm font-semibold text-slate-900">{{ entity.label }}</span>
-      <span class="block wrap-anywhere text-xs text-slate-500">{{ entityType(entity) }}</span>
-    </span>
-  </ng-template>
 
   <ng-template #loadingIndicator>
     <div class="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500" role="status">
       <span suiSpinner size="sm"></span>{{ t("app.screens.common.loading") }}
     </div>
+  </ng-template>
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="searchOrigin"
+    [cdkConnectedOverlayOpen]="filtersOpen()"
+    [cdkConnectedOverlayMatchWidth]="true"
+    [cdkConnectedOverlayHasBackdrop]="true"
+    [cdkConnectedOverlayFlexibleDimensions]="false"
+    [cdkConnectedOverlayViewportMargin]="8"
+    [cdkConnectedOverlayPositions]="[{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' }]"
+    cdkConnectedOverlayBackdropClass="cdk-overlay-dark-backdrop"
+    (backdropClick)="filtersOpen.set(false)"
+    (detach)="filtersOpen.set(false)"
+    (overlayKeydown)="$event.key === 'Escape' && filtersOpen.set(false)"
+  >
+    <app-advanced-search-panel (closed)="filtersOpen.set(false)" (searchRequested)="submitSearch()" (resetRequested)="resetSearch()" />
   </ng-template>
 </ng-container>

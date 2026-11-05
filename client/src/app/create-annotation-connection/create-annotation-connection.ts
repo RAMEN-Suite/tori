@@ -3,14 +3,19 @@ import {
   computed,
   inject,
   input,
+  OnInit,
   Signal,
   signal,
 } from '@angular/core';
 import { SearchEntityService } from '../search-entity.service';
-import { FilterPane } from '../filter-pane/filter-pane';
+import { SearchBar } from '../search/search-bar/search-bar';
+import { SearchFilterFields } from '../search/search-filter-fields/search-filter-fields';
+import { SearchState } from '../search/search-state';
+import { Button } from '@sushi-kit/angular';
+import { TranslocoDirective } from '@jsverse/transloco';
 import { FormsModule } from '@angular/forms';
 import { EntityList } from '../entity-list/entity-list';
-import { Annotation, OldEntity } from '../../interfaces';
+import { Annotation, EntityNames, OldEntity } from '../../interfaces';
 import { ConfirmService } from '../utils/confirm.service';
 import { NotificationService } from '../utils/notification.service';
 import { AnnotationApiService } from '../api/annotation-api.service';
@@ -21,11 +26,29 @@ import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-annotation-connection',
-  providers: [SearchEntityService],
-  imports: [FilterPane, FormsModule, EntityList],
+  providers: [SearchEntityService, SearchState],
+  imports: [
+    SearchBar,
+    SearchFilterFields,
+    Button,
+    TranslocoDirective,
+    FormsModule,
+    EntityList,
+  ],
   templateUrl: './create-annotation-connection.html',
 })
-export class CreateAnnotationConnection {
+export class CreateAnnotationConnection implements OnInit {
+  protected readonly search = inject(SearchState);
+
+  public ngOnInit(): void {
+    void this.search.initialize();
+  }
+
+  protected selectSuggestion(entity: EntityNames): void {
+    this.search.setQuery(entity.label);
+    void this.search.submit();
+  }
+
   private readonly entityService = inject(EntityService);
   private readonly annotationApi = inject(AnnotationApiService);
   private readonly searchService = inject(SearchEntityService);
