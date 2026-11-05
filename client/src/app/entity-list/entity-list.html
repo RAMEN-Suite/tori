@@ -4,9 +4,17 @@
       <span>{{ t("app.shared.entityList.empty") }}</span>
     </div>
   } @else {
-    <div #list (scroll)="onScroll($event)" class="overflow-y-auto rounded-2xl border border-slate-200 bg-white" [style]="{ width: width(), height: height() }">
+    <div
+      #list
+      (scroll)="onScroll($event)"
+      class="overflow-y-auto rounded-2xl border border-slate-200 bg-white"
+      [style]="{ width: width(), height: height() }"
+    >
       @for (item of entities(); track $index; let odd = $odd) {
-        <div class="flex items-center justify-between border-b border-slate-100 p-4 last:border-0" [ngClass]="{ 'bg-slate-100 dark:bg-slate-700': odd }">
+        <div
+          class="flex items-center justify-between border-b border-slate-100 p-4 last:border-0"
+          [ngClass]="{ 'bg-slate-100 dark:bg-slate-700': odd }"
+        >
           <div class="flex-1 min-w-0">
             <div class="flex flex-row items-center gap-2 flex-wrap">
               @if (item.types.length !== 0) {
