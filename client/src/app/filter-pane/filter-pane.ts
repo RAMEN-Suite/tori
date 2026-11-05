@@ -1,28 +1,34 @@
+import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
+import { CdkTrapFocus } from '@angular/cdk/a11y';
 import { OptionsPipe, compareSelectionValues } from '../utils/options.pipe';
 import { Icon } from '../utils/icon';
 import {
   Autocomplete,
   AutocompleteItemTemplate,
   AutocompletePrefixTemplate,
-  Popover,
-  PopoverTrigger,
   Button,
+  Input,
+  MultiSelect,
   Select,
 } from '@sushi-kit/angular';
 import {
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   effect,
   inject,
   input,
   output,
   signal,
+  TemplateRef,
+  viewChild,
 } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  FormsModule,
   Validators,
 } from '@angular/forms';
 import { SearchEntityService } from '../search-entity.service';
@@ -37,7 +43,7 @@ import { distinctUntilChanged, firstValueFrom, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TypeFilter } from './type-filter/type-filter';
 import { NgTemplateOutlet } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { QueryParamsService } from '../utils/query-params.service';
 import { ConfigService } from '../config-module/config.service';
 import { TranslocoDirective } from '@jsverse/transloco';
@@ -50,16 +56,20 @@ interface CFOption {
 @Component({
   selector: 'app-filter-pane',
   imports: [
+    CdkConnectedOverlay,
+    CdkOverlayOrigin,
+    CdkTrapFocus,
     OptionsPipe,
     Icon,
     ReactiveFormsModule,
     Autocomplete,
     AutocompleteItemTemplate,
     AutocompletePrefixTemplate,
-    Popover,
-    PopoverTrigger,
     NgTemplateOutlet,
     Button,
+    Input,
+    MultiSelect,
+    FormsModule,
     Select,
     TypeFilter,
     RouterLink,
@@ -71,6 +81,9 @@ export class FilterPane {
   protected readonly compareSelectionValues = compareSelectionValues;
 
   private destroyRef = inject(DestroyRef);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly router = inject(Router);
+  private readonly autocomplete = viewChild(Autocomplete);
 
   private readonly searchService = inject(SearchEntityService);
   private readonly collectionService = inject(CollectionService);
@@ -84,7 +97,10 @@ export class FilterPane {
   public readonly workspace = input(false);
   public readonly searchSubmitted = output();
   public readonly searchReset = output();
-  public readonly suggestionSelected = output<EntityNames>();
+  public readonly resultFilters =
+    viewChild<TemplateRef<unknown>>('resultFilters');
+  protected readonly searchAttempted = signal(false);
+  protected readonly filtersOpen = signal(false);
 
   protected remoteConfig = this.configService.getRemoteConfig();
   protected config = this.configService.getConfig();
@@ -124,6 +140,29 @@ export class FilterPane {
   protected showEmptyMessage = signal<boolean>(false);
 
   public constructor() {
+    // Capture Enter before the combobox selects its active suggestion.
+    const onKeydown = (event: KeyboardEvent) => {
+      if (
+        !this.workspace() ||
+        event.key !== 'Enter' ||
+        event.isComposing ||
+        !(event.target instanceof HTMLInputElement) ||
+        event.target.getAttribute('role') !== 'combobox'
+      )
+        return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      void this.onSubmit();
+    };
+    this.host.nativeElement.addEventListener('keydown', onKeydown, {
+      capture: true,
+    });
+    this.destroyRef.onDestroy(() => {
+      this.host.nativeElement.removeEventListener('keydown', onKeydown, {
+        capture: true,
+      });
+    });
+
     effect(() => {
       const opts = this.collectionFilterOptions();
       opts.forEach((opt) => {
@@ -207,7 +246,7 @@ export class FilterPane {
     queueMicrotask(() => {
       this.form.controls.label.setValue(value.label);
       if (this.workspace()) {
-        this.suggestionSelected.emit(value);
+        void this.router.navigate(['/entity', value.id]);
       } else {
         void this.onSubmit();
       }
@@ -249,13 +288,76 @@ export class FilterPane {
     this.showEmptyMessage.set(this.calcShowEmptyMessage());
   }
 
+  protected hasResultFilters(): boolean {
+    return (
+      this.form.controls.types.value.length > 0 ||
+      Object.values(this.form.controls.collectionFilter.value).some(Boolean)
+    );
+  }
+
+  protected async updateResultTypes(value: unknown): Promise<void> {
+    if (!Array.isArray(value)) return;
+    const types = value.filter(
+      (type): type is string =>
+        typeof type === 'string' && this.config().entityTypes.includes(type),
+    );
+    this.form.controls.types.setValue(types);
+    await this.onSubmit();
+  }
+
+  protected async updateResultCollection(
+    type: string,
+    value: unknown,
+  ): Promise<void> {
+    const selectedOption = this.collectionFilterOptions()
+      .find((filter) => filter.type === type)
+      ?.values.find((option) => this.compareSelectionValues(option, value));
+    this.form.controls.collectionFilter
+      .get(type)
+      ?.setValue(selectedOption ?? null);
+    await this.onSubmit();
+  }
+
+  protected async clearResultFilters(): Promise<void> {
+    this.form.controls.types.setValue([]);
+    this.form.controls.collectionFilter.reset();
+    await this.onSubmit();
+  }
+
+  protected toggleFilters(): void {
+    this.autocomplete()?.hide();
+    this.filtersOpen.update((open) => !open);
+  }
+
+  protected updateAdvancedQuery(event: Event): void {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const query = event.target.value;
+    // Clear the autocomplete's internal edit buffer before updating its value.
+    this.autocomplete()?.reset();
+    this.form.controls.label.setValue(query);
+    this.searchAttempted.set(false);
+  }
+
+  protected submitFilters(event: Event): void {
+    if (!(event instanceof KeyboardEvent) || event.isComposing) return;
+    event.preventDefault();
+    void this.onSubmit();
+  }
+
+  protected closeFilters(): void {
+    this.filtersOpen.set(false);
+  }
+
   protected async onSubmit() {
-    if (this.searchService.getEntitiesLoading()()) return;
+    if (this.searching()) return;
+    this.autocomplete()?.hide();
+    this.searchAttempted.set(true);
     if (!this.form.valid) {
       Object.values(this.form.controls).forEach((ctrl) => ctrl.markAsTouched());
       return;
     }
 
+    this.closeFilters();
     const label = this.form.controls.label.value;
     const types = this.form.controls.types.value;
     const collectionFilter = this.form.controls.collectionFilter.value;
@@ -394,6 +496,9 @@ export class FilterPane {
 
   public async resetFilterClicked(): Promise<void> {
     if (this.searchService.getEntitiesLoading()()) return;
+    this.autocomplete()?.reset();
+    this.searchAttempted.set(false);
+    this.closeFilters();
     this.resetForm();
     this.searchService.resetEntityList();
     if (this.setQueryParams()) await this.queryParamService.setQueryParams({});

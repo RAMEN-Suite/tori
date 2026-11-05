@@ -8,7 +8,6 @@
       [setQueryParams]="true"
       (searchSubmitted)="onSearch()"
       (searchReset)="onReset()"
-      (suggestionSelected)="selectEntity($event)"
     />
   </app-navbar>
 
@@ -55,6 +54,7 @@
         </header>
 
         @if (view() === "results") {
+          <ng-container *ngTemplateOutlet="search.resultFilters() ?? null" />
           @if (entities().length > 0) {
             <ul class="divide-y divide-slate-100">
               @for (entity of entities(); track entity.id) {
