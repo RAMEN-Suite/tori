@@ -18,6 +18,7 @@ Clones that used the old husky hook must run `npm run prepare` once as well: the
 
 ```bash
 cp .example.env .env              # its values fit the compose services; put the gcore files into ./config
+(cd client && npm ci) && (cd server && npm ci)   # for your editor (types, ESLint)
 docker compose up --build --watch
 ```
 
