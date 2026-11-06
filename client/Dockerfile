@@ -3,7 +3,6 @@ WORKDIR /app
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
   NPM_CONFIG_FUND=false
 
-# Local development only (compose.yml target dev): ng serve on the bind-mounted sources, /api proxied to tori-server
 FROM base AS dev
 ENV NODE_ENV=development
 COPY client/package*.json client/.npmrc ./
@@ -12,7 +11,6 @@ COPY client .
 EXPOSE 4200
 CMD ["npm", "run", "start:docker"]
 
-# The production configuration builds src/index-prod.html (Caddy templates) as index.html
 FROM base AS build
 COPY client .
 RUN npm ci \
