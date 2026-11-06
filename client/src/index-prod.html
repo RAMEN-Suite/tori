@@ -2,15 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>${TORI_APP_NAME}</title>
+    <title>{{env `TORI_APP_NAME` | default `Tori - Graph Based Entity Management` | html}}</title>
     <meta name="description" content="RAMEN Based Entity Manager" />
 
-    <link rel="canonical" href="${TORI_APP_HOST}" />
+    <link rel="canonical" href="{{env `TORI_APP_HOST` | html}}" />
 
-    <base href="${TORI_APP_PREFIX}" />
+    <base href="{{env `TORI_APP_PREFIX` | default `/` | html}}" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="${TORI_APP_DESCRIPTION}" />
-    <link rel="icon" type="image/x-icon" href="${TORI_APP_FAVICON}" />
+    <meta name="description" content="{{env `TORI_APP_DESCRIPTION` | default `Entity Management for Graph Applications using the RAMEN-Framework` | html}}" />
+    <link rel="icon" type="image/x-icon" href="{{env `TORI_APP_FAVICON` | default `./favicon-default.jpg` | html}}" />
   </head>
   <body>
     <app-root></app-root>

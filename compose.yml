@@ -3,35 +3,38 @@ name: tori-dev
 services:
   tori-server:
     build:
-      context: server
+      context: .
       target: dev
-      dockerfile: Dockerfile
+      dockerfile: server/Dockerfile
     image: tori-server
     restart: unless-stopped
     depends_on:
       neo4j:
         condition: service_healthy
     ports:
-      - "8090:3000"
+      - '8090:3000'
     volumes:
-      - ./config:/tori-config:r
+      - ./config:/tori-config:ro
+      - ./user-db:/user-db
     environment:
       TORI_APP_NAME: ${TORI_APP_NAME}
       TORI_APP_PREFIX: ${TORI_APP_PREFIX}
       TORI_APP_DESCRIPTION: ${TORI_APP_DESCRIPTION}
       TORI_APP_FAVICON: ${TORI_APP_FAVICON}
       TORI_APP_HOST: ${TORI_APP_HOST}
-      TORI_SERVER_PORT: ${TORI_SERVER_PORT}
+      TORI_SERVER_PORT: ${TORI_SERVER_PORT:-3000}
       TORI_GCORE: ${TORI_GCORE}
       TORI_GCORE_RAMEN: ${TORI_GCORE_RAMEN}
       TORI_GCORE_PROJECT: ${TORI_GCORE_PROJECT}
       TORI_DB_HOST: ${TORI_DB_HOST}
       TORI_DB_PASSWORD: ${TORI_DB_PASSWORD}
-      TORI_DB_PORT: ${TORI_DB_PORT}
-      TORI_DB_USER: ${TORI_DB_USER}
-      TORI_DB_SCHEME: ${TORI_DB_SCHEME}
-      TORI_DB_NAME: ${TORI_DB_NAME}
-      TORI_CAMI_HOST: ${TORI_CAMI_HOST}
+      TORI_DB_PORT: ${TORI_DB_PORT:-7687}
+      TORI_DB_USER: ${TORI_DB_USER:-neo4j}
+      TORI_DB_SCHEME: ${TORI_DB_SCHEME:-bolt}
+      TORI_DB_NAME: ${TORI_DB_NAME:-neo4j}
+      TORI_USER_DB_NAME: ${TORI_USER_DB_NAME:-/user-db/user.db}
+      TORI_USER_DB_SYNCHRONIZE: ${TORI_USER_DB_SYNCHRONIZE:-true}
+      TORI_MISO_HOST: ${TORI_MISO_HOST:-}
     develop:
       watch:
         - action: sync
@@ -43,22 +46,21 @@ services:
           path: ./server/package.json
           target: /app/package.json
     healthcheck:
-      test: [ "CMD", "wget", "-qO-", "http://127.0.0.1:${TORI_SERVER_PORT:-3000}/api/health" ]
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:${TORI_SERVER_PORT:-3000}/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
 
-
   tori-client:
     build:
-      context: client
+      context: .
       target: dev
-      dockerfile: Dockerfile
+      dockerfile: client/Dockerfile
     image: tori-client
     restart: unless-stopped
     ports:
-      - "8080:4200"
+      - '8080:4200'
     develop:
       watch:
         - action: sync
@@ -70,14 +72,13 @@ services:
           path: ./client/package.json
           target: /app/package.json
 
-
   neo4j:
     container_name: neo4j
-    image: neo4j:2026.04
+    image: neo4j:5.26.32@sha256:42ef3ebfd671ebd01fdebb6dcbe80cf7b45eef2aa3d346ef4132f7ef31e67d2f
     restart: unless-stopped
     ports:
-      - "7474:7474"
-      - "7687:7687"
+      - '7474:7474'
+      - '7687:7687'
     volumes:
       - ./neo4j/import:/import
       - ./neo4j/backups:/backups
@@ -85,15 +86,16 @@ services:
       - neo4j_data:/data
     environment:
       NEO4J_AUTH: neo4j/neo4jadmin
-      NEO4J_PLUGINS: '["apoc", "apoc-extended"]'
+      NEO4J_PLUGINS: '["apoc"]'
       apoc.import.file.enabled: 'true'
       NEO4J_dbms_security_procedures_unrestricted: apoc.\\\*,atag.\\\*
       apoc.export.file.enabled: 'true'
       apoc.initializer.neo4j.0: CREATE CONSTRAINT collection_uuid IF NOT EXISTS FOR (c:Collection) REQUIRE c.uuid IS UNIQUE
-      apoc.initializer.neo4j.1: CREATE CONSTRAINT text_uuid IF NOT EXISTS FOR (t:Text) REQUIRE t.uuid IS UNIQUE
+      apoc.initializer.neo4j.1: CREATE CONSTRAINT content_uuid IF NOT EXISTS FOR (content:Content) REQUIRE content.uuid IS UNIQUE
       apoc.initializer.neo4j.2: CREATE CONSTRAINT character_uuid IF NOT EXISTS FOR (ch:Character) REQUIRE ch.uuid IS UNIQUE
       apoc.initializer.neo4j.3: CREATE CONSTRAINT annotation_uuid IF NOT EXISTS FOR (a:Annotation) REQUIRE a.uuid IS UNIQUE
       apoc.initializer.neo4j.4: CREATE CONSTRAINT entity_uuid IF NOT EXISTS FOR (e:Entity) REQUIRE e.uuid IS UNIQUE
+      apoc.initializer.neo4j.5: CREATE FULLTEXT INDEX entity_label_fulltext IF NOT EXISTS FOR (n:Entity) ON EACH [n.label]
     healthcheck:
       test: /var/lib/neo4j/bin/cypher-shell -u "neo4j" -p "neo4jadmin" "show databases;"
       start_period: 20s
