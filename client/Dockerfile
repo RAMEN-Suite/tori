@@ -1,118 +1,63 @@
-ARG NODE_VERSION=24-alpine
-ARG CADDY_VERSION=2.11.2-alpine
-
-FROM node:${NODE_VERSION} AS base
+FROM node:26.13.0-alpine@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94 AS base
+WORKDIR /app
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
   NPM_CONFIG_FUND=false
 
-# =========================================
-# Dev
-# =========================================
+# Local development only (compose.yml target dev): ng serve on the bind-mounted sources, /api proxied to tori-server
 FROM base AS dev
-
-# Set environment variable to indicate development mode
 ENV NODE_ENV=development
-
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy only the dependency files first to optimize Docker caching
-COPY package.json package-lock.json* ./
-
-# Copy .npmrc for supplychain security
-COPY .npmrc ./
-
-# Install dependencies using npm with caching to speed up subsequent builds
+COPY client/package*.json client/.npmrc ./
 RUN --mount=type=cache,target=/root/.npm npm install
-
-# Copy all application source files into the container
-COPY . .
-
-# Expose the port Angular uses for the dev server (default is 4200)
+COPY client .
 EXPOSE 4200
+CMD ["npm", "run", "start:docker"]
 
-# Start the Angular dev server and bind it to all network dto
-CMD ["npm", "start", "--", "--proxy-config", "proxy.conf.docker.json", "--host=0.0.0.0"]
+# The production configuration builds src/index-prod.html (Caddy templates) as index.html
+FROM base AS build
+COPY client .
+RUN npm ci \
+  && npm run build
 
+FROM caddy:2.11.4-alpine@sha256:6aeddd44c3078b0f9a35206472a11420648a79c184603ef95957d0a20044cb2b AS caddy
+RUN setcap -r /usr/bin/caddy
 
-# =========================================
-# Stage 1: Build the Angular Application
-# =========================================
-
-# Use a lightweight DHI Node.js image for building
-FROM base AS builder
-
-# Set the working directory inside the container
+FROM alpine:3@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a AS runtime
 WORKDIR /app
-
-# Copy package-related files first to leverage Docker's caching mechanism
-COPY package.json package-lock.json* ./
-
-# Copy .npmrc for supplychain security
-COPY .npmrc ./
-
-# Install project dependencies using npm ci (ensures a clean, reproducible install)
-RUN --mount=type=cache,target=/root/.npm npm ci
-
-# Copy the rest of the application source code into the container
-COPY . .
-
-# Build the Angular application
-RUN npm run build
-
-# =========================================
-# Stage 2: Prepare caddy to Serve Static Files
-# =========================================
-
-FROM caddy:${CADDY_VERSION} AS prod
-WORKDIR /app
+ENV XDG_CONFIG_HOME=/config \
+  XDG_DATA_HOME=/data
 
 RUN addgroup -S -g 10001 webuser \
   && adduser -S -u 10001 webuser -G webuser \
-  && apk add --no-cache gettext-envsubst=0.24.1-r1 \
-  && setcap -r /usr/bin/caddy
+  && apk add --no-cache mailcap=2.1.54-r0 \
+  && mkdir -p /etc/caddy /usr/share/caddy
 
-
-COPY --chown=webuser:webuser --from=builder /app/dist/*/browser /usr/share/caddy
+COPY --from=caddy /usr/bin/caddy /usr/bin/caddy
+COPY --from=build --chown=webuser:webuser /app/dist/client/browser /usr/share/caddy
+COPY client/NOTICES.md .
 
 RUN cat > /etc/caddy/Caddyfile <<'EOF'
 {
-    persist_config off
     admin off
+    persist_config off
 }
 :8080 {
-    root * /tmp/www
+    root * /usr/share/caddy
     try_files {path} {path}/ /index.html
+    # Only the static index.html from this image. Template functions can read the environment and files: never
+    # enable them for proxied or user-supplied content, and keep secrets out of this container's environment.
+    @index path / /index.html
+    templates @index {
+        mime text/html
+    }
     file_server
 }
 EOF
 
-RUN cat > /usr/local/bin/tori-entrypoint <<'EOF' \
-  && chmod +x /usr/local/bin/tori-entrypoint
-#!/bin/sh
-set -eu
 
-: "${TORI_APP_NAME:=Tori - Graph Based Entity Management}"
-: "${TORI_APP_PREFIX:=/}"
-: "${TORI_APP_DESCRIPTION:=Entity Management for Graph Applications using the RAMEN-Framework}"
-: "${TORI_APP_FAVICON:=./favicon-default.jpg}"
-
-rm -rf /tmp/www
-mkdir -p /tmp/www
-cp -R /usr/share/caddy/. /tmp/www/
-
-envsubst '${TORI_APP_HOST} ${TORI_APP_NAME} ${TORI_APP_PREFIX} ${TORI_APP_DESCRIPTION} ${TORI_APP_FAVICON}' \
-  < /usr/share/caddy/index.html \
-  > /tmp/www/index.html
-
-exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
-EOF
-
-USER webuser
+USER 10001:10001
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -q -O /dev/null http://127.0.0.1:8080 || exit 1
+  CMD ["/bin/sh", "-c", "wget -q -O /dev/null http://127.0.0.1:8080 || exit 1"]
 
-CMD ["tori-entrypoint"]
-
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
