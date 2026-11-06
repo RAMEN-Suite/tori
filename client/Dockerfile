@@ -6,7 +6,7 @@ ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
 FROM base AS dev
 ENV NODE_ENV=development
 COPY client/package*.json client/.npmrc ./
-RUN --mount=type=cache,target=/root/.npm npm install
+RUN --mount=type=cache,target=/root/.npm npm ci
 COPY client .
 EXPOSE 4200
 CMD ["npm", "run", "start:docker"]

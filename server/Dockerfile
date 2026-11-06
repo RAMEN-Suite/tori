@@ -11,7 +11,7 @@ RUN npm ci --omit=dev \
 FROM base AS dev
 ENV NODE_ENV=development
 COPY server/package*.json server/.npmrc ./
-RUN npm install \
+RUN npm ci \
   && npm rebuild better-sqlite3 --ignore-scripts=false
 COPY server .
 RUN echo "APP_VERSION=$(npm pkg get version)" >> .env
