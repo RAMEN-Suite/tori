@@ -14,9 +14,7 @@ Clones that used the old husky hook must run `npm run prepare` once as well: the
 
 ### With Docker Compose
 
-`compose.yml` is for local development only. It starts Neo4j and builds its own images for the server and the client
-from the `dev` stages of `server/Dockerfile` and `client/Dockerfile` (local images `tori-server` and `tori-client`, not
-the published ones on ghcr.io):
+`compose.yml` is for local development only. It starts Neo4j and builds its own images for the server and the client:
 
 ```bash
 cp .example.env .env              # its values fit the compose services; put the gcore files into ./config
