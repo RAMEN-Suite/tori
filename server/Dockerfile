@@ -1,70 +1,45 @@
-# Use the official Node.js image as the base image
-FROM node:24-alpine AS base
+FROM node:26.13.0-alpine@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94 AS base
+WORKDIR /app
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
   NPM_CONFIG_FUND=false
 
-# Dependencies
 FROM base AS deps
-# Set the working directory inside the container
-WORKDIR /app
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-# Copy .npmrc for supplychain security
-COPY .npmrc ./
-# Install the production dependencies, omit the development dependencies
-RUN npm ci --omit=dev
-RUN npm rebuild better-sqlite3 --ignore-scripts=false
+COPY server/package*.json server/.npmrc ./
+RUN npm ci --omit=dev \
+  && npm rebuild better-sqlite3 --ignore-scripts=false
 
-# Dev
 FROM base AS dev
-# Set the working directory inside the container
-WORKDIR /app
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
-# Copy .npmrc for supplychain security
-COPY .npmrc ./
-# Install the application dependencies
-RUN npm install && npm rebuild better-sqlite3 --ignore-scripts=false
-# Copy the rest of the application files
-COPY . .
-
-RUN echo "APP_VERSION=$(npm pkg get version)" >> ./.env
 ENV NODE_ENV=development
-# Expose the application port
+COPY server/package*.json server/.npmrc ./
+RUN npm ci \
+  && npm rebuild better-sqlite3 --ignore-scripts=false
+COPY server .
+RUN echo "APP_VERSION=$(npm pkg get version)" >> .env
 EXPOSE 3000
-# Command to run the application in development mode
 CMD ["npm", "run", "start:dev"]
 
-# --------------------------------
-# Builder
-FROM base AS builder
-WORKDIR /usr/src/app
-COPY package*.json ./
-COPY .npmrc ./
-RUN npm ci && npm rebuild better-sqlite3 --ignore-scripts=false
-COPY . .
-RUN npm run build
+FROM base AS build
+COPY server .
+RUN npm ci && npm run build
 
-# --------------------------------
-# Production
-FROM base AS prod
-WORKDIR /usr/src/app
-ENV NODE_ENV=production
-ENV PORT=3000
+FROM node:26.13.0-alpine@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94 AS runtime
+WORKDIR /app
+ENV NODE_ENV=production \
+  PORT=3000
 
 RUN addgroup -S -g 10001 nodeapp && adduser -S -u 10001 nodeapp -G nodeapp && \
-  apk upgrade --no-cache && \
   apk add --no-cache tini=0.19.0-r3 && \
-  mkdir -p /user-db && chown nodeapp:nodeapp /user-db
+  mkdir -p /user-db && chown 10001:10001 /user-db
 
-COPY --chown=nodeapp:nodeapp package.json ./
-COPY --from=builder --chown=nodeapp:nodeapp /usr/src/app/dist ./dist
 COPY --from=deps --chown=nodeapp:nodeapp /app/node_modules ./node_modules
-COPY NOTICES.md .
+COPY --from=build --chown=nodeapp:nodeapp /app/dist ./dist
+COPY --from=build --chown=nodeapp:nodeapp /app/package.json .
+COPY server/NOTICES.md .
+
+RUN echo "APP_VERSION=$(npm pkg get version)" > .env
 
 RUN cat > /usr/local/bin/expand-file-secrets.sh <<'EOF' \
-  && chmod 0555 /usr/local/bin/expand-file-secrets.sh \
-  && echo "APP_VERSION=$(npm pkg get version)" >> ./.env
+  && chmod 0555 /usr/local/bin/expand-file-secrets.sh
 #!/bin/sh
 set -eu
 for _name in $(env | sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)_FILE=.*/\1/p'); do
@@ -82,11 +57,11 @@ unset _name _path _value
 exec "$@"
 EOF
 
-USER nodeapp
-EXPOSE ${PORT}
+EXPOSE 3000
+USER 10001:10001
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1
+  CMD ["/bin/sh", "-c", "wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1"]
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/expand-file-secrets.sh"]
 CMD ["node", "dist/src/main"]

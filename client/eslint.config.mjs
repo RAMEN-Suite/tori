@@ -13,6 +13,7 @@ export default defineConfig(
       "coverage/**",
       "node_modules/**",
       "**/*.js",
+      "src/index-prod.html",
     ],
   },
   {

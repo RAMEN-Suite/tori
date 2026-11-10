@@ -11,3 +11,7 @@
 .env*
 node_modules
 /config/
+/user-db/
+
+# Scan results when running trivy, gitleaks or semgrep locally
+*.sarif
