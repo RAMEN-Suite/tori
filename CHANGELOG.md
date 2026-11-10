@@ -2,6 +2,8 @@
 
 All notable changes to this project are documented here.
 
+## [0.0.16](https://github.com/RAMEN-Suite/tori/compare/v0.0.15...v0.0.16) (2026-10-20)
+
 ## [0.0.15](https://github.com/RAMEN-Suite/tori/compare/v0.0.14...v0.0.15) (2026-09-01)
 
 
