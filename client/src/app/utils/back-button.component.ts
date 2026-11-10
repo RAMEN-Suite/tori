@@ -1,19 +1,20 @@
+import { Icon } from './icon';
+import { Button } from '@sushi-kit/angular';
 import { Component, inject, input } from '@angular/core';
 import { Location } from '@angular/common';
-import { Button } from 'primeng/button';
 
 @Component({
   selector: 'app-back-button',
-  imports: [Button],
+  imports: [Icon, Button],
   template: `
-    <p-button
-      [label]="label()"
-      icon="pi pi-arrow-left"
+    <button
+      suiButton
       severity="secondary"
-      [outlined]="outlined()"
-      [text]="text()"
-      (onClick)="goBack()"
-    />
+      [variant]="outlined() ? 'outlined' : text() ? 'text' : null"
+      (click)="goBack()"
+    >
+      <app-icon name="arrow-left" />{{ label() }}
+    </button>
   `,
 })
 export class BackButtonComponent {

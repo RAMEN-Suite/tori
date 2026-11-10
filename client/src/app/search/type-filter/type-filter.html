@@ -1,0 +1,18 @@
+<div class="gap-2" [class]="compact() ? 'flex flex-wrap' : 'grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3'">
+  @for (type of types(); track type) {
+    <div
+      class="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 has-checked:border-blue-300 has-checked:bg-blue-50"
+      [class]="compact() ? 'px-2 py-2' : 'px-3 py-2.5'"
+    >
+      <input
+        suiCheckbox
+        type="checkbox"
+        [id]="type"
+        [checked]="form().value.includes(type)"
+        [disabled]="form().disabled"
+        (change)="toggleType(type, $event)"
+      />
+      <label [for]="type" class="min-w-0 cursor-pointer wrap-anywhere text-sm"> {{ type | titlecase }} </label>
+    </div>
+  }
+</div>

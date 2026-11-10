@@ -1,7 +1,18 @@
-<p-splitbutton
-  *transloco="let t"
-  [label]="t('app.shared.createEntity.label')"
-  (onClick)="clickCreateEntityBtn()"
-  [model]="btnItems()"
-  outlined
-/>
+<div suiJoin *transloco="let t" class="flex items-center gap-1">
+  <button suiButton suiJoinItem class="px-3" (click)="clickCreateEntityBtn()" [attr.aria-label]="t('app.shared.createEntity.label')">
+    @if (compact()) {
+      <app-icon name="plus" class="sm:hidden" />
+    }
+    <span [class]="compact() ? 'hidden sm:inline' : ''">{{ t("app.shared.createEntity.label") }}</span>
+  </button>
+  <button suiButton suiJoinItem class="px-2.5" variant="outlined" [suiPopoverTrigger]="types" aria-label="Entity type">
+    <app-icon name="chevron-down" />
+  </button>
+</div>
+<sui-popover #types="suiPopover">
+  <div class="flex flex-col gap-1 p-2">
+    @for (item of btnItems(); track item.label) {
+      <button suiButton variant="text" (click)="types.hide(); item.command()">{{ item.label }}</button>
+    }
+  </div>
+</sui-popover>

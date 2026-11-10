@@ -1,8 +1,6 @@
-<p-button
-  [label]="title()"
-  [icon]="buttonIcon() ?? undefined"
-  (onClick)="clickCreate()"
-  [disabled]="disabled()"
-  severity="primary"
-  [outlined]="true"
-/>
+<button suiButton (click)="clickCreate()" [disabled]="disabled()" severity="primary" variant="outlined">
+  @if (buttonIcon(); as icon) {
+    <app-icon [name]="icon" />
+  }
+  {{ title() }}
+</button>

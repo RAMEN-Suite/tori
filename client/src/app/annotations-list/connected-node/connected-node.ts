@@ -1,13 +1,15 @@
+import { Icon } from '../../utils/icon';
+import { Button } from '@sushi-kit/angular';
 import {
   booleanAttribute,
   Component,
   computed,
   inject,
   input,
-  OnInit,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmService } from '../../utils/confirm.service';
+import { NotificationService } from '../../utils/notification.service';
 import { EntityService } from '../../entity.service';
 import { AnnotationApiService } from '../../api/annotation-api.service';
 import { ConnectedNodeDto, StatementNodeView } from '../../../interfaces';
@@ -21,7 +23,6 @@ import {
 } from '../../../constants';
 import { getLabelProperty } from '../../utils/entity.utils';
 import { NodeTypes } from '../node-types/node-types';
-import { Button } from 'primeng/button';
 import { getProperty } from '../../utils/utils';
 import { ConfigService } from '../../config-module/config.service';
 import { NgTemplateOutlet } from '@angular/common';
@@ -29,16 +30,16 @@ import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-connected-node',
-  imports: [NodeTypes, RouterLink, Button, NgTemplateOutlet],
-  providers: [MessageService],
+  imports: [Icon, NodeTypes, RouterLink, Button, NgTemplateOutlet],
+  providers: [NotificationService],
   templateUrl: './connected-node.html',
 })
-export class ConnectedNode implements OnInit {
+export class ConnectedNode {
   private readonly config = inject(ConfigService);
   private readonly entityService = inject(EntityService);
   private readonly annotationApi = inject(AnnotationApiService);
-  private readonly messageService = inject(MessageService);
-  private readonly confirmationService = inject(ConfirmationService);
+  private readonly messageService = inject(NotificationService);
+  private readonly confirmationService = inject(ConfirmService);
   private readonly router = inject(Router);
   private readonly utils = inject(UtilsService);
   private readonly transloco = inject(TranslocoService);
@@ -53,35 +54,6 @@ export class ConnectedNode implements OnInit {
   protected readonly title = computed<string | undefined>(() => {
     return this.getTitle(this.node().node);
   });
-
-  protected annotationConnectionOptions: MenuItem[] | undefined;
-
-  public ngOnInit(): void {
-    this.annotationConnectionOptions = [
-      {
-        icon: 'pi pi-trash',
-        label: this.transloco.translate(
-          'app.shared.connectedNode.menu.deleteConnection',
-        ),
-        command: ($event) => {
-          this.clickDeleteAnnotationRelation(
-            this.annotationId(),
-            this.node().id,
-            $event.originalEvent,
-          );
-        },
-      },
-      {
-        icon: 'pi pi-clipboard',
-        label: this.transloco.translate(
-          'app.shared.connectedNode.menu.copyUuid',
-        ),
-        command: () => {
-          void this.utils.copyToClipboard(this.node().id);
-        },
-      },
-    ];
-  }
 
   protected async navigate(entityLink: string) {
     await this.router.navigate([entityLink]);
@@ -98,7 +70,7 @@ export class ConnectedNode implements OnInit {
         'app.shared.connectedNode.delete.confirm.message',
       ),
       header: this.transloco.translate('app.shared.common.dangerZone'),
-      icon: 'pi pi-info-circle',
+      icon: 'info-circle',
       rejectButtonProps: {
         label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',

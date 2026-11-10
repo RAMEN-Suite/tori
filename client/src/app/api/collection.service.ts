@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CollectionName } from '../../interfaces';
 import { catchError, map, of } from 'rxjs';
-import { MessageService } from 'primeng/api';
+import { NotificationService } from '../utils/notification.service';
 import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
@@ -10,7 +10,7 @@ import { TranslocoService } from '@jsverse/transloco';
 })
 export class CollectionService {
   private readonly http = inject(HttpClient);
-  private readonly messageService = inject(MessageService);
+  private readonly messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
 
   public getFilterable() {

@@ -1,3 +1,12 @@
+import { OptionsPipe } from '../utils/options.pipe';
+import { Icon } from '../utils/icon';
+import {
+  Accordion,
+  AccordionItem,
+  Button,
+  SelectButton,
+  Skeleton,
+} from '@sushi-kit/angular';
 import {
   Component,
   DestroyRef,
@@ -9,20 +18,10 @@ import {
 import { EntityService } from '../entity.service';
 import { AnnotationOfEntityWithContent, Direction } from '../../interfaces';
 import { ANNOTATION_LABEL_NAME } from '../../constants';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionHeader,
-  AccordionPanel,
-} from 'primeng/accordion';
-import { Chip } from 'primeng/chip';
 import { AnnotationCard } from './annotation-card/annotation-card';
-import { Button } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
-import { SelectButton } from 'primeng/selectbutton';
 import { ConfigService } from '../config-module/config.service';
 import { castUnknownToString } from '../utils/utils';
-import { Skeleton } from 'primeng/skeleton';
 import type { AnnotationGroupView } from './annotation-list.model';
 import {
   calculateGroupedAnnotations,
@@ -33,11 +32,10 @@ import { TranslocoDirective } from '@jsverse/transloco';
 @Component({
   selector: 'app-annotations-list',
   imports: [
+    AccordionItem,
+    OptionsPipe,
+    Icon,
     Accordion,
-    AccordionPanel,
-    AccordionContent,
-    AccordionHeader,
-    Chip,
     AnnotationCard,
     Button,
     SelectButton,
@@ -46,7 +44,7 @@ import { TranslocoDirective } from '@jsverse/transloco';
     TranslocoDirective,
   ],
   templateUrl: './annotation-list.html',
-  styleUrl: './annotation-list.scss',
+  host: { class: 'flex min-w-0 flex-col gap-4' },
 })
 export class AnnotationList {
   private readonly entityService = inject(EntityService);
@@ -60,12 +58,12 @@ export class AnnotationList {
     {
       labelKey: 'app.shared.annotationList.directions.outgoing',
       value: 'OUTGOING',
-      icon: 'pi pi-arrow-right',
+      icon: 'arrow-right',
     },
     {
       labelKey: 'app.shared.annotationList.directions.incoming',
       value: 'INCOMING',
-      icon: 'pi pi-arrow-left',
+      icon: 'arrow-left',
     },
   ];
 
@@ -166,9 +164,7 @@ export class AnnotationList {
     this.activeAccordionPanels.set([]);
   }
 
-  protected setActiveAccordionPanels(
-    value: string | number | string[] | number[] | null | undefined,
-  ) {
+  protected setActiveAccordionPanels(value: readonly (string | number)[]) {
     this.activeAccordionPanels.set(this.toStringArray(value));
   }
 

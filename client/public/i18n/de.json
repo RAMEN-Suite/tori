@@ -92,6 +92,37 @@
         "entries": "Einträge zu: {{ value }}",
         "empty": "Es konnten keine Einträge gefunden werden.",
         "default": "Alle Register"
+      },
+      "workspace": {
+        "shortcuts": "Schnellzugriffe",
+        "toggleSidebar": "Schnellzugriffe ein- oder ausklappen",
+        "overview": "Übersicht",
+        "recent": "Zuletzt bearbeitet",
+        "frequent": "Häufig verwendet",
+        "results": "Suchergebnisse",
+        "description": "Greife auf zuletzt bearbeitete und häufig geöffnete Entitäten zu.",
+        "clearTypeFilter": "Entitätstypen entfernen",
+        "clearResultFilters": "Filter löschen",
+        "closeFilters": "Suchfilter schließen",
+        "filters": "Suchfilter",
+        "more": "Weitere Ergebnisse laden",
+        "showMore": "Mehr anzeigen",
+        "feedError": "Dieser Bereich konnte nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "recentEmpty": "Hier erscheinen Entitäten, sobald sie bearbeitet wurden.",
+        "frequentEmpty": "Hier erscheinen häufig geöffnete Entitäten.",
+        "preview": "Vorschau",
+        "closePreview": "Vorschau schließen",
+        "previewError": "Die Vorschau konnte nicht geladen werden.",
+        "openDetails": "Detailseite öffnen"
+      },
+      "search": {
+        "title": "Entitäten suchen",
+        "description": "Personen, Orte und Begriffe finden und ihre Verbindungen erkunden.",
+        "inputLabel": "Suchbegriff",
+        "placeholder": "Name oder Bezeichnung eingeben …",
+        "types": "Entitätstypen",
+        "results": "Suchergebnisse"
       }
     },
     "shared": {

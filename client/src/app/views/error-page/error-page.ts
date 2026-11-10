@@ -1,6 +1,6 @@
+import { Button } from '@sushi-kit/angular';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Button } from 'primeng/button';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({

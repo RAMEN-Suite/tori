@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { CreateAnnotationForm } from './create-annotation-form/create-annotation-form';
-import { DialogService } from 'primeng/dynamicdialog';
+import { DialogService } from '../utils/dialog/dialog.service';
 import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
@@ -12,20 +12,12 @@ export class CreateAnnotationDialogService {
 
   public open(entityId: string): void {
     this.dialogService.open(CreateAnnotationForm, {
-      inputValues: {
+      inputs: {
         entityId: entityId,
       },
-      header: this.transloco.translate(
+      title: this.transloco.translate(
         'app.shared.createAnnotation.dialog.header',
       ),
-      styleClass: 'w-11 md:w-9 lg:w-8',
-      style: {
-        'min-height': '20vh',
-      },
-      contentStyle: {
-        'padding-top': '0.5rem',
-      },
-      closable: true,
     });
   }
 }

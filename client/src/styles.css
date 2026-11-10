@@ -1,0 +1,61 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "@sushi-kit/angular/styles.css";
+@import "tailwindcss";
+@import "@angular/cdk/overlay-prebuilt.css";
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+app-root {
+  display: block;
+  height: 100%;
+}
+
+.loading-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+}
+
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1rem;
+  background: #fff;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+.sui-dynamic-dialog {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 20%);
+  overflow: hidden;
+}
+.sui-dynamic-dialog app-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+[suiSkeleton] {
+  min-height: 1rem;
+  min-width: 2rem;
+}

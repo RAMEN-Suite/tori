@@ -1,5 +1,6 @@
+import { Icon } from '../../utils/icon';
+import { Chip } from '@sushi-kit/angular';
 import { Component, computed, input } from '@angular/core';
-import { Chip } from 'primeng/chip';
 import { castUnknownToString, visibleProperties } from '../../utils/utils';
 import { NodePropertyDto } from '../../../interfaces';
 import { TranslocoDirective } from '@jsverse/transloco';
@@ -8,7 +9,7 @@ type TextSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
 @Component({
   selector: 'app-attribute-list',
-  imports: [Chip, TranslocoDirective],
+  imports: [Icon, Chip, TranslocoDirective],
   templateUrl: './attribute-list.html',
 })
 export class AttributeList {

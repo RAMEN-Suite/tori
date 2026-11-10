@@ -11,7 +11,7 @@ import {
 import { catchError, firstValueFrom, map, of } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { QueryParamsService } from '../utils/query-params.service';
-import { MessageService } from 'primeng/api';
+import { NotificationService } from '../utils/notification.service';
 import { TranslocoService } from '@jsverse/transloco';
 import { PageDto } from '../models/dtos/page.dto';
 
@@ -21,8 +21,14 @@ import { PageDto } from '../models/dtos/page.dto';
 export class EntityApiService {
   private http = inject(HttpClient);
   private queryParamService = inject(QueryParamsService);
-  private readonly messageService = inject(MessageService);
+  private readonly messageService = inject(NotificationService);
   private readonly transloco = inject(TranslocoService);
+
+  public getWorkspaceEntities(feed: 'recently-updated' | 'suggested') {
+    return this.http.get<PageDto<OldEntity>>(`/api/entity/${feed}`, {
+      params: { take: 12 },
+    });
+  }
 
   public searchEntities(query: EntitySearchQuery): Promise<PageDto<OldEntity>> {
     const httpParams = this.queryParamService.transformQueryParams(query);
@@ -147,7 +153,6 @@ export class EntityApiService {
               detail: Array.isArray(error.message)
                 ? error.message.join('\n')
                 : error.message,
-              closable: true,
               sticky: true,
             });
           } else {
@@ -206,7 +211,6 @@ export class EntityApiService {
               detail: Array.isArray(error.message)
                 ? error.message.join('\n')
                 : error.message,
-              closable: true,
               sticky: true,
             });
           } else {

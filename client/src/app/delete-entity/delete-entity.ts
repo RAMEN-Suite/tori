@@ -1,19 +1,21 @@
+import { Icon } from '../utils/icon';
+import { Button } from '@sushi-kit/angular';
 import { Component, inject, input, signal } from '@angular/core';
-import { Button } from 'primeng/button';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmService } from '../utils/confirm.service';
+import { NotificationService } from '../utils/notification.service';
 import { EntityApiService } from '../api/entity-api.service';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-delete-entity',
-  imports: [Button],
+  imports: [Icon, Button],
   templateUrl: './delete-entity.html',
 })
 export class DeleteEntity {
   private router = inject(Router);
-  private confirmationService = inject(ConfirmationService);
-  private messageService = inject(MessageService);
+  private confirmationService = inject(ConfirmService);
+  private messageService = inject(NotificationService);
   private entityAPI = inject(EntityApiService);
   private readonly transloco = inject(TranslocoService);
 
@@ -27,8 +29,7 @@ export class DeleteEntity {
         'app.shared.deleteEntity.confirm.message',
       ),
       header: this.transloco.translate('app.shared.common.dangerZone'),
-      icon: 'pi pi-info-circle',
-      rejectLabel: this.transloco.translate('app.shared.actions.cancel'),
+      icon: 'info-circle',
       rejectButtonProps: {
         label: this.transloco.translate('app.shared.actions.cancel'),
         severity: 'secondary',

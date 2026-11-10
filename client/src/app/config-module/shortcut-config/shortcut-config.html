@@ -1,4 +1,4 @@
-<table *transloco="let t" class="w-12">
+<table *transloco="let t" class="w-full">
   <thead>
     <tr>
       <td>{{ t("app.shared.configPane.shortcutConfig.tableHeaders.action") }}</td>
@@ -15,7 +15,7 @@
         </td>
         <td>
           <button
-            pButton
+            suiButton
             severity="secondary"
             (click)="resetShortcut(row.slug)"
             [disabled]="row.effectiveShortcut?.keys === row.defaultShortcut?.keys"

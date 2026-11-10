@@ -1,0 +1,7 @@
+<header suiDialogHeader class="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-4 bg-white">
+  <h2 class="text-lg font-semibold">{{ data.title }}</h2>
+  <button suiButton variant="text" (click)="dialog.close()" aria-label="Close dialog">×</button>
+</header>
+<div suiDialogBody class="overflow-y-auto">
+  <ng-container *ngComponentOutlet="data.component; inputs: data.inputs" />
+</div>

@@ -1,47 +1,41 @@
-<form *transloco="let t" [formGroup]="configForm" class="flex flex-column gap-2">
-  <p-floatlabel class="w-full" variant="on">
-    <p-multi-select
+<form *transloco="let t" [formGroup]="configForm" class="flex flex-col gap-2">
+  <div class="w-full">
+    <sui-multi-select
+      [compareWith]="compareSelectionValues"
       formControlName="entityTypes"
-      [options]="entityTypes()"
-      display="chip"
+      [options]="entityTypes() | options"
       id="config_entity_types_ms"
-      [maxSelectedLabels]="10"
       fluid
     />
     <label for="config_entity_types_ms">{{ t("app.shared.configPane.entityTypes.label") }}</label>
     <small>{{ t("app.shared.configPane.entityTypes.help") }}</small>
-  </p-floatlabel>
-  <p-floatlabel class="" variant="on">
-    <p-select
+  </div>
+  <div class="">
+    <sui-select
+      [compareWith]="compareSelectionValues"
       formControlName="selectedCollectionChain"
-      [options]="collectionChains()"
+      [options]="collectionChains() | options"
       class="w-full md:w-80"
       id="config_collection_chain_s"
       fluid
     >
-      <ng-template let-collectionChain #item>
-        <div class="flex items-center gap-2">
-          <div>{{ displayCollectionChain(collectionChain) }}</div>
-        </div>
-      </ng-template>
-    </p-select>
+    </sui-select>
     <label for="config_collection_chain_s">{{ t("app.shared.configPane.collectionChain.label") }}</label>
     <small>{{ t("app.shared.configPane.collectionChain.help") }}</small>
-  </p-floatlabel>
-  <p-floatlabel class="" variant="on">
-    <p-multi-select
+  </div>
+  <div class="">
+    <sui-multi-select
+      [compareWith]="compareSelectionValues"
       formControlName="filterableCollections"
-      [options]="configForm.controls.selectedCollectionChain.value"
+      [options]="configForm.controls.selectedCollectionChain.value | options"
       class="w-full md:w-80"
-      display="chip"
       id="config_collection_chain_ms"
-      [maxSelectedLabels]="4"
       fluid
     >
-    </p-multi-select>
+    </sui-multi-select>
     <label for="config_collection_chain_ms">{{ t("app.shared.configPane.collectionTypes.label") }}</label>
     <small>{{ t("app.shared.configPane.collectionTypes.help") }}</small>
-  </p-floatlabel>
+  </div>
 </form>
 <div class="mt-8">
   <app-shortcut-config />

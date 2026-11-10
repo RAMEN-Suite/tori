@@ -1,1 +1,3 @@
-<p-button icon="pi pi-pencil" (onClick)="clickEditEntityBtn()" [disabled]="!entity()" severity="secondary" [outlined]="true" />
+<button suiButton (click)="clickEditEntityBtn()" [disabled]="!entity()" severity="secondary" variant="outlined" aria-label="Edit">
+  <app-icon name="pencil" />
+</button>

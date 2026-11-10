@@ -1,3 +1,5 @@
+import { OptionsPipe } from '../../utils/options.pipe';
+import { Button, Select } from '@sushi-kit/angular';
 import {
   Component,
   computed,
@@ -10,15 +12,14 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { CreateAnnotationService } from '../create-annotation.service';
-import { FloatLabel } from 'primeng/floatlabel';
+
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ButtonDirective } from 'primeng/button';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DialogService } from '../../utils/dialog/dialog.service';
+import { DialogRef } from '@angular/cdk/dialog';
 import { Annotation, GAttribute } from '../../../interfaces';
 import { CreateAnnotationConnection } from '../../create-annotation-connection/create-annotation-connection';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmService } from '../../utils/confirm.service';
 import { AnnotationApiService } from '../../api/annotation-api.service';
-import { Select } from 'primeng/select';
 import { AttributeForm } from '../../utils/attribute-form/attribute-form';
 import { UtilsService } from '../../utils/utils.service';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
@@ -28,9 +29,9 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
   selector: 'app-create-annotation-form',
   providers: [CreateAnnotationService],
   imports: [
-    FloatLabel,
+    OptionsPipe,
     FormsModule,
-    ButtonDirective,
+    Button,
     Select,
     ReactiveFormsModule,
     AttributeForm,
@@ -41,13 +42,11 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 export class CreateAnnotationForm {
   private readonly annotationApi = inject(AnnotationApiService);
   private readonly dialogService = inject(DialogService);
-  private confirmationService = inject(ConfirmationService);
+  private confirmationService = inject(ConfirmService);
   private readonly utilService = inject(UtilsService);
   private readonly transloco = inject(TranslocoService);
   private readonly createAnnotationService = inject(CreateAnnotationService);
-  private readonly dialogRef = inject(DynamicDialogRef);
-  private createAnnotationConnectionDialogRef: DynamicDialogRef<CreateAnnotationConnection> | null =
-    null;
+  private readonly dialogRef = inject(DialogRef);
 
   protected readonly types: Signal<string[]> =
     this.createAnnotationService.getAnnotationTypes();
@@ -117,7 +116,7 @@ export class CreateAnnotationForm {
         message: this.transloco.translate(
           'app.shared.createAnnotationForm.connection.message',
         ),
-        icon: 'pi pi-info-circle',
+        icon: 'info-circle',
         rejectButtonProps: {
           label: this.transloco.translate('app.shared.actions.no'),
           severity: 'secondary',
@@ -139,24 +138,13 @@ export class CreateAnnotationForm {
   }
 
   protected clickCreateAnnotationConnection(annotation: Annotation) {
-    this.createAnnotationConnectionDialogRef = this.dialogService.open(
-      CreateAnnotationConnection,
-      {
-        inputValues: {
-          annotation: annotation,
-        },
-        header: this.transloco.translate(
-          'app.shared.createAnnotationConnection.optionalHeader',
-        ),
-        styleClass: 'w-11 md:w-9 lg:w-8',
-        style: {
-          'min-height': '50vh',
-        },
-        contentStyle: {
-          'padding-top': '0.5rem',
-        },
-        closable: true,
+    this.dialogService.open(CreateAnnotationConnection, {
+      inputs: {
+        annotation: annotation,
       },
-    );
+      title: this.transloco.translate(
+        'app.shared.createAnnotationConnection.optionalHeader',
+      ),
+    });
   }
 }

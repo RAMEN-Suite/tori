@@ -1,9 +1,3 @@
-<p-button
-  [label]="label()"
-  [icon]="icon()"
-  (onClick)="clickUpdateBtn()"
-  [disabled]="!annotation()"
-  severity="secondary"
-  outlined
-  size="small"
-/>
+<button suiButton (click)="clickUpdateBtn()" [disabled]="!annotation()" severity="secondary" variant="outlined" size="sm">
+  <app-icon [name]="icon()" />{{ label() }}
+</button>

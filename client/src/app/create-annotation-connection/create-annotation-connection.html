@@ -1,5 +1,12 @@
-<div>
-  <app-filter-pane [enableLinkToEntity]="false" />
+<div *transloco="let t" class="mb-6 grid gap-5">
+  <app-search-bar (searchRequested)="search.submit()" (entitySelected)="selectSuggestion($event)" />
+  <app-search-filter-fields />
+  <div class="flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-4">
+    <button suiButton type="button" variant="text" (click)="search.reset()">{{ t("app.shared.filterPane.resetBtn.tooltip") }}</button>
+    <button suiButton type="button" [loading]="search.searching()" (click)="search.submit()">
+      {{ t("app.shared.filterPane.submitBtn.label") }}
+    </button>
+  </div>
 </div>
 <div>
   <app-entity-list [entities]="entities()" [entitiesLoading]="entitiesLoading()" [onSelect]="onSelectEntity" height="40vh" />

@@ -1,14 +1,14 @@
-<div *transloco="let t" class="error-page flex grid justify-content-center align-content-center gap-4">
-  <div class="col-12">
-    <h1 class="w-12 flex justify-content-center">
+<div *transloco="let t" class="error-page flex flex flex-wrap justify-center content-center gap-4">
+  <div class="w-full">
+    <h1 class="w-full flex justify-center">
       @if (status) {
-        <span class="bg">{{ t("app.screens.error.titleWithStatus", { status }) }}</span>
+        <span class="bg-white">{{ t("app.screens.error.titleWithStatus", { status }) }}</span>
       } @else {
-        <span class="bg">{{ t("app.screens.error.unknownTitle") }}</span>
+        <span class="bg-white">{{ t("app.screens.error.unknownTitle") }}</span>
       }
     </h1>
   </div>
-  <div class="col-5 flex justify-content-center gap-4">
+  <div class="w-5/12 flex justify-center gap-4">
     @switch (status) {
       @case ("404") {
         <span>{{ t("app.screens.error.messages.404") }}</span>
@@ -24,7 +24,7 @@
       }
     }
   </div>
-  <div class="col-12 flex justify-content-center gap-4">
-    <p-button [routerLink]="'/'" [label]="t('app.screens.error.homepage')" />
+  <div class="w-full flex justify-center gap-4">
+    <button suiButton [routerLink]="'/'">{{ t("app.screens.error.homepage") }}</button>
   </div>
 </div>
