@@ -1,42 +1,99 @@
-<form *transloco="let t" [formGroup]="configForm" class="flex flex-col gap-2">
-  <div class="w-full">
-    <sui-multi-select
-      [compareWith]="compareSelectionValues"
-      formControlName="entityTypes"
-      [options]="entityTypes() | options"
-      id="config_entity_types_ms"
-      fluid
-    />
-    <label for="config_entity_types_ms">{{ t("app.shared.configPane.entityTypes.label") }}</label>
-    <small>{{ t("app.shared.configPane.entityTypes.help") }}</small>
-  </div>
-  <div class="">
-    <sui-select
-      [compareWith]="compareSelectionValues"
-      formControlName="selectedCollectionChain"
-      [options]="collectionChains() | options"
-      class="w-full md:w-80"
-      id="config_collection_chain_s"
-      fluid
-    >
-    </sui-select>
-    <label for="config_collection_chain_s">{{ t("app.shared.configPane.collectionChain.label") }}</label>
-    <small>{{ t("app.shared.configPane.collectionChain.help") }}</small>
-  </div>
-  <div class="">
-    <sui-multi-select
-      [compareWith]="compareSelectionValues"
-      formControlName="filterableCollections"
-      [options]="configForm.controls.selectedCollectionChain.value | options"
-      class="w-full md:w-80"
-      id="config_collection_chain_ms"
-      fluid
-    >
-    </sui-multi-select>
-    <label for="config_collection_chain_ms">{{ t("app.shared.configPane.collectionTypes.label") }}</label>
-    <small>{{ t("app.shared.configPane.collectionTypes.help") }}</small>
-  </div>
-</form>
-<div class="mt-8">
-  <app-shortcut-config />
-</div>
+<ng-container *transloco="let t">
+  <form [formGroup]="configForm" class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <section aria-labelledby="config-entities-heading" class="space-y-6 p-5 sm:p-7">
+      <div class="flex items-start gap-3">
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><app-icon name="tag" /></span>
+        <div>
+          <h2 id="config-entities-heading" class="text-lg font-semibold text-slate-900">{{ t("app.shared.configPane.entitiesTitle") }}</h2>
+          <p class="mt-1 text-sm leading-6 text-slate-500">{{ t("app.shared.configPane.entitiesDescription") }}</p>
+        </div>
+      </div>
+      <div class="grid gap-2">
+        <label id="config-entity-types-label" for="config_entity_types_ms" class="text-sm font-medium text-slate-800">{{
+          t("app.shared.configPane.entityTypes.label")
+        }}</label>
+        <sui-multi-select
+          [compareWith]="compareSelectionValues"
+          formControlName="entityTypes"
+          [options]="entityTypes() | options"
+          id="config_entity_types_ms"
+          ariaLabelledby="config-entity-types-label"
+          ariaDescribedby="config-entity-types-help"
+          [placeholder]="t('app.shared.configPane.entityTypes.placeholder')"
+          [selectAllLabel]="t('app.shared.configPane.selectAll')"
+          [emptyMessage]="t('app.shared.configPane.noOptions')"
+          [loading]="!loaded()"
+          fluid
+        />
+        <p id="config-entity-types-help" class="text-sm leading-6 text-slate-500">{{ t("app.shared.configPane.entityTypes.help") }}</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="config-collections-heading" class="space-y-6 border-t border-slate-100 p-5 sm:p-7">
+      <div class="flex items-start gap-3">
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500"
+          ><app-icon name="sliders"
+        /></span>
+        <div>
+          <h2 id="config-collections-heading" class="text-lg font-semibold text-slate-900">
+            {{ t("app.shared.configPane.collectionsTitle") }}
+          </h2>
+          <p class="mt-1 text-sm leading-6 text-slate-500">{{ t("app.shared.configPane.collectionsDescription") }}</p>
+        </div>
+      </div>
+      <div class="grid items-start gap-6 md:grid-cols-2">
+        <div class="grid min-w-0 gap-2">
+          <label id="config-chain-label" for="config_collection_chain_s" class="text-sm font-medium text-slate-800">{{
+            t("app.shared.configPane.collectionChain.label")
+          }}</label>
+          <sui-select
+            [compareWith]="compareSelectionValues"
+            formControlName="selectedCollectionChain"
+            [options]="collectionChains()"
+            id="config_collection_chain_s"
+            ariaLabelledby="config-chain-label"
+            ariaDescribedby="config-chain-help"
+            [placeholder]="t('app.shared.configPane.collectionChain.placeholder')"
+            [emptyMessage]="t('app.shared.configPane.collectionChain.empty')"
+            [clearLabel]="t('app.shared.configPane.collectionChain.clear')"
+            showClear
+            fluid
+          />
+          <p id="config-chain-help" class="text-sm leading-6 text-slate-500">{{ t("app.shared.configPane.collectionChain.help") }}</p>
+        </div>
+        <div class="grid min-w-0 gap-2">
+          <label id="config-collections-label" for="config_collection_chain_ms" class="text-sm font-medium text-slate-800">{{
+            t("app.shared.configPane.collectionTypes.label")
+          }}</label>
+          <sui-multi-select
+            [compareWith]="compareSelectionValues"
+            formControlName="filterableCollections"
+            [options]="selectedCollectionChain() | options"
+            id="config_collection_chain_ms"
+            ariaLabelledby="config-collections-label"
+            ariaDescribedby="config-collections-help"
+            [placeholder]="
+              t(
+                configForm.controls.filterableCollections.disabled
+                  ? 'app.shared.configPane.collectionTypes.disabled'
+                  : 'app.shared.configPane.collectionTypes.placeholder'
+              )
+            "
+            [selectAllLabel]="t('app.shared.configPane.selectAll')"
+            fluid
+          />
+          <p id="config-collections-help" class="text-sm leading-6 text-slate-500">
+            {{
+              t(
+                configForm.controls.filterableCollections.disabled
+                  ? "app.shared.configPane.collectionTypes.disabledHelp"
+                  : "app.shared.configPane.collectionTypes.help"
+              )
+            }}
+          </p>
+        </div>
+      </div>
+    </section>
+  </form>
+  <app-shortcut-config class="mt-6 block" />
+</ng-container>

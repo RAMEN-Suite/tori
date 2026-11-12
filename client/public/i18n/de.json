@@ -183,16 +183,23 @@
       },
       "configPane": {
         "entityTypes": {
-          "label": "Entitätstypen",
-          "help": "Wähle aus, welche Entitätstypen über diese Anwendung verfügbar sein sollen."
+          "label": "Verfügbare Entitätstypen",
+          "help": "Wähle einen oder mehrere Typen aus, nach denen du deine Suchergebnisse filtern möchtest.",
+          "placeholder": "Entitätstypen auswählen"
         },
         "collectionChain": {
-          "label": "Collection Kette",
-          "help": "Wähle aus, welche Collection kette für den Filter verwendet werden soll."
+          "label": "Collection-Kette",
+          "help": "Die Kette gibt die Reihenfolge der abhängigen Collection-Filter vor. Ohne Auswahl werden keine Collection-Filter angezeigt.",
+          "placeholder": "Keine Collection-Kette ausgewählt",
+          "empty": "Keine Collection-Ketten verfügbar",
+          "clear": "Collection-Kette entfernen"
         },
         "collectionTypes": {
-          "label": "Collection-Typen",
-          "help": "Wähle aus, welche Collections filterbar sind."
+          "label": "Filterbare Collection-Typen",
+          "help": "Wähle die Typen aus dieser Kette, die als Filter in der Suche erscheinen sollen.",
+          "placeholder": "Collection-Typen auswählen",
+          "disabled": "Zuerst eine Kette auswählen",
+          "disabledHelp": "Wähle links oder oben eine Collection-Kette aus, um die zugehörigen Filter festzulegen."
         },
         "shortcutConfig": {
           "tableHeaders": {
@@ -202,9 +209,32 @@
           },
           "resetBtn": {
             "label": "Zurücksetzen",
-            "aria": "Tastaturkürzel {{ name }} auf standard zurücksetzen"
+            "aria": "Standardkürzel wiederherstellen: {{ name }}"
+          },
+          "title": "Tastaturkürzel",
+          "description": "Klicke auf ein Kürzel und drücke die gewünschte Tastenkombination. Mit Esc brichst du die Eingabe ab. Zurücksetzen stellt den Standard wieder her.",
+          "edit": "Tastaturkürzel ändern: {{ name }}",
+          "input": {
+            "recording": "Tasten drücken …",
+            "empty": "Kein Kürzel",
+            "clear": "Kürzel entfernen: {{ name }}",
+            "hint": "Jetzt die Tastenkombination drücken. Esc zum Abbrechen.",
+            "errors": {
+              "empty": "Drücke eine Tastenkombination.",
+              "modifier-only": "Drücke eine weitere Taste zur Kombination.",
+              "unsupported-key": "Diese Taste wird nicht unterstützt. Wähle eine andere Kombination."
+            }
           }
-        }
+        },
+        "title": "Einstellungen",
+        "description": "Passe die verfügbaren Entitätstypen, Suchfilter und Tastaturkürzel an deinen Arbeitsablauf an.",
+        "autosave": "Änderungen werden automatisch in diesem Browser gespeichert.",
+        "entitiesTitle": "Entitätstypen",
+        "entitiesDescription": "Lege fest, welche Entitätstypen als Suchfilter angeboten werden.",
+        "collectionsTitle": "Collection-Filter",
+        "collectionsDescription": "Bestimme, wie du Suchergebnisse nach Collections eingrenzen möchtest.",
+        "selectAll": "Alle auswählen",
+        "noOptions": "Keine Optionen verfügbar"
       },
       "connectedNode": {
         "menu": {

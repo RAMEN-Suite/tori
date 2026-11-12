@@ -3,10 +3,11 @@ import { Button } from '@sushi-kit/angular';
 import { Component, effect, inject, input, output } from '@angular/core';
 import { ShortcutValidationError } from '../../../shortcuts/shortcut-key-normalizer';
 import { ShortcutInputVm } from './shortcut-input.vm';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-shortcut-input',
-  imports: [Icon, Button],
+  imports: [Icon, Button, TranslocoDirective],
   providers: [ShortcutInputVm],
   templateUrl: './shortcut-input.html',
 })
@@ -16,6 +17,7 @@ export class ShortcutInput {
   public readonly keys = input<string | null>(null);
   public readonly disabled = input(false);
   public readonly ariaLabel = input('Keyboard shortcut');
+  public readonly clearLabel = input('Clear shortcut');
 
   public readonly keysChange = output<string | null>();
   public readonly recordingChange = output<boolean>();
@@ -23,7 +25,6 @@ export class ShortcutInput {
     output<ShortcutValidationError | null>();
 
   protected readonly displayValue = this.vm.displayValue;
-  protected readonly placeholder = this.vm.placeholder;
   protected readonly recording = this.vm.recording;
   protected readonly validationError = this.vm.validationError;
 
@@ -47,6 +48,10 @@ export class ShortcutInput {
     }
 
     this.vm.startRecording();
+  }
+
+  protected stopRecording(): void {
+    this.vm.stopRecording();
   }
 
   protected handleKeydown(event: KeyboardEvent): void {

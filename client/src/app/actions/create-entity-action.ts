@@ -3,6 +3,7 @@ import { Action } from './action.class';
 import { ActionShortcut } from '../shortcuts/shortcut.types';
 import { createAppShortcut } from '../shortcuts/createAppShortcut';
 import { CreateEntityDialogService } from '../create-entity/create-entity-dialog.service';
+import { TranslocoService } from '@jsverse/transloco';
 
 interface CreateEntitynDialog {
   preselectedType?: string;
@@ -13,13 +14,14 @@ interface CreateEntitynDialog {
 })
 export class CreateEntityAction extends Action<CreateEntitynDialog> {
   private readonly dialog = inject(CreateEntityDialogService);
+  private readonly transloco = inject(TranslocoService);
 
   public override slug(): string {
     return 'entity.create';
   }
 
   public override title(): string {
-    return 'app.actions.createEntity.title';
+    return this.transloco.translate('app.actions.createEntity.title');
   }
 
   public override icon(): string | null {

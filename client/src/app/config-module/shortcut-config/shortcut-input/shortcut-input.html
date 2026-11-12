@@ -1,25 +1,53 @@
-<div class="flex items-center gap-2">
-  <button
-    suiButton
-    type="button"
-    class="justify-start"
-    variant="outlined"
-    [class.border-amber-500]="validationError() !== null"
-    [disabled]="disabled()"
-    [attr.aria-label]="ariaLabel()"
-    (click)="startRecording()"
-    (keydown)="handleKeydown($event)"
-  >
-    @if (displayValue()) {
-      <span>{{ displayValue() }}</span>
-    } @else {
-      <span class="text-slate-500">{{ placeholder() }}</span>
-    }
-  </button>
-
-  @if (keys() !== null) {
-    <button suiButton type="button" variant="outlined" [disabled]="disabled()" aria-label="Clear shortcut" (click)="clear($event)">
-      <app-icon name="times" />
+<div *transloco="let t" class="grid gap-2">
+  <div class="flex items-center gap-1">
+    <button
+      suiButton
+      type="button"
+      class="min-w-36 justify-start whitespace-normal text-start"
+      severity="neutral"
+      variant="outlined"
+      [class.border-blue-500]="recording()"
+      [class.border-amber-500]="validationError() !== null"
+      [disabled]="disabled()"
+      [attr.aria-label]="ariaLabel()"
+      [attr.aria-pressed]="recording()"
+      (click)="startRecording()"
+      (blur)="stopRecording()"
+      (keydown)="handleKeydown($event)"
+    >
+      @if (displayValue()) {
+        <span>{{ displayValue() }}</span>
+      } @else {
+        <span class="text-slate-500">{{
+          t(recording() ? "app.shared.configPane.shortcutConfig.input.recording" : "app.shared.configPane.shortcutConfig.input.empty")
+        }}</span>
+      }
     </button>
+    @if (keys() !== null) {
+      <button
+        suiButton
+        type="button"
+        size="sm"
+        shape="square"
+        variant="text"
+        severity="neutral"
+        [disabled]="disabled()"
+        [attr.aria-label]="clearLabel()"
+        (click)="clear($event)"
+      >
+        <app-icon name="times" />
+      </button>
+    }
+  </div>
+  @if (recording()) {
+    <p role="status" class="max-w-60 text-xs leading-5 text-slate-500">
+      {{
+        t(
+          validationError()
+            ? "app.shared.configPane.shortcutConfig.input.errors." + validationError()
+            : "app.shared.configPane.shortcutConfig.input.hint"
+        )
+      }}
+    </p>
   }
 </div>

@@ -3,10 +3,12 @@ import { MultiSelect, Select } from '@sushi-kit/angular';
 import { Component, computed, effect, inject } from '@angular/core';
 import { ConfigService } from './config.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ENTITY_LABEL_NAME } from '../../constants';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { ShortcutConfig } from './shortcut-config/shortcut-config';
+import { Icon } from '../utils/icon';
 
 @Component({
   selector: 'app-config-pane',
@@ -17,6 +19,7 @@ import { ShortcutConfig } from './shortcut-config/shortcut-config';
     Select,
     TranslocoDirective,
     ShortcutConfig,
+    Icon,
   ],
   templateUrl: './config-pane.html',
 })
@@ -27,7 +30,7 @@ export class ConfigPane {
 
   private configOptions = this.configService.getRemoteConfig();
   private config = this.configService.getConfig();
-  private loaded = this.configService.getLoaded();
+  protected readonly loaded = this.configService.getLoaded();
 
   protected entityTypes = computed(() => {
     return this.configOptions().entityTypes.filter(
@@ -36,7 +39,16 @@ export class ConfigPane {
   });
 
   protected collectionChains = computed(() => {
-    return this.configOptions().collectionChains;
+    return this.configOptions().collectionChains.map((chain) => ({
+      label: chain.join(' → '),
+      // The single-select needs a scalar value; persisted chains remain arrays.
+      value: JSON.stringify(chain),
+    }));
+  });
+
+  protected selectedCollectionChain = computed(() => {
+    const chain = this.config().selectedCollectionChain;
+    return Array.isArray(chain) ? chain : [];
   });
 
   protected configForm = new FormGroup({
@@ -44,9 +56,7 @@ export class ConfigPane {
       { value: [], disabled: true },
       { nonNullable: true },
     ),
-    selectedCollectionChain: new FormControl<string[]>([], {
-      nonNullable: true,
-    }),
+    selectedCollectionChain: new FormControl<string | null>(null),
     entityTypes: new FormControl<string[]>([], { nonNullable: true }),
   });
 
@@ -54,11 +64,12 @@ export class ConfigPane {
     effect(() => {
       const config = this.config();
       const loaded = this.loaded();
+      const chain = this.selectedCollectionChain();
 
       this.configForm.patchValue(
         {
           filterableCollections: config.filterableCollections,
-          selectedCollectionChain: config.selectedCollectionChain,
+          selectedCollectionChain: chain.length ? JSON.stringify(chain) : null,
           entityTypes: config.entityTypes,
         },
         { emitEvent: false },
@@ -70,7 +81,7 @@ export class ConfigPane {
         this.configForm.disable({ emitEvent: false });
       }
 
-      if (this.configForm.controls.selectedCollectionChain.value.length > 0) {
+      if (loaded && chain.length > 0) {
         this.configForm.controls.filterableCollections.enable({
           emitEvent: false,
         });
@@ -81,16 +92,19 @@ export class ConfigPane {
       }
     });
 
-    this.configForm.valueChanges.subscribe((value) => {
+    this.configForm.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      const value = this.configForm.getRawValue();
+      const selectedCollectionChain =
+        this.configOptions().collectionChains.find(
+          (chain) => JSON.stringify(chain) === value.selectedCollectionChain,
+        ) ?? [];
       this.configService.setConfig({
-        filterableCollections: value.filterableCollections ?? [],
-        selectedCollectionChain: value.selectedCollectionChain ?? [],
-        entityTypes: value.entityTypes ?? [],
+        filterableCollections: value.filterableCollections.filter((type) =>
+          selectedCollectionChain.includes(type),
+        ),
+        selectedCollectionChain,
+        entityTypes: value.entityTypes,
       });
     });
-  }
-
-  protected displayCollectionChain(chain: string[]) {
-    return chain.join('-->');
   }
 }

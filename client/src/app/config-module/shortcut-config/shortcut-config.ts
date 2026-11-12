@@ -3,10 +3,11 @@ import { Component, inject } from '@angular/core';
 import { ShortcutConfigVm } from './shortcut-config.vm';
 import { ShortcutInput } from './shortcut-input/shortcut-input';
 import { TranslocoDirective } from '@jsverse/transloco';
+import { Icon } from '../../utils/icon';
 
 @Component({
   selector: 'app-shortcut-config',
-  imports: [ShortcutInput, Button, TranslocoDirective],
+  imports: [ShortcutInput, Button, TranslocoDirective, Icon],
   templateUrl: './shortcut-config.html',
 })
 export class ShortcutConfig {

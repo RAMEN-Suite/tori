@@ -3,6 +3,8 @@ import { CONFIGURABLE_SHORTCUT_ACTIONS } from '../../shortcuts/shortcut-registry
 import { ShortcutKeymapService } from '../../shortcuts/shortcut-keymap.service';
 import { ActionShortcut } from '../../shortcuts/shortcut.types';
 import { createAppShortcut } from '../../shortcuts/createAppShortcut';
+import { TranslocoService } from '@jsverse/transloco';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +12,9 @@ import { createAppShortcut } from '../../shortcuts/createAppShortcut';
 export class ShortcutConfigVm {
   private readonly injector = inject(Injector);
   private readonly keymap = inject(ShortcutKeymapService);
+  private readonly translation = toSignal(
+    inject(TranslocoService).selectTranslation(),
+  );
 
   private readonly actions = CONFIGURABLE_SHORTCUT_ACTIONS.map((actionType) =>
     this.injector.get(actionType),
@@ -23,6 +28,7 @@ export class ShortcutConfigVm {
       effectiveShortcut: ActionShortcut | null;
     }[]
   >(() => {
+    this.translation();
     return this.actions.map((action) => ({
       slug: action.slug(),
       title: action.title({}),

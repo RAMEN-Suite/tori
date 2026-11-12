@@ -183,16 +183,23 @@
       },
       "configPane": {
         "entityTypes": {
-          "label": "Entity Types",
-          "help": "Select which entity types should be available via this application."
+          "label": "Available entity types",
+          "help": "Select one or more types to filter your search results by.",
+          "placeholder": "Select entity types"
         },
         "collectionChain": {
-          "label": "Collection Chain",
-          "help": "Select which should be the filter collection chain."
+          "label": "Collection chain",
+          "help": "The chain defines the order of dependent collection filters. No collection filters are shown when no chain is selected.",
+          "placeholder": "No collection chain selected",
+          "empty": "No collection chains available",
+          "clear": "Remove collection chain"
         },
         "collectionTypes": {
-          "label": "Collection Types",
-          "help": "Select which collections are filterable."
+          "label": "Filterable collection types",
+          "help": "Select the types from this chain that should appear as search filters.",
+          "placeholder": "Select collection types",
+          "disabled": "Select a chain first",
+          "disabledHelp": "Select a collection chain to the left or above to configure its filters."
         },
         "shortcutConfig": {
           "tableHeaders": {
@@ -202,9 +209,32 @@
           },
           "resetBtn": {
             "label": "Reset",
-            "aria": "reset shortcut {{ name }} to default"
+            "aria": "Restore default shortcut: {{ name }}"
+          },
+          "title": "Keyboard shortcuts",
+          "description": "Click a shortcut, then press the desired key combination. Press Esc to cancel. Reset restores the default shortcut.",
+          "edit": "Edit keyboard shortcut: {{ name }}",
+          "input": {
+            "recording": "Press keys …",
+            "empty": "No shortcut",
+            "clear": "Remove shortcut: {{ name }}",
+            "hint": "Press your key combination now. Press Esc to cancel.",
+            "errors": {
+              "empty": "Press a key combination.",
+              "modifier-only": "Add another key to the combination.",
+              "unsupported-key": "This key is not supported. Choose another combination."
+            }
           }
-        }
+        },
+        "title": "Settings",
+        "description": "Adjust the available entity types, search filters and keyboard shortcuts to suit your workflow.",
+        "autosave": "Changes are saved automatically in this browser.",
+        "entitiesTitle": "Entity types",
+        "entitiesDescription": "Choose which entity types are offered as search filters.",
+        "collectionsTitle": "Collection filters",
+        "collectionsDescription": "Choose how to narrow search results by collection.",
+        "selectAll": "Select all",
+        "noOptions": "No options available"
       },
       "connectedNode": {
         "menu": {

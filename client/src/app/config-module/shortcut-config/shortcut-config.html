@@ -1,30 +1,42 @@
-<table *transloco="let t" class="w-full">
-  <thead>
-    <tr>
-      <td>{{ t("app.shared.configPane.shortcutConfig.tableHeaders.action") }}</td>
-      <td>{{ t("app.shared.configPane.shortcutConfig.tableHeaders.shortcut") }}</td>
-      <td>{{ t("app.shared.configPane.shortcutConfig.tableHeaders.reset") }}</td>
-    </tr>
-  </thead>
-  <tbody>
+<section
+  *transloco="let t"
+  aria-labelledby="config-shortcuts-heading"
+  class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+>
+  <header class="p-5 sm:p-7">
+    <h2 id="config-shortcuts-heading" class="text-lg font-semibold text-slate-900">
+      {{ t("app.shared.configPane.shortcutConfig.title") }}
+    </h2>
+    <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-500">{{ t("app.shared.configPane.shortcutConfig.description") }}</p>
+  </header>
+  <ul class="divide-y divide-slate-100 border-t border-slate-100">
     @for (row of rows(); track row.slug) {
-      <tr>
-        <td>{{ t(row.title) }}</td>
-        <td>
-          <app-shortcut-input [keys]="row.effectiveShortcut?.keys ?? null" (keysChange)="setShortcut(row.slug, $event)" />
-        </td>
-        <td>
+      <li class="grid items-center gap-3 px-5 py-5 sm:px-7 md:grid-cols-[minmax(0,1fr)_auto] md:gap-6">
+        <p class="text-sm font-medium leading-6 text-slate-800">{{ row.title }}</p>
+        <div class="flex flex-wrap items-center gap-2">
+          <app-shortcut-input
+            class="block min-w-0"
+            [keys]="row.effectiveShortcut?.keys ?? null"
+            [ariaLabel]="t('app.shared.configPane.shortcutConfig.edit', { name: row.title })"
+            [clearLabel]="t('app.shared.configPane.shortcutConfig.input.clear', { name: row.title })"
+            (keysChange)="setShortcut(row.slug, $event)"
+          />
           <button
             suiButton
-            severity="secondary"
+            type="button"
+            size="sm"
+            class="px-2"
+            severity="neutral"
+            variant="text"
             (click)="resetShortcut(row.slug)"
             [disabled]="row.effectiveShortcut?.keys === row.defaultShortcut?.keys"
-            [attr.aria-label]="t('app.shared.configPane.shortcutConfig.resetBtn.label', { name: row.title })"
+            [attr.aria-label]="t('app.shared.configPane.shortcutConfig.resetBtn.aria', { name: row.title })"
           >
+            <app-icon name="undo" />
             {{ t("app.shared.configPane.shortcutConfig.resetBtn.label") }}
           </button>
-        </td>
-      </tr>
+        </div>
+      </li>
     }
-  </tbody>
-</table>
+  </ul>
+</section>
