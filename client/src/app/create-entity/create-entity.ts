@@ -1,15 +1,17 @@
-import { Icon } from '../utils/icon';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Component, computed, inject, input } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslocoDirective } from '@jsverse/transloco';
 import {
   Button,
-  Join,
-  JoinItem,
-  Popover,
-  PopoverTrigger,
+  Menu,
+  MenuItemTemplate,
+  MenuStartTemplate,
+  MenuTrigger,
 } from '@sushi-kit/angular';
-import { Component, computed, inject, input } from '@angular/core';
+import { map } from 'rxjs';
+import { Icon } from '../utils/icon';
 import { CreateEntityService } from './create-entity.service';
-
-import { TranslocoDirective } from '@jsverse/transloco';
 import { CreateEntityDialogService } from './create-entity-dialog.service';
 
 @Component({
@@ -17,37 +19,33 @@ import { CreateEntityDialogService } from './create-entity-dialog.service';
   imports: [
     Icon,
     Button,
-    Popover,
-    PopoverTrigger,
+    Menu,
+    MenuTrigger,
+    MenuItemTemplate,
+    MenuStartTemplate,
     TranslocoDirective,
-    Join,
-    JoinItem,
   ],
   providers: [CreateEntityService],
   templateUrl: './create-entity.html',
 })
 export class CreateEntity {
   public readonly compact = input(false);
-
   private readonly createEntityService = inject(CreateEntityService);
   private readonly createEntityDialog = inject(CreateEntityDialogService);
 
-  private entityTypes = this.createEntityService.getEntityTypes();
+  protected readonly showTypeMenu = toSignal(
+    inject(BreakpointObserver)
+      .observe('(min-width: 640px)')
+      .pipe(map((state) => state.matches)),
+    { initialValue: false },
+  );
+  protected readonly typeItems = computed(() =>
+    this.createEntityService
+      .getEntityTypes()()
+      .map((type) => ({ label: type, value: type })),
+  );
 
-  protected btnItems = computed(() => {
-    return this.entityTypes().map((item) => {
-      return {
-        label: item,
-        command: () => this.show(item),
-      };
-    });
-  });
-
-  private show(preselectedType?: string) {
-    this.createEntityDialog.open(preselectedType);
-  }
-
-  protected clickCreateEntityBtn() {
-    this.show();
+  protected create(type?: string): void {
+    this.createEntityDialog.open(type);
   }
 }
