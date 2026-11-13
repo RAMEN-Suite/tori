@@ -1,5 +1,9 @@
 import { OptionsPipe, compareSelectionValues } from '../utils/options.pipe';
-import { MultiSelect, Select } from '@sushi-kit/angular';
+import {
+  MultiSelect,
+  MultiSelectSelectedItemsTemplate,
+  Select,
+} from '@sushi-kit/angular';
 import { Component, computed, effect, inject } from '@angular/core';
 import { ConfigService } from './config.service';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -9,6 +13,7 @@ import { ENTITY_LABEL_NAME } from '../../constants';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { ShortcutConfig } from './shortcut-config/shortcut-config';
 import { Icon } from '../utils/icon';
+import { MultiSelectSummary } from '../utils/multi-select-summary/multi-select-summary';
 
 @Component({
   selector: 'app-config-pane',
@@ -16,6 +21,8 @@ import { Icon } from '../utils/icon';
     OptionsPipe,
     ReactiveFormsModule,
     MultiSelect,
+    MultiSelectSelectedItemsTemplate,
+    MultiSelectSummary,
     Select,
     TranslocoDirective,
     ShortcutConfig,

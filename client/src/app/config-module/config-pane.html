@@ -13,6 +13,7 @@
           t("app.shared.configPane.entityTypes.label")
         }}</label>
         <sui-multi-select
+          class="min-w-0"
           [compareWith]="compareSelectionValues"
           formControlName="entityTypes"
           [options]="entityTypes() | options"
@@ -24,7 +25,11 @@
           [emptyMessage]="t('app.shared.configPane.noOptions')"
           [loading]="!loaded()"
           fluid
-        />
+        >
+          <ng-template suiMultiSelectSelectedItems let-selected>
+            <app-multi-select-summary [options]="selected" [placeholder]="t('app.shared.configPane.entityTypes.placeholder')" />
+          </ng-template>
+        </sui-multi-select>
         <p id="config-entity-types-help" class="text-sm leading-6 text-slate-500">{{ t("app.shared.configPane.entityTypes.help") }}</p>
       </div>
     </section>
@@ -66,6 +71,7 @@
             t("app.shared.configPane.collectionTypes.label")
           }}</label>
           <sui-multi-select
+            class="min-w-0"
             [compareWith]="compareSelectionValues"
             formControlName="filterableCollections"
             [options]="selectedCollectionChain() | options"
@@ -81,7 +87,20 @@
             "
             [selectAllLabel]="t('app.shared.configPane.selectAll')"
             fluid
-          />
+          >
+            <ng-template suiMultiSelectSelectedItems let-selected>
+              <app-multi-select-summary
+                [options]="selected"
+                [placeholder]="
+                  t(
+                    configForm.controls.filterableCollections.disabled
+                      ? 'app.shared.configPane.collectionTypes.disabled'
+                      : 'app.shared.configPane.collectionTypes.placeholder'
+                  )
+                "
+              />
+            </ng-template>
+          </sui-multi-select>
           <p id="config-collections-help" class="text-sm leading-6 text-slate-500">
             {{
               t(

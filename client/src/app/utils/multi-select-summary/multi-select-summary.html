@@ -1,0 +1,9 @@
+<span class="sr-only">{{ fullText() || placeholder() }}</span>
+<span aria-hidden="true" class="block truncate" [class.text-slate-500]="!options().length" [attr.title]="fullText() || placeholder()">{{
+  displayValue()
+}}</span>
+<span #measurements aria-hidden="true" class="pointer-events-none invisible absolute top-0 left-0 block w-max whitespace-nowrap">
+  @for (candidate of candidates(); track $index) {
+    <span #candidate class="block w-max">{{ candidate }}</span>
+  }
+</span>

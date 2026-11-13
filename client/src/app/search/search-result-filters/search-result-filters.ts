@@ -1,10 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Button, MultiSelect, Select } from '@sushi-kit/angular';
+import {
+  Button,
+  MultiSelect,
+  MultiSelectSelectedItemsTemplate,
+  Select,
+} from '@sushi-kit/angular';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { OptionsPipe, compareSelectionValues } from '../../utils/options.pipe';
 import { Icon } from '../../utils/icon';
 import { SearchState } from '../search-state';
+import { MultiSelectSummary } from '../../utils/multi-select-summary/multi-select-summary';
 
 @Component({
   selector: 'app-search-result-filters',
@@ -12,6 +18,8 @@ import { SearchState } from '../search-state';
     FormsModule,
     Button,
     MultiSelect,
+    MultiSelectSelectedItemsTemplate,
+    MultiSelectSummary,
     Select,
     OptionsPipe,
     Icon,
