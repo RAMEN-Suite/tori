@@ -16,12 +16,14 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { isActive, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NgTemplateOutlet } from '@angular/common';
 import { ConfigService } from './config-module/config.service';
 
 import { HealthService } from './health.service';
 import { filter } from 'rxjs';
 import { Navbar } from './navbar/navbar';
+import { NavbarOutletService } from './navbar/navbar-outlet.service';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { ShortcutService } from './shortcuts/shortcut.service';
 import { CreateEntityAction } from './actions/create-entity-action';
@@ -37,6 +39,7 @@ import { SushiToastTemplates } from './models/config/SushiToastTemplates';
     Button,
     ConfirmDialog,
     Navbar,
+    NgTemplateOutlet,
     Skeleton,
     TranslocoDirective,
     SushiToast,
@@ -53,12 +56,7 @@ export class App implements OnInit {
 
   private readonly destroyRef = inject(DestroyRef);
   private router = inject(Router);
-  protected readonly isWorkspace = isActive('/', this.router, {
-    paths: 'exact',
-    queryParams: 'ignored',
-    fragment: 'ignored',
-    matrixParams: 'ignored',
-  });
+  protected readonly navbarOutlet = inject(NavbarOutletService);
 
   @ViewChild('appContent') private appContent!: ElementRef<HTMLDivElement>;
 

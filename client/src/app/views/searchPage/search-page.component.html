@@ -1,15 +1,33 @@
 <ng-container *transloco="let t">
-  <app-navbar class="sticky top-0 z-20 block" [workspace]="true" (homeClicked)="resetSearch()">
-    <div navbar-search cdkOverlayOrigin #searchOrigin="cdkOverlayOrigin">
-      <app-search-bar
-        [workspace]="true"
-        [filtersOpen]="filtersOpen()"
-        (searchRequested)="submitSearch()"
-        (filtersRequested)="filtersOpen.set(!filtersOpen())"
-        (entitySelected)="openEntity($event)"
-      />
-    </div>
-  </app-navbar>
+  <ng-template #workspaceNavbar>
+    <app-navbar class="block" [workspace]="true" (homeClicked)="resetSearch()">
+      <div navbar-search cdkOverlayOrigin #searchOrigin="cdkOverlayOrigin">
+        <app-search-bar
+          [workspace]="true"
+          [filtersOpen]="filtersOpen()"
+          (searchRequested)="submitSearch()"
+          (filtersRequested)="filtersOpen.set(!filtersOpen())"
+          (entitySelected)="openEntity($event)"
+        />
+      </div>
+    </app-navbar>
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="searchOrigin"
+      [cdkConnectedOverlayOpen]="filtersOpen()"
+      [cdkConnectedOverlayMatchWidth]="true"
+      [cdkConnectedOverlayHasBackdrop]="true"
+      [cdkConnectedOverlayFlexibleDimensions]="false"
+      [cdkConnectedOverlayViewportMargin]="8"
+      [cdkConnectedOverlayPositions]="[{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' }]"
+      cdkConnectedOverlayBackdropClass="cdk-overlay-dark-backdrop"
+      (backdropClick)="filtersOpen.set(false)"
+      (detach)="filtersOpen.set(false)"
+      (overlayKeydown)="$event.key === 'Escape' && filtersOpen.set(false)"
+    >
+      <app-advanced-search-panel (closed)="filtersOpen.set(false)" (searchRequested)="submitSearch()" (resetRequested)="resetSearch()" />
+    </ng-template>
+  </ng-template>
 
   <div class="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-3 py-4 sm:px-6 lg:flex-row lg:gap-6">
     <app-workspace-sidebar
@@ -98,21 +116,5 @@
     <div class="flex items-center gap-2 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500" role="status">
       <span suiSpinner size="sm"></span>{{ t("app.screens.common.loading") }}
     </div>
-  </ng-template>
-  <ng-template
-    cdkConnectedOverlay
-    [cdkConnectedOverlayOrigin]="searchOrigin"
-    [cdkConnectedOverlayOpen]="filtersOpen()"
-    [cdkConnectedOverlayMatchWidth]="true"
-    [cdkConnectedOverlayHasBackdrop]="true"
-    [cdkConnectedOverlayFlexibleDimensions]="false"
-    [cdkConnectedOverlayViewportMargin]="8"
-    [cdkConnectedOverlayPositions]="[{ originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' }]"
-    cdkConnectedOverlayBackdropClass="cdk-overlay-dark-backdrop"
-    (backdropClick)="filtersOpen.set(false)"
-    (detach)="filtersOpen.set(false)"
-    (overlayKeydown)="$event.key === 'Escape' && filtersOpen.set(false)"
-  >
-    <app-advanced-search-panel (closed)="filtersOpen.set(false)" (searchRequested)="submitSearch()" (resetRequested)="resetSearch()" />
   </ng-template>
 </ng-container>

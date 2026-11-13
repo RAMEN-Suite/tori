@@ -10,6 +10,7 @@ import { Location } from '@angular/common';
     <button
       suiButton
       severity="secondary"
+      [shape]="label() ? null : 'square'"
       [variant]="outlined() ? 'outlined' : text() ? 'text' : null"
       (click)="goBack()"
     >

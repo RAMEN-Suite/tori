@@ -1,4 +1,13 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  afterRenderEffect,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  signal,
+  TemplateRef,
+  viewChild,
+} from '@angular/core';
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,6 +25,7 @@ import { EntityPreview } from '../../search/entity-preview/entity-preview';
 import { WorkspaceView } from '../../search/workspace-view';
 import { CdkConnectedOverlay, CdkOverlayOrigin } from '@angular/cdk/overlay';
 import { Navbar } from '../../navbar/navbar';
+import { NavbarOutletService } from '../../navbar/navbar-outlet.service';
 import { SearchEntityService } from '../../search-entity.service';
 import { Icon } from '../../utils/icon';
 
@@ -48,6 +58,9 @@ export class SearchPage implements OnInit {
   private readonly api = inject(EntityApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly searchService = inject(SearchEntityService);
+  private readonly navbarOutlet = inject(NavbarOutletService);
+  private readonly navbarTemplate =
+    viewChild<TemplateRef<unknown>>('workspaceNavbar');
 
   protected readonly hasSearched = signal(
     this.route.snapshot.queryParamMap.has('label'),
@@ -77,6 +90,12 @@ export class SearchPage implements OnInit {
       : sections.filter((section) => section.id === current);
   });
   public constructor() {
+    afterRenderEffect((onCleanup) => {
+      const template = this.navbarTemplate();
+      if (!template) return;
+      this.navbarOutlet.attach(template);
+      onCleanup(() => this.navbarOutlet.detach(template));
+    });
     this.search.submitted$
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.onSearch());
