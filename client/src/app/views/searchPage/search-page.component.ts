@@ -11,7 +11,7 @@ import {
 import { rxResource, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Button, Spinner } from '@sushi-kit/angular';
+import { Button, Drawer, DrawerContent, Spinner } from '@sushi-kit/angular';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { EntityNames } from '../../../interfaces';
 import { EntityApiService } from '../../api/entity-api.service';
@@ -43,6 +43,8 @@ import { Icon } from '../../utils/icon';
     Navbar,
     Icon,
     Button,
+    Drawer,
+    DrawerContent,
     Spinner,
     NgTemplateOutlet,
     TranslocoDirective,

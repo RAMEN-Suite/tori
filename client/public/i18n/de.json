@@ -114,7 +114,8 @@
         "preview": "Vorschau",
         "closePreview": "Vorschau schließen",
         "previewError": "Die Vorschau konnte nicht geladen werden.",
-        "openDetails": "Detailseite öffnen"
+        "openDetails": "Detailseite öffnen",
+        "closeSidebar": "Navigation schließen"
       },
       "search": {
         "title": "Entitäten suchen",

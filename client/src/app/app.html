@@ -16,7 +16,11 @@
       <app-navbar class="block" />
     }
   </header>
-  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-stable" #appContent (scroll)="onContentScroll($event)">
+  <div
+    class="flex min-h-0 flex-1 flex-col overflow-y-auto scrollbar-gutter-both lg:scrollbar-gutter-stable"
+    #appContent
+    (scroll)="onContentScroll($event)"
+  >
     <main class="flex-1 shrink-0">
       @if (loaded()) {
         <router-outlet />

@@ -1,35 +1,48 @@
-<nav *transloco="let t" [class]="collapsed() ? 'lg:w-12' : 'lg:w-52'" [attr.aria-label]="t('app.screens.workspace.shortcuts')">
-  <div class="mb-3 hidden items-center justify-between gap-2 px-2 lg:flex" [class.justify-center]="collapsed()">
+<sui-sidebar
+  *transloco="let t"
+  class="h-full lg:rounded-2xl lg:border lg:border-slate-200 lg:shadow-sm"
+  [groups]="groups()"
+  [value]="active()"
+  [collapsed]="collapsed()"
+  [ariaLabel]="t('app.screens.workspace.shortcuts')"
+  (valueChange)="selectView($event)"
+>
+  <div suiSidebarHeader class="flex min-h-10 items-center justify-between gap-2" [class.justify-center]="collapsed()">
     @if (!collapsed()) {
-      <span class="text-xs font-semibold tracking-wide text-slate-500 uppercase">{{ t("app.screens.workspace.shortcuts") }}</span>
+      <span class="pl-1 text-xs font-semibold tracking-wide text-slate-500 uppercase">{{ t("app.screens.workspace.shortcuts") }}</span>
     }
     <button
       suiButton
+      type="button"
       variant="text"
-      severity="secondary"
-      shape="circle"
+      severity="neutral"
+      shape="square"
       size="sm"
+      class="hidden lg:inline-flex"
       (click)="collapsed.set(!collapsed())"
       [attr.aria-expanded]="!collapsed()"
       [attr.aria-label]="t('app.screens.workspace.toggleSidebar')"
     >
       <app-icon name="sidebar" />
     </button>
+    <button
+      suiButton
+      type="button"
+      variant="text"
+      severity="neutral"
+      shape="square"
+      size="sm"
+      class="lg:hidden"
+      (click)="closeRequested.emit()"
+      [attr.aria-label]="t('app.screens.workspace.closeSidebar')"
+    >
+      <app-icon name="times" />
+    </button>
   </div>
-  <div class="flex flex-wrap gap-1.5 lg:flex-col">
-    @for (item of items(); track item.id) {
-      <button
-        type="button"
-        class="flex min-h-10 items-center gap-2 rounded-full px-3 text-start text-sm font-medium text-slate-700 hover:bg-slate-200/70 focus-visible:outline-2 focus-visible:outline-blue-600"
-        [class.bg-blue-100]="active() === item.id"
-        [class.text-blue-950]="active() === item.id"
-        [class.lg:justify-center]="collapsed()"
-        [attr.aria-current]="active() === item.id ? 'page' : null"
-        [attr.title]="collapsed() ? t('app.screens.workspace.' + item.id) : null"
-        (click)="viewSelected.emit(item.id)"
-      >
-        <app-icon [name]="item.icon" /><span [class]="collapsed() ? 'lg:sr-only' : ''">{{ t("app.screens.workspace." + item.id) }}</span>
-      </button>
-    }
-  </div>
-</nav>
+  <ng-template [suiSidebarItem]="groups()" let-item let-collapsed="collapsed">
+    <span class="flex min-w-0 flex-1 items-center gap-2.5" [class.justify-center]="collapsed">
+      <app-icon [name]="item.icon" />
+      <span class="min-w-0 flex-1 truncate" [class.sr-only]="collapsed">{{ item.label }}</span>
+    </span>
+  </ng-template>
+</sui-sidebar>

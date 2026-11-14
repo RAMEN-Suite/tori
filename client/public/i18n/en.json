@@ -114,7 +114,8 @@
         "preview": "Preview",
         "closePreview": "Close preview",
         "previewError": "The preview could not be loaded.",
-        "openDetails": "Open details"
+        "openDetails": "Open details",
+        "closeSidebar": "Close navigation"
       },
       "search": {
         "title": "Search entities",

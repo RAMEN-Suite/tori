@@ -29,87 +29,97 @@
     </ng-template>
   </ng-template>
 
-  <div class="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-3 py-4 sm:px-6 lg:flex-row lg:gap-6">
-    <app-workspace-sidebar
-      [active]="view()"
-      [hasResults]="hasSearched()"
-      [(collapsed)]="sidebarCollapsed"
-      (viewSelected)="showView($event)"
-    />
+  <div class="mx-auto w-full max-w-screen-2xl px-3 py-4 sm:px-6">
+    <sui-drawer
+      #navigation="suiDrawer"
+      persistentAt="lg"
+      class="gap-0 lg:gap-6 lg:[&>.drawer-side]:h-fit [--sui-drawer-width:17rem]!"
+      [class]="sidebarCollapsed() ? 'lg:[--sui-drawer-width:4.5rem]!' : ''"
+      [ariaLabel]="t('app.screens.workspace.shortcuts')"
+    >
+      <div suiDrawerContent class="min-w-0">
+        <div class="grid min-w-0 flex-1 items-start gap-4" [class]="selected() ? 'xl:grid-cols-[minmax(0,1fr)_24rem]' : ''">
+          <section class="min-w-0 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6" [class]="selected() ? 'hidden xl:block' : ''">
+            <header class="mb-6">
+              <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">{{ t("app.screens.workspace." + view()) }}</h1>
+              @if (view() === "overview") {
+                <p class="mt-1 text-sm leading-relaxed text-slate-500">{{ t("app.screens.workspace.description") }}</p>
+              }
+            </header>
 
-    <div class="grid min-w-0 flex-1 items-start gap-4" [class]="selected() ? 'xl:grid-cols-[minmax(0,1fr)_24rem]' : ''">
-      <section class="min-w-0 rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6" [class]="selected() ? 'hidden xl:block' : ''">
-        <header class="mb-6">
-          <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">{{ t("app.screens.workspace." + view()) }}</h1>
-          @if (view() === "overview") {
-            <p class="mt-1 text-sm leading-relaxed text-slate-500">{{ t("app.screens.workspace.description") }}</p>
-          }
-        </header>
-
-        @if (view() === "results") {
-          <app-search-result-filters />
-          @if (entities().length > 0) {
-            <app-workspace-entities [entities]="entities()" [selectedId]="selected()?.id" (entitySelected)="selectEntity($event)" />
-            @if (meta().hasNextPage) {
-              <div class="mt-4 flex justify-center">
-                <button suiButton variant="outlined" severity="secondary" [loading]="loading()" (click)="nextPage()">
-                  {{ t("app.screens.workspace.more") }}
-                </button>
-              </div>
-            }
-          } @else if (loading()) {
-            <ng-container *ngTemplateOutlet="loadingIndicator" />
-          } @else {
-            <p class="rounded-2xl bg-slate-50 p-5 text-sm text-slate-500">{{ t("app.shared.entityList.empty") }}</p>
-          }
-        } @else {
-          <div class="grid gap-8">
-            @for (section of sections(); track section.id) {
-              <section>
-                @if (view() === "overview") {
-                  <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-                    <h2 class="flex items-center gap-2 text-base font-semibold">
-                      <app-icon [name]="section.icon" class="text-slate-500" />{{ t("app.screens.workspace." + section.id) }}
-                    </h2>
-                    @if (section.feed.hasValue() && section.feed.value().data.length > section.limit) {
-                      <button suiButton size="sm" variant="text" severity="secondary" (click)="showView(section.id)">
-                        {{ t("app.screens.workspace.showMore") }} <app-icon name="arrow-right" />
-                      </button>
-                    }
-                  </div>
-                }
-                @if (section.feed.isLoading()) {
-                  <ng-container *ngTemplateOutlet="loadingIndicator" />
-                } @else if (section.feed.error()) {
-                  <div class="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-slate-50 p-4 text-sm">
-                    <span role="status">{{ t("app.screens.workspace.feedError") }}</span>
-                    <button suiButton size="sm" variant="outlined" severity="secondary" (click)="section.feed.reload()">
-                      {{ t("app.screens.workspace.retry") }}
+            @if (view() === "results") {
+              <app-search-result-filters />
+              @if (entities().length > 0) {
+                <app-workspace-entities [entities]="entities()" [selectedId]="selected()?.id" (entitySelected)="selectEntity($event)" />
+                @if (meta().hasNextPage) {
+                  <div class="mt-4 flex justify-center">
+                    <button suiButton variant="outlined" severity="secondary" [loading]="loading()" (click)="nextPage()">
+                      {{ t("app.screens.workspace.more") }}
                     </button>
                   </div>
-                } @else if (section.feed.hasValue() && section.feed.value().data.length > 0) {
-                  @let entries = view() === "overview" ? section.feed.value().data.slice(0, section.limit) : section.feed.value().data;
-                  <app-workspace-entities
-                    [entities]="entries"
-                    [cards]="section.id === 'recent' && view() === 'overview'"
-                    [selectedId]="selected()?.id"
-                    (entitySelected)="selectEntity($event)"
-                  />
-                } @else {
-                  <p class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm leading-relaxed text-slate-500">
-                    {{ t("app.screens.workspace." + section.id + "Empty") }}
-                  </p>
                 }
-              </section>
+              } @else if (loading()) {
+                <ng-container *ngTemplateOutlet="loadingIndicator" />
+              } @else {
+                <p class="rounded-2xl bg-slate-50 p-5 text-sm text-slate-500">{{ t("app.shared.entityList.empty") }}</p>
+              }
+            } @else {
+              <div class="grid gap-8">
+                @for (section of sections(); track section.id) {
+                  <section>
+                    @if (view() === "overview") {
+                      <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <h2 class="flex items-center gap-2 text-base font-semibold">
+                          <app-icon [name]="section.icon" class="text-slate-500" />{{ t("app.screens.workspace." + section.id) }}
+                        </h2>
+                        @if (section.feed.hasValue() && section.feed.value().data.length > section.limit) {
+                          <button suiButton size="sm" variant="text" severity="secondary" (click)="showView(section.id)">
+                            {{ t("app.screens.workspace.showMore") }} <app-icon name="arrow-right" />
+                          </button>
+                        }
+                      </div>
+                    }
+                    @if (section.feed.isLoading()) {
+                      <ng-container *ngTemplateOutlet="loadingIndicator" />
+                    } @else if (section.feed.error()) {
+                      <div class="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-slate-50 p-4 text-sm">
+                        <span role="status">{{ t("app.screens.workspace.feedError") }}</span>
+                        <button suiButton size="sm" variant="outlined" severity="secondary" (click)="section.feed.reload()">
+                          {{ t("app.screens.workspace.retry") }}
+                        </button>
+                      </div>
+                    } @else if (section.feed.hasValue() && section.feed.value().data.length > 0) {
+                      @let entries = view() === "overview" ? section.feed.value().data.slice(0, section.limit) : section.feed.value().data;
+                      <app-workspace-entities
+                        [entities]="entries"
+                        [cards]="section.id === 'recent' && view() === 'overview'"
+                        [selectedId]="selected()?.id"
+                        (entitySelected)="selectEntity($event)"
+                      />
+                    } @else {
+                      <p class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-5 text-sm leading-relaxed text-slate-500">
+                        {{ t("app.screens.workspace." + section.id + "Empty") }}
+                      </p>
+                    }
+                  </section>
+                }
+              </div>
             }
-          </div>
-        }
-      </section>
+          </section>
 
-      @if (selected(); as selection) {
-        <app-entity-preview [selection]="selection" (closed)="selected.set(undefined)" />
-      }
-    </div>
+          @if (selected(); as selection) {
+            <app-entity-preview [selection]="selection" (closed)="selected.set(undefined)" />
+          }
+        </div>
+      </div>
+      <app-workspace-sidebar
+        [active]="view()"
+        [hasResults]="hasSearched()"
+        [(collapsed)]="sidebarCollapsed"
+        (viewSelected)="showView($event); navigation.close()"
+        (closeRequested)="navigation.close()"
+      />
+    </sui-drawer>
   </div>
 
   <ng-template #loadingIndicator>
